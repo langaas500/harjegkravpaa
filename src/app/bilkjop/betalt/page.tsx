@@ -554,9 +554,9 @@ function BetaltContent() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0f] text-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-pink-400" />
           <p>Laster rapport...</p>
         </div>
       </div>
@@ -565,7 +565,7 @@ function BetaltContent() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 space-y-6">
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/50 p-8 space-y-6 text-center">
+      <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 space-y-6 text-center">
         <div className="mx-auto w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
           <CheckCircle2 className="h-8 w-8 text-green-400" />
         </div>
@@ -575,7 +575,7 @@ function BetaltContent() {
           <p className="text-slate-400">Takk for kjøpet. Din rapport er klar.</p>
         </div>
 
-        <div className="bg-slate-800/50 rounded-xl p-4 text-left">
+        <div className="bg-white/5 rounded-xl p-4 text-left">
           <p className="text-sm text-slate-400 mb-1">Ordre</p>
           <p className="font-semibold">Bilkjøp-rapport PDF</p>
           <p className="text-slate-400">49 kr</p>
@@ -584,7 +584,7 @@ function BetaltContent() {
         <button
           onClick={generatePDF}
           disabled={isGenerating}
-          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-green-600 py-4 text-white font-semibold hover:bg-green-500 transition disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 py-4 text-white font-semibold hover:from-pink-500 hover:to-purple-500 transition disabled:opacity-60"
         >
           {isGenerating ? (
             <>
@@ -600,13 +600,13 @@ function BetaltContent() {
         </button>
 
         {downloaded && (
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
-            <p className="text-blue-400 text-sm">✓ Rapporten er lastet ned!</p>
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+            <p className="text-green-400 text-sm">✓ Rapporten er lastet ned!</p>
           </div>
         )}
 
         {/* UPSELL: Kravbrev */}
-        <div className="border-t border-slate-700 pt-6 mt-6">
+        <div className="border-t border-white/10 pt-6 mt-6">
           <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-2xl p-5 text-left">
             <div className="flex items-start gap-4">
               <div className="p-2 rounded-xl bg-pink-500/20">
@@ -625,7 +625,7 @@ function BetaltContent() {
                 </ul>
                 <button
                   onClick={() => router.push("/bilkjop/kravbrev")}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-pink-600 py-3 text-white font-semibold hover:bg-pink-500 transition"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 py-3 text-white font-semibold hover:from-pink-500 hover:to-purple-500 transition"
                 >
                   Bestill kravbrev – 149 kr
                   <ArrowRight className="h-4 w-4" />
@@ -650,14 +650,23 @@ function BetaltContent() {
 
 export default function BetaltPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      }>
-        <BetaltContent />
-      </Suspense>
+    <main className="min-h-screen bg-[#0a0a0f] text-slate-100 overflow-hidden">
+      {/* Gradient orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-72 h-72 bg-pink-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-40 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative z-10">
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-pink-400" />
+          </div>
+        }>
+          <BetaltContent />
+        </Suspense>
+      </div>
     </main>
   );
 }
