@@ -1,36 +1,23 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { AppHeader } from "@/app/components/AppHeader";
 import "./globals.css";
+import AppHeader from "./components/AppHeader";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Har jeg krav på?",
-  description:
-    "Enkle sjekker basert på norsk regelverk. Gratis vurdering, betal kun for PDF-rapport.",
-  keywords: ["bilkjøp", "reklamasjon", "forbrukerkjøpsloven", "kjøpsloven", "Norge"],
-  authors: [{ name: "Har jeg krav på" }],
-  openGraph: {
-    title: "Har jeg krav på?",
-    description: "Enkle sjekker basert på norsk regelverk.",
-    type: "website",
-    locale: "nb_NO",
-  },
+  description: "Enkle svar på hva du har krav på – basert på norsk regelverk.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="nb" className={inter.variable}>
-      <body className={`${inter.className} min-h-screen bg-slate-950 text-slate-100 antialiased`}>
+    <html lang="no">
+      <body className={inter.className}>
         <AppHeader />
         {children}
       </body>
