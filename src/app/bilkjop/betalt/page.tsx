@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
-import { CheckCircle2, FileDown, Loader2, ArrowRight } from "lucide-react";
+import { CheckCircle2, FileDown, Loader2, FileText, ArrowRight } from "lucide-react";
 
 function BetaltContent() {
   const searchParams = useSearchParams();
@@ -605,14 +605,42 @@ function BetaltContent() {
           </div>
         )}
 
-        <div className="pt-4 border-t border-slate-800">
-          <p className="text-sm text-slate-500 mb-3">Trenger du mer hjelp?</p>
+        {/* UPSELL: Kravbrev */}
+        <div className="border-t border-slate-700 pt-6 mt-6">
+          <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-2xl p-5 text-left">
+            <div className="flex items-start gap-4">
+              <div className="p-2 rounded-xl bg-pink-500/20">
+                <FileText className="h-6 w-6 text-pink-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg mb-1">Trenger du et kravbrev?</h3>
+                <p className="text-sm text-slate-400 mb-3">
+                  Få et ferdig formulert juridisk brev du kan sende direkte til selger. 
+                  Spar tid og få et profesjonelt resultat.
+                </p>
+                <ul className="text-sm text-slate-300 space-y-1 mb-4">
+                  <li>✓ Tilpasset din sak</li>
+                  <li>✓ Juridisk korrekt språk</li>
+                  <li>✓ Konkrete krav og frister</li>
+                </ul>
+                <button
+                  onClick={() => router.push("/bilkjop/kravbrev")}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-pink-600 py-3 text-white font-semibold hover:bg-pink-500 transition"
+                >
+                  Bestill kravbrev – 149 kr
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-4">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center justify-center gap-2 text-pink-400 hover:text-pink-300 mx-auto"
+            className="text-slate-400 hover:text-slate-300 text-sm"
           >
             Tilbake til forsiden
-            <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       </div>
