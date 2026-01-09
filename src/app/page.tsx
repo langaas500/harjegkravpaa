@@ -2,12 +2,11 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Car, Plane, Package, Wrench } from "lucide-react";
+import { ArrowRight, Car, Plane, Package, Wrench, ChevronDown } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
 
-  // Bruk kun sosialt bevis hvis dette er ekte tall.
   const showSocialProof = true;
 
   const soonCats = [
@@ -19,7 +18,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Hero - én ting i fokus */}
-      <section className="min-h-[calc(100vh-60px)] flex flex-col items-center justify-center px-4 text-center">
+      <section className="relative min-h-[calc(100vh-60px)] flex flex-col items-center justify-center px-4 text-center">
         {showSocialProof ? (
           <p className="text-sm text-slate-500 mb-8">
             52 har sjekket saken sin denne uken
@@ -111,8 +110,13 @@ export default function HomePage() {
           </div>
 
           <p className="mt-3 text-[11px] text-slate-600">
-            Bilkjøp er live nå. Klikk “Snart” for å få beskjed når vi lanserer.
+            Bilkjøp er live nå. Klikk "Snart" for å få beskjed når vi lanserer.
           </p>
+        </div>
+
+        {/* Scroll-indikator */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce">
+          <ChevronDown className="h-6 w-6 text-slate-500" />
         </div>
       </section>
 
@@ -124,10 +128,10 @@ export default function HomePage() {
               Høres dette kjent ut?
             </p>
             <div className="space-y-3 text-lg text-slate-300">
-              <p>“Feil oppstår kort tid etter kjøp.”</p>
-              <p>“Selger svarer tregt eller ikke i det hele tatt.”</p>
-              <p>“Forhandler skylder på deg.”</p>
-              <p>“Du vet ikke hva du kan kreve.”</p>
+              <p>"Feil oppstår kort tid etter kjøp."</p>
+              <p>"Selger svarer tregt eller ikke i det hele tatt."</p>
+              <p>"Forhandler skylder på deg."</p>
+              <p>"Du vet ikke hva du kan kreve."</p>
             </div>
           </div>
 
