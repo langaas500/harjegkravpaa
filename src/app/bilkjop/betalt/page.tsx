@@ -110,7 +110,7 @@ function BetaltContent() {
       // PAGE 1
       doc.setFillColor(30, 41, 59);
       doc.rect(0, 0, pageWidth, 30, "F");
-      doc.setFillColor(236, 72, 153);
+      doc.setFillColor(16, 185, 129);
       doc.roundedRect(margin, 8, 14, 14, 2, 2, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(12);
@@ -157,7 +157,7 @@ function BetaltContent() {
       doc.setFont(useFont, "bold");
       doc.text("Parter", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.setLineWidth(0.5);
       doc.line(margin, y, margin + 18, y);
       y += 5;
@@ -187,7 +187,7 @@ function BetaltContent() {
       doc.setFont(useFont, "bold");
       doc.text("Kjøretøy", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.line(margin, y, margin + 22, y);
       y += 5;
 
@@ -251,7 +251,7 @@ function BetaltContent() {
       doc.setFont(useFont, "bold");
       doc.text("Problemet", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.line(margin, y, margin + 26, y);
       y += 5;
 
@@ -298,7 +298,7 @@ function BetaltContent() {
       doc.setFont(useFont, "bold");
       doc.text("Kontakt med selger", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.line(margin, y, margin + 42, y);
       y += 5;
 
@@ -356,7 +356,7 @@ function BetaltContent() {
       doc.setTextColor(30, 41, 59);
       doc.text("Vurderingsgrunnlag", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.line(margin, y, margin + 42, y);
       y += 5;
 
@@ -368,7 +368,7 @@ function BetaltContent() {
 
       (data.outcome?.keyPoints || []).forEach((point: string) => {
         checkPageBreak(10);
-        doc.setFillColor(59, 130, 246);
+        doc.setFillColor(16, 185, 129);
         doc.circle(margin + 2, y - 1, 1.2, "F");
         doc.setTextColor(30, 41, 59);
         doc.setFontSize(8);
@@ -384,7 +384,7 @@ function BetaltContent() {
       doc.setTextColor(30, 41, 59);
       doc.text("Anbefalte neste steg", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.line(margin, y, margin + 46, y);
       y += 5;
 
@@ -396,7 +396,7 @@ function BetaltContent() {
 
       (data.outcome?.nextSteps || []).forEach((step: string, index: number) => {
         checkPageBreak(10);
-        doc.setFillColor(59, 130, 246);
+        doc.setFillColor(16, 185, 129);
         doc.circle(margin + 3, y, 3, "F");
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(7);
@@ -417,7 +417,7 @@ function BetaltContent() {
       doc.setTextColor(30, 41, 59);
       doc.text("Juridisk grunnlag", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.line(margin, y, margin + 38, y);
       y += 6;
 
@@ -470,7 +470,7 @@ function BetaltContent() {
         doc.setTextColor(30, 41, 59);
         doc.text("Din beskrivelse", margin, y);
         y += 2;
-        doc.setDrawColor(236, 72, 153);
+        doc.setDrawColor(16, 185, 129);
         doc.line(margin, y, margin + 36, y);
         y += 5;
 
@@ -489,7 +489,7 @@ function BetaltContent() {
       doc.setTextColor(30, 41, 59);
       doc.text("Dokumentasjon du trenger", margin, y);
       y += 2;
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.line(margin, y, margin + 58, y);
       y += 5;
 
@@ -511,18 +511,18 @@ function BetaltContent() {
       y += 8;
 
       checkPageBreak(28);
-      doc.setDrawColor(236, 72, 153);
+      doc.setDrawColor(16, 185, 129);
       doc.setLineWidth(0.5);
       doc.roundedRect(margin, y, contentWidth, 26, 2, 2, "S");
       doc.setFontSize(10);
       doc.setFont(useFont, "bold");
-      doc.setTextColor(236, 72, 153);
+      doc.setTextColor(16, 185, 129);
       doc.text("Trenger du et ferdig kravbrev?", margin + 3, y + 6);
       doc.setFontSize(8);
       doc.setFont(useFont, "normal");
       doc.setTextColor(71, 85, 105);
       doc.text(doc.splitTextToSize("Vi tilbyr kravbrev tilpasset din sak med juridisk korrekt språk, krav og frister.", safeWidth - 4), margin + 3, y + 12);
-      doc.setTextColor(236, 72, 153);
+      doc.setTextColor(16, 185, 129);
       doc.setFont(useFont, "bold");
       doc.text("Bestill på harjegkravpå.no", margin + 3, y + 22);
       y += 32;
@@ -554,9 +554,9 @@ function BetaltContent() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] text-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-pink-400" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-white" />
           <p>Laster rapport...</p>
         </div>
       </div>
@@ -565,18 +565,18 @@ function BetaltContent() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 space-y-6">
-      <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 space-y-6 text-center">
-        <div className="mx-auto w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-          <CheckCircle2 className="h-8 w-8 text-green-400" />
+      <div className="space-y-6 text-center">
+        <div className="mx-auto w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
+          <CheckCircle2 className="h-8 w-8 text-emerald-400" />
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold mb-2">Betaling fullført!</h1>
+          <h1 className="text-3xl font-bold mb-2">Betaling fullført!</h1>
           <p className="text-slate-400">Takk for kjøpet. Din rapport er klar.</p>
         </div>
 
-        <div className="bg-white/5 rounded-xl p-4 text-left">
-          <p className="text-sm text-slate-400 mb-1">Ordre</p>
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left">
+          <p className="text-sm text-slate-500 mb-1">Ordre</p>
           <p className="font-semibold">Bilkjøp-rapport PDF</p>
           <p className="text-slate-400">49 kr</p>
         </div>
@@ -584,7 +584,7 @@ function BetaltContent() {
         <button
           onClick={generatePDF}
           disabled={isGenerating}
-          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 py-4 text-white font-semibold hover:from-pink-500 hover:to-purple-500 transition disabled:opacity-60"
+          className="group w-full flex items-center justify-center gap-2 rounded-full bg-white text-black py-4 font-bold text-lg hover:bg-slate-100 transition disabled:opacity-60"
         >
           {isGenerating ? (
             <>
@@ -600,17 +600,17 @@ function BetaltContent() {
         </button>
 
         {downloaded && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
-            <p className="text-green-400 text-sm">✓ Rapporten er lastet ned!</p>
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
+            <p className="text-emerald-400 text-sm">✓ Rapporten er lastet ned!</p>
           </div>
         )}
 
         {/* UPSELL: Kravbrev */}
         <div className="border-t border-white/10 pt-6 mt-6">
-          <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-2xl p-5 text-left">
+          <div className="border border-white/10 bg-white/[0.03] rounded-2xl p-5 text-left">
             <div className="flex items-start gap-4">
-              <div className="p-2 rounded-xl bg-pink-500/20">
-                <FileText className="h-6 w-6 text-pink-400" />
+              <div className="p-2 rounded-xl border border-white/10 bg-white/[0.03]">
+                <FileText className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-lg mb-1">Trenger du et kravbrev?</h3>
@@ -625,10 +625,10 @@ function BetaltContent() {
                 </ul>
                 <button
                   onClick={() => router.push("/bilkjop/kravbrev")}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 py-3 text-white font-semibold hover:from-pink-500 hover:to-purple-500 transition"
+                  className="group w-full flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
                 >
                   Bestill kravbrev – 149 kr
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -638,7 +638,7 @@ function BetaltContent() {
         <div className="pt-4">
           <button
             onClick={() => router.push("/")}
-            className="text-slate-400 hover:text-slate-300 text-sm"
+            className="text-slate-500 hover:text-slate-300 text-sm"
           >
             Tilbake til forsiden
           </button>
@@ -650,23 +650,14 @@ function BetaltContent() {
 
 export default function BetaltPage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-slate-100 overflow-hidden">
-      {/* Gradient orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-72 h-72 bg-pink-500/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-40 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10">
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-pink-400" />
-          </div>
-        }>
-          <BetaltContent />
-        </Suspense>
-      </div>
+    <main className="min-h-screen bg-[#0a0a0a] text-white">
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+        </div>
+      }>
+        <BetaltContent />
+      </Suspense>
     </main>
   );
 }

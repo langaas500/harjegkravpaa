@@ -2,194 +2,192 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  Scale,
-  FileText,
-  Shield,
-  CheckCircle,
-  Car,
-  Plane,
-  Package,
-  Wrench,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Car, Plane, Package, Wrench } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
 
+  // Bruk kun sosialt bevis hvis dette er ekte tall.
+  const showSocialProof = true;
+
+  const soonCats = [
+    { key: "flyreiser", icon: Plane, title: "Flyreiser", desc: "Forsinket?" },
+    { key: "reklamasjon", icon: Package, title: "Reklamasjon", desc: "Feil vare?" },
+    { key: "handverker", icon: Wrench, title: "Håndverker", desc: "Dårlig arbeid?" },
+  ] as const;
+
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
-      {/* Gradient orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-72 h-72 bg-pink-500/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-40 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-      </div>
+    <main className="min-h-screen bg-[#0a0a0a] text-white">
+      {/* Hero - én ting i fokus */}
+      <section className="min-h-[calc(100vh-60px)] flex flex-col items-center justify-center px-4 text-center">
+        {showSocialProof ? (
+          <p className="text-sm text-slate-500 mb-8">
+            52 har sjekket saken sin denne uken
+          </p>
+        ) : (
+          <p className="text-sm text-slate-500 mb-8">
+            Basert på norsk lov • Gratis vurdering • Ingen persondata lagres
+          </p>
+        )}
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <section className="px-4 pt-8 pb-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-3">
-              <Sparkles className="h-3 w-3 text-pink-400" />
-              <span className="text-xs text-slate-300">AI-drevet juridisk vurdering</span>
+        <h1 className="text-5xl md:text-7xl font-bold max-w-4xl leading-[1.1] mb-4">
+          Finn ut om du har krav
+        </h1>
+
+        <p className="text-xl md:text-2xl text-slate-400 mb-8 max-w-xl">
+          før du gir opp eller betaler advokat
+        </p>
+
+        <button
+          onClick={() => router.push("/bilkjop")}
+          className="group px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:bg-slate-100 transition-all mb-4"
+        >
+          <span className="flex items-center gap-3">
+            Sjekk saken din
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </span>
+        </button>
+
+        <p className="text-sm text-slate-600">
+          Tar 2 minutter • Gratis vurdering • Rapport 49 kr (valgfritt)
+        </p>
+
+        <p className="mt-3 text-xs text-slate-700 max-w-xl">
+          Veiledende vurdering, ikke juridisk rådgivning. Resultat avhenger av fakta og dokumentasjon.
+        </p>
+
+        {/* Minimal kategorirad */}
+        <div className="mt-10 w-full max-w-3xl">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="h-px w-10 bg-white/10" />
+            <p className="text-xs text-slate-500 uppercase tracking-wide">Kategorier</p>
+            <span className="h-px w-10 bg-white/10" />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {/* Bilkjøp LIVE */}
+            <button
+              onClick={() => router.push("/bilkjop")}
+              className="group text-left rounded-2xl border border-emerald-500/25 bg-emerald-500/10 hover:bg-emerald-500/12 transition-all p-4"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2">
+                  <Car className="h-4 w-4 text-emerald-300" />
+                </div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-200">
+                  Live
+                </span>
+              </div>
+              <p className="font-semibold text-white text-sm">Bilkjøp</p>
+              <p className="text-xs text-slate-300 mt-1">Feil på bilen?</p>
+              <p className="text-xs text-emerald-200 mt-2 flex items-center gap-1">
+                Start{" "}
+                <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              </p>
+            </button>
+
+            {/* Snart-kategorier (klikkbare til waitlist-side) */}
+            {soonCats.map((c) => (
+              <button
+                key={c.key}
+                onClick={() => router.push(`/snart?cat=${encodeURIComponent(c.key)}`)}
+                className="group text-left rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-all p-4"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2">
+                    <c.icon className="h-4 w-4 text-slate-200" />
+                  </div>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-200">
+                    Snart
+                  </span>
+                </div>
+                <p className="font-semibold text-white text-sm">{c.title}</p>
+                <p className="text-xs text-slate-400 mt-1">{c.desc}</p>
+                <p className="text-xs text-slate-500 mt-2 group-hover:text-slate-300 transition-colors">
+                  Varsle meg
+                </p>
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-3 text-[11px] text-slate-600">
+            Bilkjøp er live nå. Klikk “Snart” for å få beskjed når vi lanserer.
+          </p>
+        </div>
+      </section>
+
+      {/* Under fold - kort og skummbar */}
+      <section className="border-t border-white/5 py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="mb-14">
+            <p className="text-slate-500 text-sm uppercase tracking-wide mb-6">
+              Høres dette kjent ut?
+            </p>
+            <div className="space-y-3 text-lg text-slate-300">
+              <p>“Feil oppstår kort tid etter kjøp.”</p>
+              <p>“Selger svarer tregt eller ikke i det hele tatt.”</p>
+              <p>“Forhandler skylder på deg.”</p>
+              <p>“Du vet ikke hva du kan kreve.”</p>
             </div>
+          </div>
 
-            <h1 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
-              Har du krav?
-              <span className="block bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
-                Få svar på sekunder.
-              </span>
-            </h1>
+          <div className="mb-14">
+            <p className="text-slate-500 text-sm uppercase tracking-wide mb-6">
+              Det du får
+            </p>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div>
+                <p className="text-3xl font-bold text-white mb-2">Svar</p>
+                <p className="text-slate-400">
+                  Realistisk vurdering: ja / nei / usikkert, med kort begrunnelse.
+                </p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-white mb-2">Dokumentasjon</p>
+                <p className="text-slate-400">
+                  PDF-rapport med struktur og lovhenvisninger du kan sende til selger.
+                </p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-white mb-2">Tyngde</p>
+                <p className="text-slate-400">
+                  En vag melding kan ignoreres. Et ryddig dokument gjør dialogen mer seriøs.
+                </p>
+              </div>
+            </div>
+          </div>
 
-            <p className="text-sm text-slate-400 mb-4 max-w-lg mx-auto">
-              Vår AI analyserer saken din basert på norsk lovverk og gir deg en profesjonell vurdering.
+          <div className="mb-10">
+            <p className="text-slate-500 text-sm uppercase tracking-wide mb-6">Pris</p>
+            <div className="flex items-baseline gap-3">
+              <span className="text-5xl font-bold text-white">49 kr</span>
+              <span className="text-slate-500 text-lg">for rapport</span>
+            </div>
+            <p className="text-slate-600 mt-3">
+              Vurderingen er gratis. Du betaler kun hvis du vil ha rapporten.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-2 justify-center mb-3">
+            <div className="text-center mt-10">
               <button
                 onClick={() => router.push("/bilkjop")}
-                className="group px-5 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl font-semibold text-sm hover:from-pink-500 hover:to-purple-500 transition-all shadow-lg shadow-pink-500/25"
+                className="group px-8 py-4 bg-white text-black font-bold text-lg rounded-full hover:bg-slate-100 transition-all"
               >
-                <span className="flex items-center justify-center gap-2">
+                <span className="flex items-center gap-3">
                   Start gratis vurdering
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
-
-              <button
-                onClick={() => document.getElementById("categories")?.scrollIntoView({ behavior: "smooth" })}
-                className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl font-semibold text-sm hover:bg-white/10 transition-all"
-              >
-                Se kategorier
-              </button>
-            </div>
-
-            {/* Trust badges */}
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500">
-              <div className="flex items-center gap-1">
-                <CheckCircle className="h-3 w-3 text-green-500" />
-                <span>Gratis vurdering</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <CheckCircle className="h-3 w-3 text-green-500" />
-                <span>Basert på norsk lov</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <CheckCircle className="h-3 w-3 text-green-500" />
-                <span>Svar på 30 sekunder</span>
-              </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Features */}
-        <section className="px-4 py-3">
-          <div className="max-w-5xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-3">
-              {[
-                { icon: Scale, title: "Juridisk grunnlag", desc: "Kjøpsloven og Forbrukerkjøpsloven", gradient: "from-pink-500 to-rose-500" },
-                { icon: Shield, title: "Nøktern analyse", desc: "Realistisk sannsynlighet", gradient: "from-purple-500 to-indigo-500" },
-                { icon: FileText, title: "Profesjonell rapport", desc: "PDF du kan sende til selger", gradient: "from-blue-500 to-cyan-500" },
-              ].map((feature, i) => (
-                <div key={i} className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all">
-                  <div className={`inline-flex p-1.5 rounded-lg bg-gradient-to-br ${feature.gradient} mb-2`}>
-                    <feature.icon className="h-3.5 w-3.5 text-white" />
-                  </div>
-                  <h3 className="text-sm font-semibold mb-0.5">{feature.title}</h3>
-                  <p className="text-slate-400 text-xs">{feature.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Categories */}
-        <section id="categories" className="px-4 py-3">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-lg font-bold mb-3 text-center">Velg kategori</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-              {/* Bilkjøp */}
-              <button
-                onClick={() => router.push("/bilkjop")}
-                className="group p-3 rounded-xl bg-gradient-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/20 hover:border-pink-500/40 transition-all text-left"
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="p-1.5 rounded-lg bg-pink-500/20">
-                    <Car className="h-4 w-4 text-pink-400" />
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 text-[10px]">Live</span>
-                </div>
-                <h3 className="font-bold text-sm mb-0.5">Bilkjøp</h3>
-                <p className="text-slate-400 text-[11px] mb-1">Kjøpt bil med feil?</p>
-                <span className="text-pink-400 text-xs font-medium flex items-center gap-1">
-                  Start <ArrowRight className="h-2.5 w-2.5" />
-                </span>
-              </button>
-
-              {/* Fly */}
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] text-left opacity-50">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="p-1.5 rounded-lg bg-white/10">
-                    <Plane className="h-4 w-4 text-slate-400" />
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-400 text-[10px]">Snart</span>
-                </div>
-                <h3 className="font-bold text-sm mb-0.5">Flyreiser</h3>
-                <p className="text-slate-500 text-[11px]">Forsinket fly?</p>
-              </div>
-
-              {/* Reklamasjon */}
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] text-left opacity-50">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="p-1.5 rounded-lg bg-white/10">
-                    <Package className="h-4 w-4 text-slate-400" />
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-400 text-[10px]">Snart</span>
-                </div>
-                <h3 className="font-bold text-sm mb-0.5">Reklamasjon</h3>
-                <p className="text-slate-500 text-[11px]">Feil på varer?</p>
-              </div>
-
-              {/* Håndverker */}
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] text-left opacity-50">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="p-1.5 rounded-lg bg-white/10">
-                    <Wrench className="h-4 w-4 text-slate-400" />
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-slate-400 text-[10px]">Snart</span>
-                </div>
-                <h3 className="font-bold text-sm mb-0.5">Håndverker</h3>
-                <p className="text-slate-500 text-[11px]">Dårlig arbeid?</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA - Inline */}
-        <section className="px-4 py-2">
-          <div className="max-w-2xl mx-auto">
-            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-between">
-              <span className="text-sm text-slate-300">Gratis vurdering – rapport kun <span className="font-bold text-white">49 kr</span></span>
-              <button
-                onClick={() => router.push("/bilkjop")}
-                className="px-4 py-1.5 bg-white text-slate-900 rounded-lg font-semibold hover:bg-slate-100 transition-all text-sm"
-              >
-                Prøv gratis
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="px-4 py-2 border-t border-white/5">
-          <div className="max-w-5xl mx-auto flex justify-between items-center text-[11px] text-slate-500">
-            <span>© 2026 HarJegKravPå.no</span>
-            <span>Veiledning, ikke juridisk rådgivning</span>
-          </div>
-        </footer>
-      </div>
+      <footer className="border-t border-white/5 py-6 px-4">
+        <div className="max-w-3xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-slate-600">
+          <span>© 2026 harjegkravpå.no</span>
+          <span>Veiledende vurdering, ikke juridisk rådgivning</span>
+        </div>
+      </footer>
     </main>
   );
 }
