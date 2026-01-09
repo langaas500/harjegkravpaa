@@ -7,23 +7,33 @@ export async function POST(req: NextRequest) {
   try {
     const { productType } = await req.json();
 
-    const prices: Record<string, { amount: number; name: string; desc: string }> = {
+    const prices: Record<string, { 
+      amount: number; 
+      name: string; 
+      desc: string;
+      successUrl: string;
+      cancelUrl: string;
+    }> = {
       rapport: { 
         amount: 4900, 
         name: "Bilkjøp-rapport PDF", 
-        desc: "Juridisk vurdering av din bilkjøp-sak"
+        desc: "Juridisk vurdering av din bilkjøp-sak",
+        successUrl: "/bilkjop/betalt",
+        cancelUrl: "/bilkjop/rapport?canceled=true",
       },
       kravbrev: { 
         amount: 14900, 
         name: "Juridisk kravbrev", 
-        desc: "Ferdig formulert kravbrev til selger"
+        desc: "Ferdig formulert kravbrev til selger",
+        successUrl: "/bilkjop/kravbrev/betalt",
+        cancelUrl: "/bilkjop/kravbrev?canceled=true",
       },
     };
 
     const product = prices[productType] || prices.rapport;
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card", "klarna", "link"],
+      payment_method_types: ["card", "klarna"],
       line_items: [
         {
           price_data: {
@@ -38,8 +48,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/bilkjop/betalt?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/bilkjop/rapport?canceled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}${product.successUrl}?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}${product.cancelUrl}`,
     });
 
     return NextResponse.json({ url: session.url });
