@@ -17,7 +17,7 @@ export default function KravbrevPage() {
   const [discountAmount, setDiscountAmount] = useState("");
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("bilkjop-data");
+    const stored = localStorage.getItem("bilkjop-data");
     if (stored) {
       setData(JSON.parse(stored));
     }
@@ -36,7 +36,7 @@ export default function KravbrevPage() {
       claimType,
       discountAmount: claimType === "discount" ? discountAmount : null,
     };
-    sessionStorage.setItem("bilkjop-data", JSON.stringify(updatedData));
+    localStorage.setItem("bilkjop-data", JSON.stringify(updatedData));
 
     try {
       const response = await fetch("/api/create-checkout", {

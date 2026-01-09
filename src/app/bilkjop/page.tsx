@@ -187,7 +187,7 @@ export default function BilkjopPage() {
       userDescription,
       outcome,
     };
-    sessionStorage.setItem("bilkjop-data", JSON.stringify(data));
+    localStorage.setItem("bilkjop-data", JSON.stringify(data));
     router.push("/bilkjop/rapport");
   };
 

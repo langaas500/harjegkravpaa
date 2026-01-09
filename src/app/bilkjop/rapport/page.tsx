@@ -19,7 +19,7 @@ export default function RapportPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("bilkjop-data");
+    const stored = localStorage.getItem("bilkjop-data");
     if (stored) {
       setData(JSON.parse(stored));
     }
