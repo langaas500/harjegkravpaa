@@ -19,12 +19,6 @@ export default function AppHeader() {
             harjegkravpå.no
           </span>
         </button>
-        <button
-          onClick={() => router.push("/bilkjop")}
-          className="px-5 py-2.5 bg-white text-black rounded-full font-semibold hover:bg-slate-100 transition-all"
-        >
-          Start
-        </button>
       </div>
     </header>
   );
