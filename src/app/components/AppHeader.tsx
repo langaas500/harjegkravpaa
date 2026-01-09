@@ -10,9 +10,12 @@ export default function AppHeader() {
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         <button 
           onClick={() => router.push("/")}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
-          <span className="text-xl font-bold text-white">
+          <div className="text-5xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+            H
+          </div>
+          <span className="text-lg font-bold text-white">
             harjegkravpå.no
           </span>
         </button>
