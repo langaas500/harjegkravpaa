@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 interface KravbrevData {
@@ -77,23 +77,19 @@ INSTRUKSJONER:
 
 Formater brevet pent med avsnitt. Start direkte med brevhodet (avsenders adresse øverst).`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2000,
       messages: [
-        {
-          role: "system",
-          content: "Du er en erfaren norsk forbrukerrettsjurist. Du skriver presise, profesjonelle kravbrev som følger norsk forbrukerlovgivning. Svar alltid på norsk.",
-        },
         {
           role: "user",
           content: prompt,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 2000,
+      system: "Du er en erfaren norsk forbrukerrettsjurist. Du skriver presise, profesjonelle kravbrev som følger norsk forbrukerlovgivning. Svar alltid på norsk.",
     });
 
-    const letter = completion.choices[0]?.message?.content;
+    const letter = message.content[0].type === "text" ? message.content[0].text : null;
 
     if (!letter) {
       return NextResponse.json(
