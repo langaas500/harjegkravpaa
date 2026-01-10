@@ -47,7 +47,7 @@ function SoonContent() {
     localStorage.setItem(key, JSON.stringify(next));
 
     try {
-      const res = await fetch("/api/waitlist", {
+      const res = await fetch("/api/whitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: v, cat }),
