@@ -108,30 +108,32 @@ export default function GenererPDFPage() {
     try {
       const result = await mammoth.convertToHtml({
         arrayBuffer: buffer,
-        convertImage: mammoth.images.imgElement(async (image) => {
-          const imageBuffer = await image.read();
-          const base64 = btoa(
-            new Uint8Array(imageBuffer).reduce(
-              (data, byte) => data + String.fromCharCode(byte),
-              ""
-            )
-          );
-          const mimeType = image.contentType || "image/png";
-          const dataUrl = `data:${mimeType};base64,${base64}`;
+        images: {
+          convertImage: mammoth.images.imgElement(async (image) => {
+            const imageBuffer = await image.read();
+            const base64 = btoa(
+              new Uint8Array(imageBuffer).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ""
+              )
+            );
+            const mimeType = image.contentType || "image/png";
+            const dataUrl = `data:${mimeType};base64,${base64}`;
 
-          try {
-            const img = await loadImage(dataUrl);
-            images.push({
-              data: dataUrl,
-              width: img.width,
-              height: img.height,
-            });
-          } catch {
-            images.push({ data: dataUrl, width: 400, height: 300 });
-          }
+            try {
+              const img = await loadImage(dataUrl);
+              images.push({
+                data: dataUrl,
+                width: img.width,
+                height: img.height,
+              });
+            } catch {
+              images.push({ data: dataUrl, width: 400, height: 300 });
+            }
 
-          return { src: dataUrl };
-        }),
+            return { src: dataUrl };
+          }),
+        },
       });
 
       const text = result.value
@@ -545,18 +547,11 @@ export default function GenererPDFPage() {
 
             doc.setFontSize(9);
             doc.setTextColor(113, 63, 18);
-            doc.text(
-              "Merk: PDF-filer kan ikke vises direkte her.",
-              margin + 10,
-              contentY + 58
-            );
+            doc.text("Merk: PDF-filer kan ikke vises direkte her.", margin + 10, contentY + 58);
             doc.text("Originalfilen bør sendes som separat vedlegg.", margin + 10, contentY + 65);
           }
           // === TEKSTFILER ===
-          else if (
-            storedDoc.fileType === "text/plain" ||
-            storedDoc.fileType === "text/html"
-          ) {
+          else if (storedDoc.fileType === "text/plain" || storedDoc.fileType === "text/html") {
             try {
               const decoder = new TextDecoder("utf-8");
               const text = decoder.decode(storedDoc.fileData);
@@ -685,9 +680,7 @@ Ved spørsmål, kontakt oss på post@harjegkravpå.no`;
             <FileText className="h-8 w-8 text-emerald-400" />
           </div>
           <h1 className="text-2xl font-bold">Generer samlet PDF</h1>
-          <p className="text-slate-400">
-            Kravbrev og alle vedlegg i ett dokument
-          </p>
+          <p className="text-slate-400">Kravbrev og alle vedlegg i ett dokument</p>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-4">
