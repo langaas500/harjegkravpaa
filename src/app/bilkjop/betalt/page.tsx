@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
 import { CheckCircle2, FileDown, Loader2, FileText, ArrowRight } from "lucide-react";
 
 function BetaltContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("bilkjop-data");
+    const stored = localStorage.getItem("bilkjop-data");
     if (stored) {
       setData(JSON.parse(stored));
     }
@@ -34,7 +33,7 @@ function BetaltContent() {
             btoa(new Uint8Array(buffer).reduce((d, byte) => d + String.fromCharCode(byte), ""));
           setFontData({ regular: toBase64(regularBuffer), bold: toBase64(boldBuffer) });
         }
-      } catch (error) {
+      } catch {
         console.log("Font load error");
       }
     };
@@ -81,7 +80,9 @@ function BetaltContent() {
       const isDealer = data.sellerType === "DEALER";
       const applicableLaw = isDealer ? "Forbrukerkjøpsloven" : "Kjøpsloven";
       const warrantyText = isDealer ? "5 år (2 år for slitedeler)" : "2 år";
-      const daysSince = calculateDaysSince(data.vehicle?.purchaseDate);
+      const vehicle = data.vehicle as Record<string, string> | undefined;
+      const outcome = data.outcome as Record<string, unknown> | undefined;
+      const daysSince = calculateDaysSince(vehicle?.purchaseDate || "");
 
       const addPage = () => {
         doc.addPage();
@@ -126,18 +127,19 @@ function BetaltContent() {
 
       const levelColors: Record<string, number[]> = { GREEN: [34, 197, 94], YELLOW: [234, 179, 8], RED: [239, 68, 68] };
       const levelLabels: Record<string, string> = { GREEN: "SANNSYNLIG JA", YELLOW: "USIKKERT", RED: "SANNSYNLIG NEI" };
-      const levelColor = levelColors[data.outcome?.level] || levelColors.YELLOW;
+      const outcomeLevel = outcome?.level as string || "YELLOW";
+      const levelColor = levelColors[outcomeLevel] || levelColors.YELLOW;
 
       doc.setFillColor(levelColor[0], levelColor[1], levelColor[2]);
       doc.rect(margin, y, contentWidth, 7, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
-      doc.text(levelLabels[data.outcome?.level] || "USIKKERT", margin + 3, y + 5);
+      doc.text(levelLabels[outcomeLevel] || "USIKKERT", margin + 3, y + 5);
       y += 7;
 
-      const titleLines = doc.splitTextToSize(data.outcome?.title || "", safeWidth);
-      const summaryLines = doc.splitTextToSize(data.outcome?.summary || "", safeWidth);
+      const titleLines = doc.splitTextToSize((outcome?.title as string) || "", safeWidth);
+      const summaryLines = doc.splitTextToSize((outcome?.summary as string) || "", safeWidth);
       const summaryBoxHeight = Math.max(32, 10 + titleLines.length * 5 + summaryLines.length * 4);
 
       drawBox(margin, y, contentWidth, summaryBoxHeight, [248, 250, 252]);
@@ -177,8 +179,8 @@ function BetaltContent() {
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate(data.buyerName || "Ikke oppgitt", 18), margin + 2, y + 12);
-      doc.text(truncate(data.sellerName || "Ikke oppgitt", 18), margin + boxW + 4, y + 12);
+      doc.text(truncate((data.buyerName as string) || "Ikke oppgitt", 18), margin + 2, y + 12);
+      doc.text(truncate((data.sellerName as string) || "Ikke oppgitt", 18), margin + boxW + 4, y + 12);
       doc.text(isDealer ? "Forhandler" : "Privat", margin + (boxW + 2) * 2 + 2, y + 12);
       y += 22;
 
@@ -205,9 +207,9 @@ function BetaltContent() {
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate(data.vehicle?.make, 16), margin + 2, y + 12);
-      doc.text(truncate(data.vehicle?.model, 16), margin + boxW + 4, y + 12);
-      doc.text(truncate(data.vehicle?.regNum, 12), margin + (boxW + 2) * 2 + 2, y + 12);
+      doc.text(truncate(vehicle?.make || "", 16), margin + 2, y + 12);
+      doc.text(truncate(vehicle?.model || "", 16), margin + boxW + 4, y + 12);
+      doc.text(truncate(vehicle?.regNum || "", 12), margin + (boxW + 2) * 2 + 2, y + 12);
       y += 20;
 
       drawBox(margin, y, boxW, 18, [248, 250, 252]);
@@ -224,9 +226,9 @@ function BetaltContent() {
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(data.vehicle?.year || "-", margin + 2, y + 12);
-      doc.text(data.vehicle?.km ? `${data.vehicle.km} km` : "-", margin + boxW + 4, y + 12);
-      doc.text(data.vehicle?.price ? `${data.vehicle.price} kr` : "-", margin + (boxW + 2) * 2 + 2, y + 12);
+      doc.text(vehicle?.year || "-", margin + 2, y + 12);
+      doc.text(vehicle?.km ? `${vehicle.km} km` : "-", margin + boxW + 4, y + 12);
+      doc.text(vehicle?.price ? `${vehicle.price} kr` : "-", margin + (boxW + 2) * 2 + 2, y + 12);
       y += 20;
 
       const halfW = (contentWidth - 2) / 2;
@@ -242,7 +244,7 @@ function BetaltContent() {
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(formatDate(data.vehicle?.purchaseDate), margin + 2, y + 12);
+      doc.text(formatDate(vehicle?.purchaseDate || ""), margin + 2, y + 12);
       doc.text(daysSince ? `${daysSince} dager` : "-", margin + halfW + 4, y + 12);
       y += 22;
 
@@ -269,7 +271,8 @@ function BetaltContent() {
       doc.setFontSize(8);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate((data.issues || []).join(", "), 22), margin + 2, y + 12);
+      const issues = data.issues as string[] || [];
+      doc.text(truncate(issues.join(", "), 22), margin + 2, y + 12);
       doc.text(data.safetyCritical ? "Ja" : "Nei", margin + boxW + 4, y + 12);
       doc.text(data.notDriveable ? "Nei" : "Ja", margin + (boxW + 2) * 2 + 2, y + 12);
       y += 20;
@@ -288,7 +291,7 @@ function BetaltContent() {
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate(data.costBracket || "Ukjent", 14), margin + 2, y + 12);
+      doc.text(truncate((data.costBracket as string) || "Ukjent", 14), margin + 2, y + 12);
       doc.text(data.complainedQuickly ? "Raskt" : "Sent", margin + boxW + 4, y + 12);
       doc.text(data.defectSoonAfter ? "Tidlig" : "Sent", margin + (boxW + 2) * 2 + 2, y + 12);
       y += 22;
@@ -319,7 +322,7 @@ function BetaltContent() {
       y += 20;
 
       if (data.contactedSeller && data.sellerResponse) {
-        const responseLines = doc.splitTextToSize(data.sellerResponse, safeWidth - 6);
+        const responseLines = doc.splitTextToSize(data.sellerResponse as string, safeWidth - 6);
         const responseHeight = Math.min(20, 8 + responseLines.length * 4);
         drawBox(margin, y, contentWidth, responseHeight, [254, 243, 199]);
         doc.setFontSize(7);
@@ -366,7 +369,8 @@ function BetaltContent() {
       doc.text("Basert på informasjonen du har oppgitt:", margin, y);
       y += 6;
 
-      (data.outcome?.keyPoints || []).forEach((point: string) => {
+      const keyPoints = (outcome?.keyPoints as string[]) || [];
+      keyPoints.forEach((point: string) => {
         checkPageBreak(10);
         doc.setFillColor(16, 185, 129);
         doc.circle(margin + 2, y - 1, 1.2, "F");
@@ -394,7 +398,8 @@ function BetaltContent() {
       doc.text("For å ta saken videre:", margin, y);
       y += 6;
 
-      (data.outcome?.nextSteps || []).forEach((step: string, index: number) => {
+      const nextSteps = (outcome?.nextSteps as string[]) || [];
+      nextSteps.forEach((step: string, index: number) => {
         checkPageBreak(10);
         doc.setFillColor(16, 185, 129);
         doc.circle(margin + 3, y, 3, "F");
@@ -421,7 +426,8 @@ function BetaltContent() {
       doc.line(margin, y, margin + 38, y);
       y += 6;
 
-      (data.outcome?.legalRefs || []).forEach((section: { heading: string; refs: string[] }) => {
+      const legalRefs = (outcome?.legalRefs as Array<{ heading: string; refs: string[] }>) || [];
+      legalRefs.forEach((section) => {
         checkPageBreak(16);
         doc.setFontSize(9);
         doc.setFont(useFont, "bold");
@@ -444,7 +450,7 @@ function BetaltContent() {
       y += 4;
 
       checkPageBreak(22);
-      const tipLines = doc.splitTextToSize(data.outcome?.proTip || "", safeWidth - 6);
+      const tipLines = doc.splitTextToSize((outcome?.proTip as string) || "", safeWidth - 6);
       const tipHeight = Math.max(18, 10 + tipLines.length * 4);
       drawBox(margin, y, contentWidth, tipHeight, [254, 249, 195]);
       doc.setFontSize(9);
@@ -535,7 +541,7 @@ function BetaltContent() {
       doc.text("Viktig:", margin + 3, y + 5);
       doc.setFont(useFont, "normal");
       doc.setFontSize(7);
-      doc.text(truncate(data.outcome?.disclaimer || "Veiledning, ikke juridisk rådgivning.", 80), margin + 16, y + 5);
+      doc.text(truncate((outcome?.disclaimer as string) || "Veiledning, ikke juridisk rådgivning.", 80), margin + 16, y + 5);
 
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
@@ -575,7 +581,7 @@ function BetaltContent() {
           <p className="text-slate-400">Takk for kjøpet. Din rapport er klar.</p>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-left">
           <p className="text-sm text-slate-500 mb-1">Ordre</p>
           <p className="font-semibold">Bilkjøp-rapport PDF</p>
           <p className="text-slate-400">49 kr</p>
@@ -601,15 +607,14 @@ function BetaltContent() {
 
         {downloaded && (
           <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
-            <p className="text-emerald-400 text-sm">✓ Rapporten er lastet ned!</p>
+            <p className="text-emerald-400 text-sm">Rapporten er lastet ned!</p>
           </div>
         )}
 
-        {/* UPSELL: Kravbrev */}
         <div className="border-t border-white/10 pt-6 mt-6">
-          <div className="border border-white/10 bg-white/[0.03] rounded-2xl p-5 text-left">
+          <div className="border border-white/10 bg-white/5 rounded-2xl p-5 text-left">
             <div className="flex items-start gap-4">
-              <div className="p-2 rounded-xl border border-white/10 bg-white/[0.03]">
+              <div className="p-2 rounded-xl border border-white/10 bg-white/5">
                 <FileText className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
@@ -619,15 +624,15 @@ function BetaltContent() {
                   Spar tid og få et profesjonelt resultat.
                 </p>
                 <ul className="text-sm text-slate-300 space-y-1 mb-4">
-                  <li>✓ Tilpasset din sak</li>
-                  <li>✓ Juridisk korrekt språk</li>
-                  <li>✓ Konkrete krav og frister</li>
+                  <li>Tilpasset din sak</li>
+                  <li>Juridisk korrekt språk</li>
+                  <li>Konkrete krav og frister</li>
                 </ul>
                 <button
                   onClick={() => router.push("/bilkjop/kravbrev")}
                   className="group w-full flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
                 >
-                  Bestill kravbrev – 149 kr
+                  Bestill kravbrev - 149 kr
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>

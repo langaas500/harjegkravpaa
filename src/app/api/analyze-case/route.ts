@@ -21,24 +21,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const prompt = `Du er en norsk forbrukerrettighetsekspert. Analyser denne bilkjøp-saken og gi en vurdering.
+    const prompt = `Du er en norsk forbrukerrettighetsekspert. Analyser denne bilkjøp-saken og gi en NØKTERN vurdering.
 
-VIKTIG OM NIVÅ-VURDERING:
-- "GREEN" = Kjøper har STERKE rettigheter, sannsynlig at de har krav
-- "YELLOW" = Usikkert, kan gå begge veier
-- "RED" = Kjøper har SVAKE rettigheter, sannsynlig at de IKKE har krav
+KRITISK: FORBUDTE FORMULERINGER
+Du skal ALDRI bruke disse absolutte formuleringene:
+- "sterkt krav" / "meget sterkt krav" → bruk "grunnlag for å reklamere"
+- "klart mangel" / "åpenbart mangel" → bruk "kan utgjøre en mangel"
+- "juridisk feil" → bruk "ikke i tråd med loven"
+- "selger har bevisbyrden" → bruk "etter loven presumeres feil som viser seg innen seks måneder å ha eksistert ved levering"
+- "garantert" / "udiskutabelt" / "uomtvistelig" → ALDRI
+- "vil vinne frem" / "har rett til" → bruk "kan ha grunnlag for"
 
-VELG NIVÅ BASERT PÅ DETTE:
-- Sikkerhetskritiske feil + kort tid siden kjøp + forhandler = GREEN
-- Alvorlige feil innen 6 måneder fra forhandler = GREEN (bevisbyrde på selger)
-- Mindre feil eller lang tid siden kjøp = YELLOW eller RED
-- Kjøper burde oppdaget feilen før kjøp = RED
+BRUK HELLER DISSE FORMULERINGENE:
+- "det er momenter som taler for..."
+- "basert på opplysningene kan dette utgjøre..."
+- "det kan være grunnlag for å reklamere"
+- "saken har elementer som styrker/svekker..."
+
+NIVÅ-VURDERING:
+- "GREEN" = Flere momenter som taler for at kjøper kan ha et krav
+- "YELLOW" = Usikkert, avhenger av ytterligere dokumentasjon
+- "RED" = Få momenter som taler for kjøpers sak
 
 JURIDISK KONTEKST:
 - Gjeldende lov: ${applicableLaw}
 - Reklamasjonsfrist: ${warrantyPeriod}
 - Dager siden kjøp: ${daysSincePurchase || "Ukjent"}
-${isDealer ? "- Ved forhandlerkjøp har selger bevisbyrden de første 6 månedene" : "- Ved privatkjøp har kjøper bevisbyrden"}
+${isDealer && daysSincePurchase && daysSincePurchase <= 180 ? "- Kjøpet er innen 6 måneder: Etter loven presumeres feil å ha eksistert ved levering" : ""}
+${!isDealer ? "- Ved privatkjøp må kjøper normalt dokumentere at feilen eksisterte ved kjøpet" : ""}
 
 SAKSDATA:
 - Kjøper: ${data.buyerName || "Ikke oppgitt"}
@@ -59,20 +69,27 @@ ${data.userDescription ? `- Brukerens beskrivelse: ${data.userDescription}` : ""
 SVAR I DETTE JSON-FORMATET:
 {
   "level": "GREEN" | "YELLOW" | "RED",
-  "title": "Kort oppsummering av konklusjonen (maks 15 ord)",
-  "summary": "2-3 setninger som forklarer hovedkonklusjonen og hvorfor kjøper har/ikke har krav",
+  "headline": "SANNSYNLIG JA" | "USIKKERT" | "SANNSYNLIG NEI",
+  "title": "Kort, nøktern oppsummering (maks 15 ord) - IKKE bruk 'sterkt krav' eller 'klart mangel'",
+  "summary": "2-3 setninger som forklarer vurderingen. Bruk 'kan utgjøre', 'momenter som taler for', 'grunnlag for'. ALDRI absolutte påstander.",
   "confidence": "Høy" | "Middels" | "Lav",
-  "keyPoints": ["Punkt 1 om saken", "Punkt 2", "Punkt 3", "Punkt 4"],
-  "legalRefs": [{"heading": "${applicableLaw}", "refs": ["§X: Forklaring", "§Y: Forklaring"]}],
+  "keyPoints": ["Punkt 1 - nøktern formulering", "Punkt 2", "Punkt 3", "Punkt 4"],
+  "legalRefs": [{"heading": "${applicableLaw}", "refs": ["§X: Kort forklaring"]}],
   "nextSteps": ["Konkret steg 1", "Konkret steg 2", "Konkret steg 3", "Konkret steg 4", "Konkret steg 5"],
-  "proTip": "Et konkret tips som kan styrke saken",
+  "proTip": "Et konkret tips som kan styrke dokumentasjonen",
   "disclaimer": "Dette er veiledning basert på oppgitt informasjon, ikke juridisk rådgivning. Kontakt advokat for bindende råd."
 }
 
-KRITISK: Sørg for at "level" MATCHER konklusjonen:
-- Hvis du sier kjøper har "sterke rettigheter" eller "godt grunnlag" → level SKAL være "GREEN"
-- Hvis du sier kjøper har "svake rettigheter" eller "lite grunnlag" → level SKAL være "RED"
-- Ikke gi motstridende signaler!
+EKSEMPLER PÅ GODE FORMULERINGER:
+- title: "Flere momenter taler for reklamasjonsrett" (ikke "Sterkt krav")
+- summary: "Basert på opplysningene kan feilen utgjøre en mangel etter forbrukerkjøpsloven. Ettersom problemet viste seg innen kort tid, presumeres det etter loven å ha eksistert ved levering."
+- keyPoints: "Feilen kan utgjøre en mangel - ikke normal slitasje" (ikke "klart mangel")
+
+EKSEMPLER PÅ FORBUDTE FORMULERINGER:
+- "Du har et meget sterkt reklamasjonskrav" ❌
+- "Dette er klart en mangel" ❌
+- "Selgers påstand er juridisk feil" ❌
+- "Selger har bevisbyrden" ❌
 
 Svar KUN med JSON, ingen annen tekst.`;
 
