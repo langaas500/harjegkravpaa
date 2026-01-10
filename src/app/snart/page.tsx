@@ -38,7 +38,7 @@ function SoonContent() {
     }
 
     // (Backup) lagre lokalt også
-    const key = "hjkp_waitlist_v1";
+    const key = "hjkp_whitelist_v1";
     const raw = typeof window !== "undefined" ? localStorage.getItem(key) : null;
     const list: Array<{ email: string; cat: string; createdAt: string }> = raw ? JSON.parse(raw) : [];
 
@@ -47,15 +47,15 @@ function SoonContent() {
     localStorage.setItem(key, JSON.stringify(next));
 
     try {
-      const res = await fetch("/api/whitlist", {
+      const res = await fetch("/api/whitelist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: v, cat }),
+        body: JSON.stringify({ email: v, source: `snart:${cat}` }),
       });
 
       const json = await res.json().catch(() => ({} as any));
 
-      if (!res.ok) {
+      if (!res.ok || json?.ok === false) {
         setError(json?.error || "Kunne ikke lagre e-post. Prøv igjen.");
         return;
       }
@@ -69,10 +69,7 @@ function SoonContent() {
 
   return (
     <div className="mx-auto max-w-xl py-10">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white"
-      >
+      <Link href="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">
         <ArrowLeft className="h-4 w-4" />
         Tilbake
       </Link>
@@ -118,18 +115,14 @@ function SoonContent() {
               <CheckCircle2 className="h-5 w-5 text-emerald-300 mt-0.5" />
               <div>
                 <p className="font-semibold text-white">Takk! Du står på lista.</p>
-                <p className="text-sm text-slate-300 mt-1">
-                  Vi gir beskjed når {info.title} lanseres.
-                </p>
+                <p className="text-sm text-slate-300 mt-1">Vi gir beskjed når {info.title} lanseres.</p>
               </div>
             </div>
           </div>
         )}
 
         <div className="mt-8 border-t border-white/10 pt-6">
-          <p className="text-sm text-slate-400 mb-3">
-            Vil du sjekke bilkjøp nå?
-          </p>
+          <p className="text-sm text-slate-400 mb-3">Vil du sjekke bilkjøp nå?</p>
           <Link
             href="/bilkjop"
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 font-semibold hover:bg-white/[0.05]"
