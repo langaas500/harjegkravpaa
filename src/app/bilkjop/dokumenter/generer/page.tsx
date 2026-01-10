@@ -106,9 +106,9 @@ export default function GenererPDFPage() {
     const images: { data: string; width: number; height: number }[] = [];
 
     try {
-      const result = await mammoth.convertToHtml({
-        arrayBuffer: buffer,
-        images: {
+      const result = await mammoth.convertToHtml(
+        { arrayBuffer: buffer },
+        {
           convertImage: mammoth.images.imgElement(async (image) => {
             const imageBuffer = await image.read();
             const base64 = btoa(
@@ -133,8 +133,8 @@ export default function GenererPDFPage() {
 
             return { src: dataUrl };
           }),
-        },
-      });
+        }
+      );
 
       const text = result.value
         .replace(/<\/p>/gi, "\n\n")
@@ -386,7 +386,10 @@ export default function GenererPDFPage() {
           }
           let fileName = d.fileName;
           const maxFileNameWidth = contentWidth - 15;
-          while (doc.getTextWidth(`  ${vedleggNr}. ${fileName}`) > maxFileNameWidth && fileName.length > 10) {
+          while (
+            doc.getTextWidth(`  ${vedleggNr}. ${fileName}`) > maxFileNameWidth &&
+            fileName.length > 10
+          ) {
             fileName = fileName.slice(0, -4) + "...";
           }
           doc.text(`  ${vedleggNr}. ${fileName}`, margin, y);
@@ -680,7 +683,9 @@ Ved spørsmål, kontakt oss på post@harjegkravpå.no`;
             <FileText className="h-8 w-8 text-emerald-400" />
           </div>
           <h1 className="text-2xl font-bold">Generer samlet PDF</h1>
-          <p className="text-slate-400">Kravbrev og alle vedlegg i ett dokument</p>
+          <p className="text-slate-400">
+            Kravbrev og alle vedlegg i ett dokument
+          </p>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-4">
