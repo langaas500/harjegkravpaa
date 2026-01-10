@@ -1,4 +1,4 @@
-// app/api/waitlist/route.ts
+// src/app/api/whitelist/route.ts
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -7,7 +7,6 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// Optional: for CORS/preflight (ofte unødvendig på samme domene, men skader ikke)
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
@@ -35,7 +34,6 @@ export async function POST(req: Request) {
       email = String(form.get("email") || "").trim().toLowerCase();
       source = String(form.get("source") || "web");
     } else {
-      // Hvis klienten sender noe rart
       const text = await req.text();
       try {
         const body = JSON.parse(text);
@@ -53,9 +51,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hvis du ikke har database enda: returner ok for å bevise at API-ruten fungerer
-    // (Dette fjerner 405 og lar deg teste UI uten backend.)
-    // Når du er klar for lagring: slå på Supabase-lagring under.
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -67,8 +62,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // Lagring i Supabase (tabell: waitlist med kolonne: email (unique), source (text), created_at default now())
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+    // ✅ Lagring i Supabase: TABELL = whitelist
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/whitelist`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_SERVICE_ROLE_KEY,
