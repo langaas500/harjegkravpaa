@@ -27,7 +27,7 @@ function SoonContent() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
@@ -37,15 +37,34 @@ function SoonContent() {
       return;
     }
 
+    // (Backup) lagre lokalt også
     const key = "hjkp_waitlist_v1";
     const raw = typeof window !== "undefined" ? localStorage.getItem(key) : null;
     const list: Array<{ email: string; cat: string; createdAt: string }> = raw ? JSON.parse(raw) : [];
 
     const exists = list.some((x) => x.email === v && x.cat === cat);
     const next = exists ? list : [...list, { email: v, cat, createdAt: new Date().toISOString() }];
-
     localStorage.setItem(key, JSON.stringify(next));
-    setSaved(true);
+
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: v, cat }),
+      });
+
+      const json = await res.json().catch(() => ({} as any));
+
+      if (!res.ok) {
+        setError(json?.error || "Kunne ikke lagre e-post. Prøv igjen.");
+        return;
+      }
+
+      setSaved(true);
+    } catch (err) {
+      console.error("Waitlist submit error:", err);
+      setError("Kunne ikke kontakte server. Prøv igjen.");
+    }
   }
 
   return (
