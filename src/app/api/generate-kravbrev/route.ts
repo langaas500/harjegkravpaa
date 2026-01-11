@@ -15,6 +15,13 @@ export async function POST(request: NextRequest) {
     const additionalInfo = data.additionalInfo || "";
     const outcome = data.outcome || "retting";
 
+    // Nye kritiske felt
+    const sellerPromises = data.sellerPromises || "";
+    const hadAsIsClause = data.hadAsIsClause;
+    const visibleDefect = data.visibleDefect;
+    const hasWorkshopReport = data.hasWorkshopReport;
+    const workshopReportText = data.workshopReportText || "";
+
     // Kontaktinfo fra skjema
     const contactInfo = data.contactInfo || {};
     const buyerName = contactInfo.buyerName || "[Ditt navn]";
@@ -250,6 +257,15 @@ ${additionalInfo ? `\nTILLEGGSINFORMASJON (viktig - inkluder relevante detaljer 
 ${isSafetyCritical ? "⚠️ SIKKERHETSKRITISK FEIL" : ""}
 ${isNotDriveable ? "⚠️ BILEN ER IKKE KJØRBAR" : ""}
 ${issues.area ? `Feilområde: ${issues.area}` : ""}
+
+KRITISKE JURIDISKE MOMENTER:
+${sellerPromises ? `- Selgers løfter/påstander ved salg: "${sellerPromises}" (Dette styrker saken betydelig hvis det viste seg å være feil!)` : ""}
+${hadAsIsClause === true ? `- ⚠️ "Som den er"-klausul: JA ${isConsumerPurchase && daysSincePurchase !== null && daysSincePurchase < 365 ? "(UGYLDIG - Forhandler kan ikke bruke slike klausuler etter 01.01.2024!)" : "(Kan ha betydning, men beskytter ikke mot skjulte feil)"}` : ""}
+${hadAsIsClause === false ? `- "Som den er"-klausul: Nei, normalt salg` : ""}
+${visibleDefect === false ? `- Synlig feil ved kjøp: NEI - Feilen var SKJULT (styrker saken)` : ""}
+${visibleDefect === true ? `- ⚠️ Synlig feil ved kjøp: JA - Feilen kunne sees (kan svekke, men ikke umuliggjør krav)` : ""}
+${hasWorkshopReport === true && workshopReportText ? `- Verkstedsrapport foreligger:\n${workshopReportText}` : ""}
+${hasWorkshopReport === false ? `- Verkstedsrapport: Ikke undersøkt ennå (anbefal å få dette gjort)` : ""}
 
 SELGERS RESPONS: ${sellerContact.response || "Ingen"}
 

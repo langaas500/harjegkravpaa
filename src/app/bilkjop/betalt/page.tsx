@@ -522,6 +522,94 @@ function BetaltContent() {
         y += descHeight + 6;
       }
 
+      if (data.sellerPromises || data.hadAsIsClause !== null || data.visibleDefect !== null || data.hasWorkshopReport !== null) {
+        checkPageBreak(40);
+        doc.setFontSize(11);
+        doc.setFont(useFont, "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text("Kritiske juridiske momenter", margin, y);
+        y += 2;
+        doc.setDrawColor(239, 68, 68);
+        doc.line(margin, y, margin + 58, y);
+        y += 5;
+
+        if (data.sellerPromises) {
+          checkPageBreak(15);
+          doc.setFontSize(8);
+          doc.setFont(useFont, "bold");
+          doc.setTextColor(217, 119, 6);
+          doc.text("Selgers løfter/påstander:", margin, y);
+          y += 5;
+          const promiseLines = doc.splitTextToSize(String(data.sellerPromises), safeWidth - 4);
+          drawBox(margin, y, contentWidth, 6 + promiseLines.slice(0, 5).length * 4, [254, 243, 199]);
+          doc.setFontSize(7);
+          doc.setFont(useFont, "normal");
+          doc.setTextColor(120, 53, 15);
+          doc.text(promiseLines.slice(0, 5), margin + 3, y + 4);
+          y += 6 + promiseLines.slice(0, 5).length * 4 + 4;
+        }
+
+        if (data.hadAsIsClause !== null && data.hadAsIsClause !== undefined) {
+          checkPageBreak(10);
+          doc.setFontSize(8);
+          doc.setFont(useFont, "bold");
+          const isDealer = data.sellerType === "DEALER";
+          if (data.hadAsIsClause && isDealer) {
+            doc.setTextColor(220, 38, 38);
+            doc.text('"Som den er"-klausul: JA (UGYLDIG hos forhandler etter 01.01.2024)', margin, y);
+          } else if (data.hadAsIsClause) {
+            doc.setTextColor(217, 119, 6);
+            doc.text('"Som den er"-klausul: JA (kan ha betydning, men beskytter ikke mot skjulte feil)', margin, y);
+          } else {
+            doc.setTextColor(22, 163, 74);
+            doc.text('"Som den er"-klausul: Nei, normalt salg', margin, y);
+          }
+          y += 6;
+        }
+
+        if (data.visibleDefect !== null && data.visibleDefect !== undefined) {
+          checkPageBreak(10);
+          doc.setFontSize(8);
+          doc.setFont(useFont, "bold");
+          if (data.visibleDefect) {
+            doc.setTextColor(217, 119, 6);
+            doc.text("Synlig feil ved kjøp: JA (kan svekke saken, men ikke umuliggjør krav)", margin, y);
+          } else {
+            doc.setTextColor(22, 163, 74);
+            doc.text("Synlig feil ved kjøp: NEI - Feilen var skjult (styrker saken)", margin, y);
+          }
+          y += 6;
+        }
+
+        if (data.hasWorkshopReport !== null && data.hasWorkshopReport !== undefined) {
+          checkPageBreak(10);
+          doc.setFontSize(8);
+          doc.setFont(useFont, "bold");
+          if (data.hasWorkshopReport) {
+            doc.setTextColor(22, 163, 74);
+            doc.text("Verkstedsrapport: JA (styrker saken betydelig)", margin, y);
+            y += 5;
+            if (data.workshopReportText) {
+              const workshopLines = doc.splitTextToSize(String(data.workshopReportText), safeWidth - 4);
+              const wsHeight = 6 + Math.min(workshopLines.length, 8) * 4;
+              drawBox(margin, y, contentWidth, wsHeight, [219, 234, 254]);
+              doc.setFontSize(7);
+              doc.setFont(useFont, "normal");
+              doc.setTextColor(30, 58, 138);
+              doc.text(workshopLines.slice(0, 8), margin + 3, y + 4);
+              y += wsHeight + 4;
+            } else {
+              y += 2;
+            }
+          } else {
+            doc.setTextColor(217, 119, 6);
+            doc.text("Verkstedsrapport: Ikke undersøkt ennå (anbefales å få dette)", margin, y);
+            y += 6;
+          }
+        }
+        y += 4;
+      }
+
       if (data.additionalInfo) {
         checkPageBreak(40);
         doc.setFontSize(11);

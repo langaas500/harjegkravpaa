@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
-type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "ADDITIONAL" | "RESULT";
+type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "PROMISES" | "AS_IS_CLAUSE" | "VISIBLE_DEFECT" | "WORKSHOP_REPORT" | "ADDITIONAL" | "RESULT";
 
 interface VehicleInfo {
   make: string;
@@ -83,6 +83,14 @@ export default function BilkjopPage() {
   const [sellerResponse, setSellerResponse] = useState("");
   const [userDescription, setUserDescription] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
+
+  // Nye kritiske spørsmål
+  const [sellerPromises, setSellerPromises] = useState("");
+  const [hadAsIsClause, setHadAsIsClause] = useState<boolean | null>(null);
+  const [visibleDefect, setVisibleDefect] = useState<boolean | null>(null);
+  const [hasWorkshopReport, setHasWorkshopReport] = useState<boolean | null>(null);
+  const [workshopReportText, setWorkshopReportText] = useState("");
+
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
 
@@ -124,6 +132,11 @@ export default function BilkjopPage() {
         sellerResponse: contactedSeller ? sellerResponse : null,
         userDescription,
         additionalInfo,
+        sellerPromises,
+        hadAsIsClause,
+        visibleDefect,
+        hasWorkshopReport,
+        workshopReportText: hasWorkshopReport ? workshopReportText : null,
       };
 
       const response = await fetch("/api/analyze-case", {
@@ -188,6 +201,11 @@ export default function BilkjopPage() {
       sellerResponse: contactedSeller ? sellerResponse : null,
       userDescription,
       additionalInfo,
+      sellerPromises,
+      hadAsIsClause,
+      visibleDefect,
+      hasWorkshopReport,
+      workshopReportText: hasWorkshopReport ? workshopReportText : null,
       outcome,
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
@@ -693,8 +711,288 @@ export default function BilkjopPage() {
                 Tilbake
               </button>
               <button
-                onClick={() => setStep("ADDITIONAL")}
+                onClick={() => setStep("PROMISES")}
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "PROMISES" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-6 w-6 text-amber-400" />
+              <h2 className="text-2xl font-bold">Selgers løfter</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Lovte selger noe spesifikt om bilens tilstand? Dette kan styrke saken din vesentlig.
+            </p>
+
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
+              <p className="font-semibold text-amber-400 mb-2">Hvorfor er dette viktig?</p>
+              <p className="text-slate-300">
+                Hvis selger sa at bilen var feilfri, nylig service, eller garanterte noe som viste seg å være feil, styrker dette kravet ditt kraftig.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+              <p className="font-medium text-slate-400 mb-2">Eksempler på relevante løfter:</p>
+              <ul className="space-y-1">
+                <li>• &ldquo;Bilen er nylig EU-godkjent uten anmerkninger&rdquo;</li>
+                <li>• &ldquo;Motor og girkasse er i topp stand&rdquo;</li>
+                <li>• &ldquo;Ingen rust eller skjulte feil&rdquo;</li>
+                <li>• &ldquo;Nettopp gjort service for 15 000 kr&rdquo;</li>
+              </ul>
+            </div>
+
+            <textarea
+              value={sellerPromises}
+              onChange={(e) => setSellerPromises(e.target.value)}
+              placeholder="Beskriv hva selger sa eller lovte om bilen... (Valgfritt, men viktig hvis det gjelder deg)"
+              maxLength={1000}
+              rows={4}
+              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+            />
+            <p className="text-xs text-slate-600">{sellerPromises.length} / 1000 tegn</p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("DESCRIPTION")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("AS_IS_CLAUSE")}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "AS_IS_CLAUSE" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <FileText className="h-6 w-6 text-red-400" />
+              <h2 className="text-2xl font-bold">&ldquo;Som den er&rdquo;-klausul</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Stod det &ldquo;selges som den er&rdquo; i annonsen eller kjøpekontrakten?
+            </p>
+
+            <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4 text-sm">
+              <p className="font-semibold text-red-400 mb-2">Viktig juridisk poeng:</p>
+              <p className="text-slate-300 mb-2">
+                Fra 01.01.2024 er &ldquo;som den er&rdquo;-klausuler <strong>ugyldige</strong> ved kjøp fra <strong>forhandler</strong>.
+              </p>
+              <p className="text-slate-300">
+                Ved privatkjøp før 2024 kan slike klausuler ha betydning, men beskytter ikke mot skjulte feil.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => setHadAsIsClause(false)}
+                className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                  hadAsIsClause === false
+                    ? "border-white bg-white/10 text-white"
+                    : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                }`}
+              >
+                <p className="font-semibold">Nei, ingen slik klausul</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Normalt salg uten spesielle forbehold
+                </p>
+              </button>
+              <button
+                onClick={() => setHadAsIsClause(true)}
+                className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                  hadAsIsClause === true
+                    ? "border-white bg-white/10 text-white"
+                    : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                }`}
+              >
+                <p className="font-semibold">Ja, bilen ble solgt &ldquo;som den er&rdquo;</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Det stod i annonse/kontrakt at bilen selges uten garanti
+                </p>
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("PROMISES")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("VISIBLE_DEFECT")}
+                disabled={hadAsIsClause === null}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "VISIBLE_DEFECT" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-6 w-6 text-orange-400" />
+              <h2 className="text-2xl font-bold">Synlig ved kjøpet?</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Var feilen synlig da du kjøpte bilen, eller oppdaget du den først senere?
+            </p>
+
+            <div className="rounded-xl border border-orange-500/30 bg-orange-500/5 p-4 text-sm">
+              <p className="font-semibold text-orange-400 mb-2">Åpenbarhetsregelen:</p>
+              <p className="text-slate-300">
+                Feil som var tydelig synlige ved kjøpet (åpenbare), og som du burde oppdaget ved vanlig undersøkelse, gir normalt ikke reklamasjonsrett. Skjulte feil derimot gir rett til reklamasjon.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => setVisibleDefect(false)}
+                className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                  visibleDefect === false
+                    ? "border-white bg-white/10 text-white"
+                    : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                }`}
+              >
+                <p className="font-semibold">Nei, feilen var skjult</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Jeg oppdaget problemet først etter kjøpet
+                </p>
+              </button>
+              <button
+                onClick={() => setVisibleDefect(true)}
+                className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                  visibleDefect === true
+                    ? "border-white bg-white/10 text-white"
+                    : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                }`}
+              >
+                <p className="font-semibold">Ja, feilen kunne sees ved kjøpet</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Problemet var synlig, men jeg trodde det var mindre alvorlig
+                </p>
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("AS_IS_CLAUSE")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("WORKSHOP_REPORT")}
+                disabled={visibleDefect === null}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "WORKSHOP_REPORT" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <FileText className="h-6 w-6 text-blue-400" />
+              <h2 className="text-2xl font-bold">Verkstedsrapport</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Har du fått bilen undersøkt av et verksted?
+            </p>
+
+            <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 text-sm">
+              <p className="font-semibold text-blue-400 mb-2">Hvorfor er dette viktig?</p>
+              <p className="text-slate-300">
+                En rapport fra et autorisert verksted gir dokumentasjon på feilen og kostnadene. Dette styrker saken din betydelig.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => setHasWorkshopReport(true)}
+                className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                  hasWorkshopReport === true
+                    ? "border-white bg-white/10 text-white"
+                    : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                }`}
+              >
+                <p className="font-semibold">Ja, jeg har verkstedsrapport</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Bilen er undersøkt og jeg har dokumentasjon
+                </p>
+              </button>
+              <button
+                onClick={() => setHasWorkshopReport(false)}
+                className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                  hasWorkshopReport === false
+                    ? "border-white bg-white/10 text-white"
+                    : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                }`}
+              >
+                <p className="font-semibold">Nei, ikke undersøkt ennå</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Jeg har ikke tatt bilen til verksted
+                </p>
+              </button>
+            </div>
+
+            {hasWorkshopReport === true && (
+              <>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+                  <p className="font-medium text-slate-400 mb-2">Lim inn eller oppsummer rapporten:</p>
+                  <ul className="space-y-1">
+                    <li>• Hva verkstedet fant (feilkoder, diagnosefunn)</li>
+                    <li>• Prisestimat på reparasjon</li>
+                    <li>• Verkstedets vurdering av feilen</li>
+                  </ul>
+                </div>
+
+                <textarea
+                  value={workshopReportText}
+                  onChange={(e) => setWorkshopReportText(e.target.value)}
+                  placeholder="Lim inn eller oppsummer verkstedsrapporten her..."
+                  maxLength={2000}
+                  rows={6}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none font-mono text-sm"
+                />
+                <p className="text-xs text-slate-600">{workshopReportText.length} / 2000 tegn</p>
+              </>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("VISIBLE_DEFECT")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("ADDITIONAL")}
+                disabled={hasWorkshopReport === null}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />

@@ -65,6 +65,11 @@ SAKSDATA:
 - Kontaktet selger: ${data.contactedSeller ? "Ja" : "Nei"}
 ${data.sellerResponse ? `- Selgers respons: ${data.sellerResponse}` : ""}
 ${data.userDescription ? `- Brukerens beskrivelse: ${data.userDescription}` : ""}
+${data.sellerPromises ? `- Selgers løfter/påstander: ${data.sellerPromises}` : ""}
+${data.hadAsIsClause !== null && data.hadAsIsClause !== undefined ? `- "Som den er"-klausul: ${data.hadAsIsClause ? "JA - kan være ugyldig hvis forhandler etter 01.01.2024" : "Nei"}` : ""}
+${data.visibleDefect !== null && data.visibleDefect !== undefined ? `- Synlig feil ved kjøp: ${data.visibleDefect ? "JA - kan svekke saken (åpenbarhetsregelen)" : "Nei - skjult feil"}` : ""}
+${data.hasWorkshopReport !== null && data.hasWorkshopReport !== undefined ? `- Verkstedsrapport: ${data.hasWorkshopReport ? "JA" : "Nei, ikke undersøkt ennå"}` : ""}
+${data.workshopReportText ? `- Verkstedsrapport innhold:\n${data.workshopReportText}` : ""}
 ${data.additionalInfo ? `\nTILLEGGSINFORMASJON FRA BRUKER (viktig - inkluder dette i analysen):\n${data.additionalInfo}` : ""}
 
 SVAR I DETTE JSON-FORMATET:
