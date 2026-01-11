@@ -56,10 +56,24 @@ export default function KravbrevBetaltPage() {
       const parsedData = JSON.parse(stored);
       setData(parsedData);
 
+      // Pre-fill from existing data if available
       const storedContact = localStorage.getItem("kravbrev-contact");
       if (storedContact) {
         const parsedContact = JSON.parse(storedContact);
         setContactInfo(parsedContact);
+      } else {
+        // Pre-fill from wizard data
+        setContactInfo({
+          buyerName: parsedData.buyerName || "",
+          buyerAddress: "",
+          buyerPostcode: "",
+          buyerCity: "",
+          buyerPhone: "",
+          buyerEmail: "",
+          sellerAddress: "",
+          sellerPostcode: "",
+          sellerCity: "",
+        });
       }
     } else {
       setError("Fant ikke saksdata. Vennligst start på nytt.");

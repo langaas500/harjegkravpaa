@@ -7,6 +7,11 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
 
+    const vehicleType = data.vehicleType || "CAR";
+    const vehicleName = vehicleType === "MOTORCYCLE" ? "motorsykkel" : "bil";
+    const vehicleNameGen = vehicleType === "MOTORCYCLE" ? "motorsykkelen" : "bilen";
+    const vehicleNameDef = vehicleType === "MOTORCYCLE" ? "motorsykkelen" : "bilen";
+
     const sellerType = data.sellerType || "forhandler";
     const vehicle = data.vehicle || {};
     const issues = data.issues || {};
@@ -150,10 +155,28 @@ export async function POST(request: NextRequest) {
       .filter(Boolean)
       .join("\n");
 
-    const systemPrompt = `Du er en erfaren juridisk skribent som skriver reklamasjonsbrev for norske forbrukere.
+    const systemPrompt = `Du er en erfaren juridisk skribent som skriver profesjonelle reklamasjonsbrev for norske forbrukere.
+
+VIKTIG: Dette gjelder en ${vehicleName}. Bruk riktig terminologi (${vehicleNameDef}, ikke "bilen" hvis det er motorsykkel).
+
+JURIDISK GRUNNLAG:
+${isConsumerPurchase ? `
+- Forbrukerkjøpsloven § 15 (mangel foreligger når varen ikke er i samsvar med avtalen)
+- Forbrukerkjøpsloven § 27 (kjøpers krav ved mangel)
+- Forbrukerkjøpsloven § 28 (reklamasjonsfrister - 5 år/2 år for slitedeler)
+- Forbrukerkjøpsloven § 18 (presumpsjon - feil som viser seg innen 6 måneder presumeres å ha eksistert ved levering)
+` : `
+- Kjøpsloven § 17 (mangel foreligger når tingen ikke er i samsvar med avtalen)
+- Kjøpsloven § 30 (kjøpers krav ved mangel)
+- Kjøpsloven § 32 (reklamasjonsfrister - 2 år)
+`}
 
 OPPGAVE
-Skriv et komplett, send-klart reklamasjonsbrev på 400-500 ord. Brevet skal kunne kopieres direkte og sendes til selger uten redigering.
+Skriv et komplett, profesjonelt og send-klart reklamasjonsbrev på 450-550 ord. Brevet skal:
+- Ha profesjonelt juridisk språk (formelt, men forståelig)
+- Henvise til KONKRETE lovparagrafer
+- Kunne kopieres direkte og sendes til selger uten redigering
+- Være strukturert, logisk og overbevisende
 
 KRITISK - KRAVTYPE: ${claimType}
 ${
@@ -251,11 +274,11 @@ Pris: ${price}
 Dager siden kjøp: ${daysSincePurchase || "ukjent"}
 
 PROBLEMET:
-"${userDescription || "Det har oppstått problemer med bilen etter kjøpet."}"
+"${userDescription || `Det har oppstått problemer med ${vehicleNameDef} etter kjøpet.`}"
 
 ${additionalInfo ? `\nTILLEGGSINFORMASJON (viktig - inkluder relevante detaljer fra dette i brevet):\n${additionalInfo}\n` : ""}
 ${isSafetyCritical ? "⚠️ SIKKERHETSKRITISK FEIL" : ""}
-${isNotDriveable ? "⚠️ BILEN ER IKKE KJØRBAR" : ""}
+${isNotDriveable ? `⚠️ ${vehicleName.toUpperCase()} ER IKKE KJØRBAR` : ""}
 ${issues.area ? `Feilområde: ${issues.area}` : ""}
 
 KRITISKE JURIDISKE MOMENTER:

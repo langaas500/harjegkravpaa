@@ -7,6 +7,10 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
 
+    const vehicleType = data.vehicleType || "CAR";
+    const vehicleName = vehicleType === "MOTORCYCLE" ? "motorsykkel" : "bil";
+    const vehicleNameCapital = vehicleType === "MOTORCYCLE" ? "Motorsykkel" : "Bil";
+
     const isDealer = data.sellerType === "DEALER";
     const applicableLaw = isDealer ? "Forbrukerkjøpsloven" : "Kjøpsloven";
     const warrantyPeriod = isDealer ? "5 år (2 år for slitedeler)" : "2 år";
@@ -21,7 +25,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const prompt = `Du er en norsk forbrukerrettighetsekspert. Analyser denne bilkjøp-saken og gi en NØKTERN vurdering.
+    const prompt = `Du er en norsk forbrukerrettighetsekspert med juridisk kompetanse. Analyser denne ${vehicleName}kjøp-saken og gi en NØKTERN vurdering.
 
 KRITISK: FORBUDTE FORMULERINGER
 Du skal ALDRI bruke disse absolutte formuleringene:
@@ -53,12 +57,12 @@ ${!isDealer ? "- Ved privatkjøp må kjøper normalt dokumentere at feilen eksis
 SAKSDATA:
 - Kjøper: ${data.buyerName || "Ikke oppgitt"}
 - Selger: ${data.sellerName || "Ikke oppgitt"} (${isDealer ? "Forhandler" : "Privat"})
-- Bil: ${data.vehicle?.make || ""} ${data.vehicle?.model || ""} (${data.vehicle?.year || "ukjent"})
+- ${vehicleNameCapital}: ${data.vehicle?.make || ""} ${data.vehicle?.model || ""} (${data.vehicle?.year || "ukjent"})
 - Kilometerstand: ${data.vehicle?.km || "Ukjent"} km
 - Kjøpesum: ${data.vehicle?.price || "Ukjent"} kr
 - Feilområder: ${data.issues?.join(", ") || "Ikke spesifisert"}
 - Sikkerhetskritisk: ${data.safetyCritical ? "JA" : "Nei"}
-- Kjørbar: ${data.notDriveable ? "NEI - bilen kan ikke kjøres" : "Ja"}
+- Kjørbar: ${data.notDriveable ? `NEI - ${vehicleName} kan ikke kjøres` : "Ja"}
 - Kostnadsanslag: ${data.costBracket || "Ukjent"}
 - Reklamert raskt: ${data.complainedQuickly ? "Ja" : "Nei"}
 - Feil oppsto tidlig: ${data.defectSoonAfter ? "Ja" : "Nei"}
