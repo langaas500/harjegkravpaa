@@ -466,8 +466,8 @@ export default function KravbrevBetaltPage() {
                 {isGenerating ? (
                   <div className="flex flex-col items-center justify-center h-64 gap-4">
                     <Loader2 className="h-8 w-8 animate-spin text-white" />
-                    <p className="text-slate-400">Utarbeider kravbrev...</p>
-                    <p className="text-xs text-slate-600">Dette kan ta 10-20 sekunder</p>
+                    <p className="text-slate-400">Konstruerer kravbrev...</p>
+                    <p className="text-xs text-slate-600">Vent litt</p>
                   </div>
                 ) : error ? (
                   <div className="flex flex-col items-center justify-center h-64 gap-4">

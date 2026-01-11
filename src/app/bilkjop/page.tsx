@@ -1101,7 +1101,7 @@ export default function BilkjopPage() {
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    Vurderer saken...
+                    Sjekker hva du kan ha krav på...
                   </>
                 ) : (
                   <>
