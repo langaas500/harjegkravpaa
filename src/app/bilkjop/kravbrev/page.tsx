@@ -221,7 +221,7 @@ export default function KravbrevPage() {
             </button>
 
             <p className="text-xs text-slate-600 text-center mt-3">
-              Brevet genereres med AI basert på din sak og norsk forbrukerlovgivning.
+              Brevet utformes basert på opplysningene i saken din og norsk forbrukerlovgivning.
             </p>
           </div>
         </div>

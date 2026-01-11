@@ -348,8 +348,8 @@ export default function GenererPDFPage() {
       } else {
         doc.setTextColor(100, 100, 100);
         doc.setFontSize(11);
-        doc.text("Kravbrev ikke generert ennå.", margin, 40);
-        doc.text("Gå til kravbrev-siden for å generere.", margin, 48);
+        doc.text("Kravbrev ikke opprettet ennå.", margin, 40);
+        doc.text("Gå til kravbrev-siden for å opprette.", margin, 48);
       }
 
       // === PAGE 2: Vedleggsliste ===
@@ -699,7 +699,7 @@ Ved spørsmål, kontakt oss på post@harjegkravpå.no`;
                 <AlertCircle className="h-5 w-5 text-amber-400" />
               )}
               <span className={kravbrev ? "text-white" : "text-amber-400"}>
-                Kravbrev {kravbrev ? "(klar)" : "(ikke generert)"}
+                Kravbrev {kravbrev ? "(klar)" : "(ikke opprettet)"}
               </span>
             </div>
 
@@ -739,7 +739,7 @@ Ved spørsmål, kontakt oss på post@harjegkravpå.no`;
         {success && (
           <div className="flex items-center gap-3 p-4 rounded-xl border border-green-500/30 bg-green-500/10">
             <CheckCircle className="h-5 w-5 text-green-400 shrink-0" />
-            <p className="text-sm text-green-400">PDF generert og lastet ned!</p>
+            <p className="text-sm text-green-400">PDF opprettet og lastet ned!</p>
           </div>
         )}
 
@@ -779,7 +779,7 @@ Ved spørsmål, kontakt oss på post@harjegkravpå.no`;
         {!kravbrev && (
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
             <p className="text-sm text-amber-200">
-              <strong>Tips:</strong> Du har ikke generert kravbrev ennå.{" "}
+              <strong>Tips:</strong> Du har ikke opprettet kravbrev ennå.{" "}
               <button
                 onClick={() => router.push("/bilkjop/kravbrev")}
                 className="underline hover:text-white"

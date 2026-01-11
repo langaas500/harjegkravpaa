@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
+type VehicleType = "CAR" | "MOTORCYCLE" | null;
 type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "PROMISES" | "AS_IS_CLAUSE" | "VISIBLE_DEFECT" | "WORKSHOP_REPORT" | "ADDITIONAL" | "RESULT";
 
 interface VehicleInfo {
@@ -61,6 +62,7 @@ const COST_OPTIONS = [
 export default function BilkjopPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("INTRO");
+  const [vehicleType, setVehicleType] = useState<VehicleType>(null);
   const [sellerType, setSellerType] = useState<SellerType>(null);
   const [vehicle, setVehicle] = useState<VehicleInfo>({
     make: "",
@@ -100,6 +102,11 @@ export default function BilkjopPage() {
     );
   };
 
+  // Helper function for vehicle-specific text
+  const vehicleText = (carText: string, mcText: string) => {
+    return vehicleType === "MOTORCYCLE" ? mcText : carText;
+  };
+
   const canProceedBasics =
     vehicle.make && vehicle.model && vehicle.price && vehicle.purchaseDate;
 
@@ -109,7 +116,7 @@ export default function BilkjopPage() {
   const canProceedTiming = complainedQuickly !== null && defectSoonAfter !== null;
   const canProceedContact = contactedSeller !== null;
 
-  const analyzeWithAI = async () => {
+  const analyzeCase = async () => {
     setIsAnalyzing(true);
     try {
       const issueLabels = issues.map(
@@ -118,6 +125,7 @@ export default function BilkjopPage() {
       const costLabel = COST_OPTIONS.find((o) => o.id === costBracket)?.label || costBracket;
 
       const context = {
+        vehicleType,
         sellerType,
         vehicle,
         buyerName,
@@ -151,7 +159,7 @@ export default function BilkjopPage() {
       setOutcome(result.outcome);
       setStep("RESULT");
     } catch (error) {
-      console.error("AI analysis failed:", error);
+      console.error("Case analysis failed:", error);
       setOutcome({
         level: "YELLOW",
         title: "Vurdering fullført",
@@ -187,6 +195,7 @@ export default function BilkjopPage() {
 
   const goToReport = () => {
     const data = {
+      vehicleType,
       sellerType,
       vehicle,
       buyerName,
@@ -222,27 +231,63 @@ export default function BilkjopPage() {
               <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
                 <Car className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-3xl font-bold">Bilkjøp</h1>
+              <h1 className="text-3xl font-bold">Kjøp av bil eller motorsykkel</h1>
             </div>
-            
+
             <p className="text-lg text-slate-400">
-              Svar på noen spørsmål om kjøpet ditt, så vurderer vi om du sannsynligvis har en sak.
+              Har du kjøpt en defekt bil eller motorsykkel? Svar på noen spørsmål, så vurderer vi om du sannsynligvis har en sak.
             </p>
-            
+
+            <div className="space-y-3">
+              <p className="text-sm font-semibold text-slate-400">Hva gjelder saken?</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    setVehicleType("CAR");
+                    setStep("BASICS");
+                  }}
+                  className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                    vehicleType === "CAR"
+                      ? "border-white bg-white/10 text-white"
+                      : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Car className="h-5 w-5" />
+                    <div>
+                      <p className="font-semibold">Bil</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Personbil, varebil, SUV</p>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setVehicleType("MOTORCYCLE");
+                    setStep("BASICS");
+                  }}
+                  className={`w-full rounded-xl border px-5 py-4 text-left transition ${
+                    vehicleType === "MOTORCYCLE"
+                      ? "border-white bg-white/10 text-white"
+                      : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Car className="h-5 w-5" />
+                    <div>
+                      <p className="font-semibold">Motorsykkel</p>
+                      <p className="text-xs text-slate-500 mt-0.5">MC, scooter, moped</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             <div className="text-sm text-slate-500 space-y-1">
               <p>• Tar ca. 2 minutter</p>
               <p>• Gratis vurdering</p>
               <p>• Valgfri PDF-rapport (49 kr)</p>
             </div>
-            
-            <button
-              onClick={() => setStep("BASICS")}
-              className="group w-full flex items-center justify-center gap-3 rounded-full bg-white text-black py-4 font-bold text-lg hover:bg-slate-100 transition"
-            >
-              Start sjekk
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
+
             <p className="text-xs text-slate-600 text-center">
               Veiledende vurdering, ikke juridisk rådgivning
             </p>
@@ -728,20 +773,20 @@ export default function BilkjopPage() {
               <h2 className="text-2xl font-bold">Selgers løfter</h2>
             </div>
             <p className="text-sm text-slate-400">
-              Lovte selger noe spesifikt om bilens tilstand? Dette kan styrke saken din vesentlig.
+              Lovte selger noe spesifikt om {vehicleText("bilens", "motorsykkelens")} tilstand? Dette kan styrke saken din vesentlig.
             </p>
 
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
               <p className="font-semibold text-amber-400 mb-2">Hvorfor er dette viktig?</p>
               <p className="text-slate-300">
-                Hvis selger sa at bilen var feilfri, nylig service, eller garanterte noe som viste seg å være feil, styrker dette kravet ditt kraftig.
+                Hvis selger sa at {vehicleText("bilen", "motorsykkelen")} var feilfri, nylig service, eller garanterte noe som viste seg å være feil, styrker dette kravet ditt kraftig.
               </p>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
               <p className="font-medium text-slate-400 mb-2">Eksempler på relevante løfter:</p>
               <ul className="space-y-1">
-                <li>• &ldquo;Bilen er nylig EU-godkjent uten anmerkninger&rdquo;</li>
+                <li>• &ldquo;{vehicleText("Bilen", "Motorsykkelen")} er nylig EU-godkjent uten anmerkninger&rdquo;</li>
                 <li>• &ldquo;Motor og girkasse er i topp stand&rdquo;</li>
                 <li>• &ldquo;Ingen rust eller skjulte feil&rdquo;</li>
                 <li>• &ldquo;Nettopp gjort service for 15 000 kr&rdquo;</li>
@@ -751,7 +796,7 @@ export default function BilkjopPage() {
             <textarea
               value={sellerPromises}
               onChange={(e) => setSellerPromises(e.target.value)}
-              placeholder="Beskriv hva selger sa eller lovte om bilen... (Valgfritt, men viktig hvis det gjelder deg)"
+              placeholder={`Beskriv hva selger sa eller lovte om ${vehicleText("bilen", "motorsykkelen")}... (Valgfritt, men viktig hvis det gjelder deg)`}
               maxLength={1000}
               rows={4}
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
@@ -819,9 +864,9 @@ export default function BilkjopPage() {
                     : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/30"
                 }`}
               >
-                <p className="font-semibold">Ja, bilen ble solgt &ldquo;som den er&rdquo;</p>
+                <p className="font-semibold">Ja, {vehicleText("bilen", "motorsykkelen")} ble solgt &ldquo;som den er&rdquo;</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Det stod i annonse/kontrakt at bilen selges uten garanti
+                  Det stod i annonse/kontrakt at {vehicleText("bilen", "motorsykkelen")} selges uten garanti
                 </p>
               </button>
             </div>
@@ -853,7 +898,7 @@ export default function BilkjopPage() {
               <h2 className="text-2xl font-bold">Synlig ved kjøpet?</h2>
             </div>
             <p className="text-sm text-slate-400">
-              Var feilen synlig da du kjøpte bilen, eller oppdaget du den først senere?
+              Var feilen synlig da du kjøpte {vehicleText("bilen", "motorsykkelen")}, eller oppdaget du den først senere?
             </p>
 
             <div className="rounded-xl border border-orange-500/30 bg-orange-500/5 p-4 text-sm">
@@ -919,7 +964,7 @@ export default function BilkjopPage() {
               <h2 className="text-2xl font-bold">Verkstedsrapport</h2>
             </div>
             <p className="text-sm text-slate-400">
-              Har du fått bilen undersøkt av et verksted?
+              Har du fått {vehicleText("bilen", "motorsykkelen")} undersøkt av et verksted?
             </p>
 
             <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 text-sm">
@@ -940,7 +985,7 @@ export default function BilkjopPage() {
               >
                 <p className="font-semibold">Ja, jeg har verkstedsrapport</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Bilen er undersøkt og jeg har dokumentasjon
+                  {vehicleText("Bilen", "Motorsykkelen")} er undersøkt og jeg har dokumentasjon
                 </p>
               </button>
               <button
@@ -953,7 +998,7 @@ export default function BilkjopPage() {
               >
                 <p className="font-semibold">Nei, ikke undersøkt ennå</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Jeg har ikke tatt bilen til verksted
+                  Jeg har ikke tatt {vehicleText("bilen", "motorsykkelen")} til verksted
                 </p>
               </button>
             </div>
@@ -1014,7 +1059,7 @@ export default function BilkjopPage() {
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm">
               <p className="font-semibold text-emerald-400 mb-2">Hvorfor er dette viktig?</p>
               <p className="text-slate-300">
-                Mer kontekst gir bedre AI-analyse og mer substansielle dokumenter (rapport og kravbrev). Dette gjør saken din sterkere.
+                Jo mer kontekst du gir, desto bedre blir vurderingen og dokumentene (rapport og kravbrev). Dette gjør saken din sterkere.
               </p>
             </div>
 
@@ -1049,19 +1094,19 @@ export default function BilkjopPage() {
                 Tilbake
               </button>
               <button
-                onClick={analyzeWithAI}
+                onClick={analyzeCase}
                 disabled={isAnalyzing}
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-bold hover:bg-slate-100 transition disabled:opacity-60"
               >
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    Analyserer...
+                    Vurderer saken...
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-5 w-5" />
-                    Analyser saken min
+                    Vurder saken min
                   </>
                 )}
               </button>
