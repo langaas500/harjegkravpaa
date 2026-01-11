@@ -238,7 +238,7 @@ export default function KravbrevBetaltPage() {
 
   if (error && !data) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <main className="bg-nordic text-white flex items-center justify-center">
         <div className="text-center space-y-4">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
           <p className="text-red-400">{error}</p>
@@ -257,7 +257,7 @@ export default function KravbrevBetaltPage() {
   const sellerName = vehicle?.seller || "Selger";
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="bg-nordic text-white">
       <div className="mx-auto max-w-3xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.push("/bilkjop")}
@@ -418,7 +418,7 @@ export default function KravbrevBetaltPage() {
 
             <button
               onClick={handleContactSubmit}
-              className="w-full py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-slate-100 transition"
+              className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
             >
               Lag kravbrev
             </button>

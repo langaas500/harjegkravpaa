@@ -687,7 +687,7 @@ function BetaltContent() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <div className="bg-nordic text-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-white" />
           <p>Laster rapport...</p>
@@ -722,7 +722,7 @@ function BetaltContent() {
         <button
           onClick={generatePDF}
           disabled={isGenerating}
-          className="group w-full flex items-center justify-center gap-2 rounded-full bg-white text-black py-4 font-bold text-lg hover:bg-slate-100 transition disabled:opacity-60"
+          className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition disabled:opacity-60"
         >
           {isGenerating ? (
             <>
@@ -762,7 +762,7 @@ function BetaltContent() {
                 </ul>
                 <button
                   onClick={() => router.push("/bilkjop/kravbrev")}
-                  className="group w-full flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
+                  className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
                 >
                   Bestill kravbrev - 149 kr
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -787,7 +787,7 @@ function BetaltContent() {
 
 export default function BetaltPage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="bg-nordic text-white">
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-white" />

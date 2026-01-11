@@ -661,14 +661,14 @@ Ved spørsmål, kontakt oss på post@harjegkravpå.no`;
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <main className="bg-nordic text-white flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="bg-nordic text-white">
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
@@ -761,7 +761,7 @@ Ved spørsmål, kontakt oss på post@harjegkravpå.no`;
         <button
           onClick={generatePDF}
           disabled={isGenerating}
-          className="w-full flex items-center justify-center gap-3 py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-slate-100 transition disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-3 py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition disabled:opacity-60"
         >
           {isGenerating ? (
             <>

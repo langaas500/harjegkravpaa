@@ -15,6 +15,7 @@ import {
   Sparkles,
   Loader2,
 } from "lucide-react";
+import FileUpload from "@/components/FileUpload";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
 type VehicleType = "CAR" | "MOTORCYCLE" | null;
@@ -92,6 +93,7 @@ export default function BilkjopPage() {
   const [visibleDefect, setVisibleDefect] = useState<boolean | null>(null);
   const [hasWorkshopReport, setHasWorkshopReport] = useState<boolean | null>(null);
   const [workshopReportText, setWorkshopReportText] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<{ key: string; name: string; type: string; publicUrl: string }[]>([]);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
@@ -215,6 +217,7 @@ export default function BilkjopPage() {
       visibleDefect,
       hasWorkshopReport,
       workshopReportText: hasWorkshopReport ? workshopReportText : null,
+      uploadedFiles,
       outcome,
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
@@ -222,7 +225,7 @@ export default function BilkjopPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="bg-nordic text-white">
       <div className="mx-auto w-full max-w-2xl px-4 py-10">
         
         {step === "INTRO" && (
@@ -389,7 +392,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("SELLER")}
                 disabled={!canProceedBasics}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40 disabled:hover:bg-white"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40 disabled:hover:bg-teal-500"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -438,7 +441,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("ISSUES")}
                 disabled={!sellerType}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -477,7 +480,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("SEVERITY")}
                 disabled={!canProceedIssues}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -546,7 +549,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("COST")}
                 disabled={!canProceedSeverity}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -585,7 +588,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("TIMING")}
                 disabled={!canProceedCost}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -652,7 +655,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("CONTACT")}
                 disabled={!canProceedTiming}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -712,7 +715,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("DESCRIPTION")}
                 disabled={!canProceedContact}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -757,7 +760,7 @@ export default function BilkjopPage() {
               </button>
               <button
                 onClick={() => setStep("PROMISES")}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -813,7 +816,7 @@ export default function BilkjopPage() {
               </button>
               <button
                 onClick={() => setStep("AS_IS_CLAUSE")}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -882,7 +885,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("VISIBLE_DEFECT")}
                 disabled={hadAsIsClause === null}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -948,7 +951,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("WORKSHOP_REPORT")}
                 disabled={visibleDefect === null}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1037,7 +1040,7 @@ export default function BilkjopPage() {
               <button
                 onClick={() => setStep("ADDITIONAL")}
                 disabled={hasWorkshopReport === null}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1085,6 +1088,19 @@ export default function BilkjopPage() {
             />
             <p className="text-xs text-slate-600">{additionalInfo.length} / 5000 tegn</p>
 
+            <div>
+              <p className="text-sm text-slate-300 mb-3">Last opp dokumentasjon (valgfritt)</p>
+              <FileUpload
+                category="bilkjop"
+                maxFiles={10}
+                files={uploadedFiles}
+                onFilesChange={setUploadedFiles}
+              />
+              <p className="text-xs text-slate-600 mt-2">
+                Verkstedsrapporter, bilder av feil, kjøpekontrakt, annonse, eller annen dokumentasjon
+              </p>
+            </div>
+
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("DESCRIPTION")}
@@ -1096,7 +1112,7 @@ export default function BilkjopPage() {
               <button
                 onClick={analyzeCase}
                 disabled={isAnalyzing}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-bold hover:bg-slate-100 transition disabled:opacity-60"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-bold hover:bg-teal-400 transition disabled:opacity-60"
               >
                 {isAnalyzing ? (
                   <>
@@ -1172,7 +1188,7 @@ export default function BilkjopPage() {
               </button>
               <button
                 onClick={goToReport}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-bold hover:bg-slate-100 transition"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-bold hover:bg-teal-400 transition"
               >
                 <FileText className="h-5 w-5" />
                 Se full rapport

@@ -2,24 +2,37 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, CreditCard, FileText } from "lucide-react";
+import { ArrowLeft, Loader2, CreditCard, FileText, Clock, XCircle, UserX, Briefcase } from "lucide-react";
 
-interface ReportData {
-  sellerType: "PRIVATE" | "DEALER";
-  vehicle: any;
-  buyerName: string;
-  sellerName: string;
-  issues: string[];
-  outcome: any;
+interface FlightData {
+  problemType: "DELAY" | "CANCELLED" | "DENIED_BOARDING" | "BAGGAGE";
+  flight: {
+    airline: string;
+    flightNumber: string;
+    departureAirport: string;
+    arrivalAirport: string;
+    flightDate: string;
+    bookedPrice: string;
+  };
+  passengerName: string;
+  delayDuration: string | null;
+  cancellationNotice: string | null;
+  baggageType: "delayed" | "lost" | "damaged" | null;
+  outcome: {
+    level: "GREEN" | "YELLOW" | "RED";
+    title: string;
+    summary: string;
+    compensationAmount: string | null;
+  } | null;
 }
 
-export default function RapportPage() {
+export default function FlyreiserRapportPage() {
   const router = useRouter();
-  const [data, setData] = useState<ReportData | null>(null);
+  const [data, setData] = useState<FlightData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("bilkjop-data");
+    const stored = localStorage.getItem("flyreiser-data");
     if (stored) {
       setData(JSON.parse(stored));
     }
@@ -34,22 +47,42 @@ export default function RapportPage() {
     });
   };
 
+  const getProblemTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      DELAY: "Forsinkelse",
+      CANCELLED: "Kansellering",
+      DENIED_BOARDING: "Nektet ombordstigning",
+      BAGGAGE: "Bagasjeproblem",
+    };
+    return labels[type] || type;
+  };
+
+  const getProblemIcon = (type: string) => {
+    switch (type) {
+      case "DELAY": return <Clock className="h-5 w-5 text-amber-400" />;
+      case "CANCELLED": return <XCircle className="h-5 w-5 text-red-400" />;
+      case "DENIED_BOARDING": return <UserX className="h-5 w-5 text-orange-400" />;
+      case "BAGGAGE": return <Briefcase className="h-5 w-5 text-purple-400" />;
+      default: return null;
+    }
+  };
+
   const handlePayment = async () => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productType: "rapport" }),
+        body: JSON.stringify({ productType: "flyreiser-rapport" }),
       });
 
       const { url, error } = await response.json();
-      
+
       if (error) {
         alert("Feil: " + error);
         return;
       }
-      
+
       if (url) {
         window.location.href = url;
       }
@@ -94,28 +127,44 @@ export default function RapportPage() {
           >
             <p className="font-semibold text-lg">{data.outcome?.title}</p>
             <p className="text-slate-400 mt-1">{data.outcome?.summary}</p>
+            {data.outcome?.compensationAmount && (
+              <p className="mt-3 text-lg font-bold text-emerald-400">
+                Mulig kompensasjon: {data.outcome.compensationAmount}
+              </p>
+            )}
           </div>
 
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Kjøper</span>
-              <span>{data.buyerName || "Ikke oppgitt"}</span>
+              <span className="text-slate-500">Passasjer</span>
+              <span>{data.passengerName || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Selger</span>
-              <span>{data.sellerName || "Ikke oppgitt"}</span>
+              <span className="text-slate-500">Problemtype</span>
+              <span className="flex items-center gap-2">
+                {getProblemIcon(data.problemType)}
+                {getProblemTypeLabel(data.problemType)}
+              </span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Bil</span>
-              <span>{data.vehicle?.make} {data.vehicle?.model}</span>
+              <span className="text-slate-500">Flyselskap</span>
+              <span>{data.flight?.airline || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Kjøpsdato</span>
-              <span>{formatDate(data.vehicle?.purchaseDate)}</span>
+              <span className="text-slate-500">Flynummer</span>
+              <span>{data.flight?.flightNumber || "Ikke oppgitt"}</span>
+            </div>
+            <div className="flex justify-between py-2 border-b border-white/5">
+              <span className="text-slate-500">Rute</span>
+              <span>{data.flight?.departureAirport} → {data.flight?.arrivalAirport}</span>
+            </div>
+            <div className="flex justify-between py-2 border-b border-white/5">
+              <span className="text-slate-500">Flydato</span>
+              <span>{formatDate(data.flight?.flightDate)}</span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-slate-500">Lov</span>
-              <span>{data.sellerType === "DEALER" ? "Forbrukerkjøpsloven" : "Kjøpsloven"}</span>
+              <span className="text-slate-500">Regelverk</span>
+              <span>{data.problemType === "BAGGAGE" ? "Montrealkonvensjonen" : "EU-forordning 261/2004"}</span>
             </div>
           </div>
 
@@ -128,10 +177,10 @@ export default function RapportPage() {
                   </div>
                   <div>
                     <p className="font-semibold">Komplett PDF-rapport</p>
-                    <p className="text-xs text-slate-500">3 sider med vurdering og lovhenvisninger</p>
+                    <p className="text-xs text-slate-500">Vurdering med lovhenvisninger og neste steg</p>
                   </div>
                 </div>
-                <p className="text-2xl font-bold">49 kr</p>
+                <p className="text-2xl font-bold">39 kr</p>
               </div>
             </div>
 

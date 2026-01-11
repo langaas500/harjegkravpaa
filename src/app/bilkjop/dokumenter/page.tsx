@@ -193,14 +193,14 @@ export default function DokumenterPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+      <main className="bg-nordic text-white flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="bg-nordic text-white">
       <div className="mx-auto max-w-4xl px-4 py-10 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -389,7 +389,7 @@ export default function DokumenterPage() {
           <div className="pt-6 border-t border-white/10">
             <button
               onClick={() => router.push("/bilkjop/dokumenter/generer")}
-              className="w-full flex items-center justify-center gap-3 py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-slate-100 transition"
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
             >
               <Download className="h-5 w-5" />
               Generer samlet PDF

@@ -7,26 +7,33 @@ export async function POST(req: NextRequest) {
   try {
     const { productType } = await req.json();
 
-    const prices: Record<string, { 
-      amount: number; 
-      name: string; 
+    const prices: Record<string, {
+      amount: number;
+      name: string;
       desc: string;
       successUrl: string;
       cancelUrl: string;
     }> = {
-      rapport: { 
-        amount: 4900, 
-        name: "Bilkjøp-rapport PDF", 
+      rapport: {
+        amount: 4900,
+        name: "Bilkjøp-rapport PDF",
         desc: "Juridisk vurdering av din bilkjøp-sak",
         successUrl: "/bilkjop/betalt",
         cancelUrl: "/bilkjop/rapport?canceled=true",
       },
-      kravbrev: { 
-        amount: 9900, 
-        name: "Juridisk kravbrev", 
+      kravbrev: {
+        amount: 9900,
+        name: "Juridisk kravbrev",
         desc: "Ferdig formulert kravbrev til selger",
         successUrl: "/bilkjop/kravbrev/betalt",
         cancelUrl: "/bilkjop/kravbrev?canceled=true",
+      },
+      "flyreiser-rapport": {
+        amount: 3900,
+        name: "Flyreiser-rapport PDF",
+        desc: "Juridisk vurdering av din flyreise-sak",
+        successUrl: "/flyreiser/betalt",
+        cancelUrl: "/flyreiser/rapport?canceled=true",
       },
     };
 

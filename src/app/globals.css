@@ -1,31 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* === CORE PALETTE === */
 
-  /* Brand accent (subtil rosa) */
-  --accent: #ec4899;
-  --accent-soft: rgba(236, 72, 153, 0.18);
-  --accent-border: rgba(236, 72, 153, 0.28);
+  /* Dark theme (wizard, homepage) */
+  --bg-dark: #0c1220;
+  --bg-dark-elevated: #111827;
+  --bg-dark-card: rgba(255, 255, 255, 0.03);
+  --bg-dark-card-hover: rgba(255, 255, 255, 0.06);
+
+  /* Light theme (SEO pages) */
+  --bg-light: #f8fafc;
+  --bg-light-card: #ffffff;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dark: #0f172a;
+  --text-dark-secondary: #475569;
+
+  /* Primary action (teal/cyan) */
+  --primary: #2dd4bf;
+  --primary-hover: #5eead4;
+  --primary-muted: rgba(45, 212, 191, 0.15);
+  --primary-border: rgba(45, 212, 191, 0.3);
+
+  /* Semantic - sparsom bruk */
+  --success: #22c55e;
+  --success-muted: rgba(34, 197, 94, 0.15);
+  --success-border: rgba(34, 197, 94, 0.3);
+
+  --warning: #eab308;
+  --warning-muted: rgba(234, 179, 8, 0.15);
+  --warning-border: rgba(234, 179, 8, 0.3);
+
+  --error: #ef4444;
+  --error-muted: rgba(239, 68, 68, 0.15);
+  --error-border: rgba(239, 68, 68, 0.3);
+
+  /* Borders & dividers */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.12);
+  --border-light: #e2e8f0;
+
+  /* Legacy support */
+  --background: var(--bg-dark);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --accent: #fb3ea5;
-    --accent-soft: rgba(251, 62, 165, 0.18);
-    --accent-border: rgba(251, 62, 165, 0.30);
-  }
 }
 
 body {
@@ -34,10 +62,85 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-.brand-ring {
-  box-shadow: 0 0 0 1px var(--accent-border), 0 0 0 6px var(--accent-soft);
+/* === UTILITY CLASSES === */
+
+/* Primary CTA button */
+.btn-primary {
+  background: var(--primary);
+  color: var(--bg-dark);
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
 }
 
-.brand-border {
-  border-color: var(--accent-border);
+/* Card styles */
+.card-dark {
+  background: var(--bg-dark-card);
+  border: 1px solid var(--border-subtle);
+}
+.card-dark:hover {
+  background: var(--bg-dark-card-hover);
+}
+
+/* Status indicators */
+.status-success {
+  background: var(--success-muted);
+  border-color: var(--success-border);
+  color: var(--success);
+}
+.status-warning {
+  background: var(--warning-muted);
+  border-color: var(--warning-border);
+  color: var(--warning);
+}
+.status-error {
+  background: var(--error-muted);
+  border-color: var(--error-border);
+  color: var(--error);
+}
+
+/* === NORDIC PREMIUM BACKGROUND === */
+.bg-nordic {
+  position: relative;
+  min-height: 100vh;
+  background:
+    /* Subtle radial glow in center */
+    radial-gradient(
+      ellipse 80% 50% at 50% 40%,
+      rgba(30, 58, 82, 0.35) 0%,
+      rgba(20, 40, 60, 0.15) 40%,
+      transparent 70%
+    ),
+    /* Base gradient - deep midnight */
+    linear-gradient(
+      180deg,
+      #0a0f1a 0%,
+      #0c1220 15%,
+      #0d1424 50%,
+      #0b1018 100%
+    );
+  background-attachment: fixed;
+}
+
+/* Noise texture overlay */
+.bg-nordic::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  z-index: 0;
+}
+
+/* Ensure content is above noise */
+.bg-nordic > * {
+  position: relative;
+  z-index: 1;
 }

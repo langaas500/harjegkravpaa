@@ -137,7 +137,7 @@ function SoonContent() {
 
 export default function SoonPage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white px-4">
+    <main className="bg-nordic text-white px-4">
       <Suspense fallback={<div className="mx-auto max-w-xl py-10 text-slate-400">Laster...</div>}>
         <SoonContent />
       </Suspense>
