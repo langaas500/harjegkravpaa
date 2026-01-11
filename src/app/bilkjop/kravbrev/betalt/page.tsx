@@ -121,7 +121,7 @@ export default function KravbrevBetaltPage() {
       localStorage.setItem("kravbrev-text", result.letter);
     } catch (err) {
       console.error("Generate error:", err);
-      setError("Kunne ikke generere kravbrev. Prøv igjen.");
+      setError("Kunne ikke opprette kravbrev. Prøv igjen.");
     } finally {
       setIsGenerating(false);
     }
@@ -420,7 +420,7 @@ export default function KravbrevBetaltPage() {
               onClick={handleContactSubmit}
               className="w-full py-4 rounded-full bg-white text-black font-bold text-lg hover:bg-slate-100 transition"
             >
-              Generer kravbrev
+              Lag kravbrev
             </button>
           </div>
         )}

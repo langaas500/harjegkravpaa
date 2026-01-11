@@ -215,7 +215,7 @@ export default function KravbrevPage() {
               ) : (
                 <>
                   <FileText className="h-5 w-5" />
-                  Betal og generer kravbrev
+                  Betal og få kravbrev
                 </>
               )}
             </button>
