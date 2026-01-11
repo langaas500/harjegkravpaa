@@ -522,6 +522,29 @@ function BetaltContent() {
         y += descHeight + 6;
       }
 
+      if (data.additionalInfo) {
+        checkPageBreak(40);
+        doc.setFontSize(11);
+        doc.setFont(useFont, "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text("Tilleggsinformasjon", margin, y);
+        y += 2;
+        doc.setDrawColor(16, 185, 129);
+        doc.line(margin, y, margin + 46, y);
+        y += 5;
+
+        const addInfoLines = doc.splitTextToSize(`${data.additionalInfo}`, safeWidth - 4);
+        const maxLines = 25;
+        const linesToShow = addInfoLines.slice(0, maxLines);
+        const addInfoHeight = Math.min(60, 6 + linesToShow.length * 4);
+        drawBox(margin, y, contentWidth, addInfoHeight, [240, 253, 244]);
+        doc.setFontSize(7);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(22, 101, 52);
+        doc.text(linesToShow, margin + 3, y + 5);
+        y += addInfoHeight + 6;
+      }
+
       checkPageBreak(50);
       doc.setFontSize(11);
       doc.setFont(useFont, "bold");

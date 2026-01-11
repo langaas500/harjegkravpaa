@@ -65,6 +65,7 @@ SAKSDATA:
 - Kontaktet selger: ${data.contactedSeller ? "Ja" : "Nei"}
 ${data.sellerResponse ? `- Selgers respons: ${data.sellerResponse}` : ""}
 ${data.userDescription ? `- Brukerens beskrivelse: ${data.userDescription}` : ""}
+${data.additionalInfo ? `\nTILLEGGSINFORMASJON FRA BRUKER (viktig - inkluder dette i analysen):\n${data.additionalInfo}` : ""}
 
 SVAR I DETTE JSON-FORMATET:
 {

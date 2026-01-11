@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
-type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "RESULT";
+type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "ADDITIONAL" | "RESULT";
 
 interface VehicleInfo {
   make: string;
@@ -82,6 +82,7 @@ export default function BilkjopPage() {
   const [contactedSeller, setContactedSeller] = useState<boolean | null>(null);
   const [sellerResponse, setSellerResponse] = useState("");
   const [userDescription, setUserDescription] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
 
@@ -122,6 +123,7 @@ export default function BilkjopPage() {
         contactedSeller,
         sellerResponse: contactedSeller ? sellerResponse : null,
         userDescription,
+        additionalInfo,
       };
 
       const response = await fetch("/api/analyze-case", {
@@ -185,6 +187,7 @@ export default function BilkjopPage() {
       contactedSeller,
       sellerResponse: contactedSeller ? sellerResponse : null,
       userDescription,
+      additionalInfo,
       outcome,
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
@@ -690,6 +693,64 @@ export default function BilkjopPage() {
                 Tilbake
               </button>
               <button
+                onClick={() => setStep("ADDITIONAL")}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-semibold hover:bg-slate-100 transition"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "ADDITIONAL" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <FileText className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-bold">Tilleggsinformasjon</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Her kan du dele mer detaljert informasjon som styrker saken din. <span className="text-slate-600">(Valgfritt, men anbefalt)</span>
+            </p>
+
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm">
+              <p className="font-semibold text-emerald-400 mb-2">Hvorfor er dette viktig?</p>
+              <p className="text-slate-300">
+                Mer kontekst gir bedre AI-analyse og mer substansielle dokumenter (rapport og kravbrev). Dette gjør saken din sterkere.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+              <p className="font-medium text-slate-400 mb-2">Forslag til hva du kan inkludere:</p>
+              <ul className="space-y-1">
+                <li>• Detaljert historikk om når og hvordan problemet oppstod</li>
+                <li>• Verkstedsrapport (lim inn tekst eller oppsummer funn)</li>
+                <li>• Feilkoder og diagnoseinformasjon</li>
+                <li>• Hva som ble sagt/lovet av selger ved kjøpet</li>
+                <li>• Tidligere kommunikasjon med selger (e-poster, meldinger)</li>
+                <li>• Annen relevant dokumentasjon eller observasjoner</li>
+              </ul>
+            </div>
+
+            <textarea
+              value={additionalInfo}
+              onChange={(e) => setAdditionalInfo(e.target.value)}
+              placeholder="Skriv så mye du ønsker her. Jo mer detaljer, desto bedre vurdering og dokumenter får du..."
+              maxLength={5000}
+              rows={10}
+              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none font-mono text-sm"
+            />
+            <p className="text-xs text-slate-600">{additionalInfo.length} / 5000 tegn</p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("DESCRIPTION")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
                 onClick={analyzeWithAI}
                 disabled={isAnalyzing}
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-white text-black py-3 font-bold hover:bg-slate-100 transition disabled:opacity-60"
@@ -760,7 +821,7 @@ export default function BilkjopPage() {
             
             <div className="flex gap-3">
               <button
-                onClick={() => setStep("DESCRIPTION")}
+                onClick={() => setStep("ADDITIONAL")}
                 className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
               >
                 <ArrowLeft className="h-4 w-4" />

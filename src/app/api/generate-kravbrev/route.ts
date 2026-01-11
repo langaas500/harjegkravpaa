@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     const issues = data.issues || {};
     const sellerContact = data.sellerContact || {};
     const userDescription = data.userDescription || "";
+    const additionalInfo = data.additionalInfo || "";
     const outcome = data.outcome || "retting";
 
     // Kontaktinfo fra skjema
@@ -245,6 +246,7 @@ Dager siden kjøp: ${daysSincePurchase || "ukjent"}
 PROBLEMET:
 "${userDescription || "Det har oppstått problemer med bilen etter kjøpet."}"
 
+${additionalInfo ? `\nTILLEGGSINFORMASJON (viktig - inkluder relevante detaljer fra dette i brevet):\n${additionalInfo}\n` : ""}
 ${isSafetyCritical ? "⚠️ SIKKERHETSKRITISK FEIL" : ""}
 ${isNotDriveable ? "⚠️ BILEN ER IKKE KJØRBAR" : ""}
 ${issues.area ? `Feilområde: ${issues.area}` : ""}
