@@ -10,7 +10,6 @@ export default function HomePage() {
   const showSocialProof = true;
 
   const soonCats = [
-    { key: "flyreiser", icon: Plane, title: "Flyreiser", desc: "Forsinket?" },
     { key: "reklamasjon", icon: Package, title: "Reklamasjon", desc: "Feil vare?" },
     { key: "handverker", icon: Wrench, title: "Håndverker", desc: "Dårlig arbeid?" },
   ] as const;
@@ -85,6 +84,27 @@ export default function HomePage() {
               </p>
             </button>
 
+            {/* Flyreiser LIVE */}
+            <button
+              onClick={() => router.push("/flyreiser")}
+              className="group text-left rounded-2xl border border-emerald-500/25 bg-emerald-500/10 hover:bg-emerald-500/12 transition-all p-4"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="rounded-xl border border-white/10 bg-white/[0.04] p-2">
+                  <Plane className="h-4 w-4 text-emerald-300" />
+                </div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-200">
+                  Live
+                </span>
+              </div>
+              <p className="font-semibold text-white text-sm">Flyreiser</p>
+              <p className="text-xs text-slate-300 mt-1">Forsinket eller kansellert?</p>
+              <p className="text-xs text-emerald-200 mt-2 flex items-center gap-1">
+                Sjekk flyreisen{" "}
+                <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              </p>
+            </button>
+
             {/* Snart-kategorier (klikkbare til waitlist-side) */}
             {soonCats.map((c) => (
               <button
@@ -110,7 +130,7 @@ export default function HomePage() {
           </div>
 
           <p className="mt-3 text-[11px] text-slate-600">
-            Bilkjøp er live nå. Klikk "Snart" for å få beskjed når vi lanserer.
+            Bilkjøp og flyreiser er live nå. Klikk &ldquo;Snart&rdquo; for å få beskjed når vi lanserer flere.
           </p>
         </div>
 
