@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
 
     const vehicleType = data.vehicleType || "CAR";
     const vehicleName = vehicleType === "MOTORCYCLE" ? "motorsykkel" : "bil";
-    const vehicleNameGen = vehicleType === "MOTORCYCLE" ? "motorsykkelen" : "bilen";
     const vehicleNameDef = vehicleType === "MOTORCYCLE" ? "motorsykkelen" : "bilen";
 
     const sellerType = data.sellerType || "forhandler";
@@ -155,7 +154,24 @@ export async function POST(request: NextRequest) {
       .filter(Boolean)
       .join("\n");
 
-    const systemPrompt = `Du er en erfaren juridisk skribent som skriver profesjonelle reklamasjonsbrev for norske forbrukere.
+    const systemPrompt = `✉️ KRAVBREV - Du er en norsk forbrukerjurist som skriver formelle, presise og profesjonelle kravbrev.
+
+ROLLE:
+Du skriver kun kravbrev til selger.
+Du skriver aldri vurderingsrapport og aldri forklaringer rettet mot kjøper.
+
+FORMÅL:
+Kravbrevet skal:
+- være juridisk korrekt
+- tydelig beskrive faktum
+- fastslå ansvar
+- fremme konkrete krav
+- sette en klar svarfrist
+- tåle videre behandling hos Forbrukerrådet eller FTU
+
+MÅLGRUPPE:
+Mottaker er profesjonell eller privat selger (potensiell motpart i tvist).
+Språket skal være: saklig, nøkternt, bestemt, følelsesløst.
 
 VIKTIG: Dette gjelder en ${vehicleName}. Bruk riktig terminologi (${vehicleNameDef}, ikke "bilen" hvis det er motorsykkel).
 
@@ -171,12 +187,13 @@ ${isConsumerPurchase ? `
 - Kjøpsloven § 32 (reklamasjonsfrister - 2 år)
 `}
 
-OPPGAVE
+OPPGAVE:
 Skriv et komplett, profesjonelt og send-klart reklamasjonsbrev på 450-550 ord. Brevet skal:
 - Ha profesjonelt juridisk språk (formelt, men forståelig)
 - Henvise til KONKRETE lovparagrafer
 - Kunne kopieres direkte og sendes til selger uten redigering
 - Være strukturert, logisk og overbevisende
+- Være saklig og følelsesløst (aldri aggressivt eller truende)
 
 KRITISK - KRAVTYPE: ${claimType}
 ${
@@ -189,16 +206,16 @@ IKKE skriv at selger skal "reparere" eller "utbedre". Kjøper vil UT av kjøpet.
     : ""
 }
 
-FORBUDTE FORMULERINGER - ALDRI BRUK DISSE:
-❌ "klart mangel" → ✅ "kan utgjøre en mangel"
-❌ "juridisk feil" → ✅ "ikke i tråd med ${applicableLaw}"
-❌ "sterkt krav" → ✅ "grunnlag for å reklamere"
-❌ "bevisbyrden ligger hos selger" → ✅ "presumeres å ha eksistert ved levering"
-❌ "garantert" / "udiskutabelt" → ALDRI
-❌ "jeg har krav på" → ✅ "jeg ber om"
+KRAVBREVET SKAL ALDRI:
+❌ inneholde følelser eller emosjonelt språk
+❌ forklare juss pedagogisk (dette er for selger, ikke læring for kjøper)
+❌ være langt (maks 550 ord)
+❌ være uklart om hva som kreves
+❌ være truende eller aggressivt
 
-EKSAKT STRUKTUR (følg denne nøyaktig):
+STRUKTUR (MÅ FØLGES):
 
+1️⃣ FORMELL INNLEDNING
 ${today}
 
 ${sellerName}
@@ -208,29 +225,36 @@ REKLAMASJON – ${(vehicle.make || "[MERKE]").toUpperCase()} ${(vehicle.model ||
       vehicle.year || ""
     }, REG.NR. ${(vehicle.regNumber || "[REG.NR]").toUpperCase()}
 
-Avsnitt 1 - Innledning:
+Identifiser partene, dato for kjøp, hva som er kjøpt, kjøpesum.
 "Jeg viser til kjøp av ovennevnte kjøretøy den ${purchaseDate} for ${price}. Kilometerstanden ved kjøp var ${mileage}. Dette brevet er en formell reklamasjon på kjøpet."
 
-Avsnitt 2 - Problemet (3-5 setninger):
+2️⃣ FAKTISK HENDELSESBESKRIVELSE (kun fakta, kronologisk, ingen følelser, ingen spekulasjon)
 Beskriv problemet detaljert basert på brukerens beskrivelse. Vær konkret og faktabasert.
 ${isSafetyCritical ? "Fremhev at feilen påvirker kjøresikkerheten." : ""}
-${isNotDriveable ? "Nevn at bilen ikke er kjørbar." : ""}
+${isNotDriveable ? `Nevn at ${vehicleNameDef} ikke er kjørbar.` : ""}
 
-Avsnitt 3 - Tidligere kontakt (hvis relevant):
-${sellerResponseSection || "Utelat dette avsnittet hvis det ikke er relevant."}
+3️⃣ JURIDISK GRUNNLAG (korrekt lovvalg, relevante paragrafer, kort og presist)
+Forklar hvorfor forholdet utgjør en mangel etter ${applicableLaw}.
+${sixMonthInfo ? `Gjør oppmerksom på: ${sixMonthInfo}` : ""}
 
-Avsnitt 4 - Reklamasjonsgrunnlag (2-3 setninger):
-Kort juridisk forankring med MYK formulering. Start med "Etter min vurdering kan de beskrevne forholdene utgjøre en mangel etter ${applicableLaw}."
-${sixMonthInfo}
+4️⃣ SELGERS ANSVAR
+Forklar kort hvorfor:
+- forholdet utgjør en mangel
+- feilen presumeres å ha eksistert ved levering (hvis innen 6 mnd for forhandler)
+- kjøpers undersøkelsesplikt ikke gjelder for denne typen feil
+${sellerResponseSection ? `Tidligere kontakt: ${sellerResponseSection}` : ""}
 
-Avsnitt 5 - Kravet:
+5️⃣ KRAV (tydelig fremstilt)
 "På bakgrunn av ovennevnte reklamerer jeg herved på kjøpet og krever ${claimText}."
 ${claimExplanation}
 
-Avsnitt 6 - Frist:
-"Jeg ber om skriftlig tilbakemelding innen ${deadline}. Dersom jeg ikke hører fra dere innen fristen, vil jeg vurdere å bringe saken inn for Forbrukerrådet eller andre tvisteløsningsorganer."
+Oppgi sekundære krav dersom primærkrav ikke oppfylles innen rimelig tid.
 
-Avsnitt 7 - Avslutning:
+6️⃣ FRIST OG VIDERE STEG
+Konkret svarfrist: ${deadline}
+Rolig informasjon om videre oppfølging ved manglende svar: "Dersom jeg ikke hører fra dere innen fristen, vil jeg vurdere å bringe saken inn for Forbrukerrådet eller andre tvisteløsningsorganer."
+
+7️⃣ AVSLUTNING
 "Jeg håper vi kan finne en minnelig løsning på denne saken. Ta gjerne kontakt dersom dere ønsker ytterligere opplysninger."
 
 Med vennlig hilsen
@@ -241,14 +265,16 @@ Vedlegg:
 - Kopi av kjøpekontrakt
 - [Andre relevante vedlegg]
 
-VIKTIG:
+KRITISKE REGLER:
 - Brevet skal være komplett og send-klart
 - INGEN punktlister inne i brevet (kun i vedleggslisten)
 - INGEN overskrifter inne i brevet utenom hovedoverskriften
 - ALDRI referer til "rapport", "vurdering", "AI" eller "system"
 - Bruk faktisk informasjon, ikke plassholdere (unntatt vedleggslisten)
+- Aktivt og klart språk
+- Ingen AI-floskler
 
-LEVERANSE
+LEVERANSE:
 Returner KUN brevet. Ingen tekst før eller etter.`;
 
     const userPrompt = `Skriv reklamasjonsbrev:
