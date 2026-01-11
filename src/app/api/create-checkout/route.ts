@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         cancelUrl: "/bilkjop/rapport?canceled=true",
       },
       kravbrev: { 
-        amount: 14900, 
+        amount: 9900, 
         name: "Juridisk kravbrev", 
         desc: "Ferdig formulert kravbrev til selger",
         successUrl: "/bilkjop/kravbrev/betalt",

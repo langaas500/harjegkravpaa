@@ -198,7 +198,7 @@ export default function KravbrevPage() {
                   <p className="font-semibold">Juridisk kravbrev</p>
                   <p className="text-xs text-slate-500">Ferdig formulert, klart til å sende</p>
                 </div>
-                <p className="text-2xl font-bold">149 kr</p>
+                <p className="text-2xl font-bold">99 kr</p>
               </div>
             </div>
 

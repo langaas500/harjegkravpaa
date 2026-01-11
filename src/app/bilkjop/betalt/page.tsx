@@ -123,35 +123,98 @@ function BetaltContent() {
       doc.setFont(useFont, "normal");
       doc.text(`${isDealer ? "Forhandler" : "Privat"} - ${new Date().toLocaleDateString("nb-NO")}`, margin + 20, 24);
 
-      y = 38;
+      y = 40;
 
+      // === SEKSJON A: VURDERING AV KRAV ===
       const levelColors: Record<string, number[]> = { GREEN: [34, 197, 94], YELLOW: [234, 179, 8], RED: [239, 68, 68] };
-      const levelLabels: Record<string, string> = { GREEN: "SANNSYNLIG JA", YELLOW: "USIKKERT", RED: "SANNSYNLIG NEI" };
+      const levelLabels: Record<string, string> = { GREEN: "Sterkt krav", YELLOW: "Usikkert krav", RED: "Svakt krav" };
+      const levelExplanations: Record<string, string> = {
+        GREEN: "Basert på opplysningene i saken er det høy sannsynlighet for at du har et gyldig krav mot selger.",
+        YELLOW: "Basert på opplysningene i saken er det usikkert om du har et gyldig krav mot selger.",
+        RED: "Basert på opplysningene i saken er det lav sannsynlighet for at du har et gyldig krav mot selger."
+      };
       const outcomeLevel = outcome?.level as string || "YELLOW";
       const levelColor = levelColors[outcomeLevel] || levelColors.YELLOW;
 
-      doc.setFillColor(levelColor[0], levelColor[1], levelColor[2]);
-      doc.rect(margin, y, contentWidth, 7, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(9);
+      // Tittel: Vurdering av krav
+      doc.setFontSize(14);
       doc.setFont(useFont, "bold");
-      doc.text(levelLabels[outcomeLevel] || "USIKKERT", margin + 3, y + 5);
-      y += 7;
-
-      const titleLines = doc.splitTextToSize((outcome?.title as string) || "", safeWidth);
-      const summaryLines = doc.splitTextToSize((outcome?.summary as string) || "", safeWidth);
-      const summaryBoxHeight = Math.max(32, 10 + titleLines.length * 5 + summaryLines.length * 4);
-
-      drawBox(margin, y, contentWidth, summaryBoxHeight, [248, 250, 252]);
       doc.setTextColor(30, 41, 59);
-      doc.setFontSize(11);
+      doc.text("Vurdering av krav", margin, y);
+      y += 8;
+
+      // Status med farge
+      doc.setFillColor(levelColor[0], levelColor[1], levelColor[2]);
+      doc.circle(margin + 3, y, 3, "F");
+      doc.setFontSize(12);
       doc.setFont(useFont, "bold");
-      doc.text(titleLines, margin + 3, y + 6);
-      doc.setFontSize(9);
+      doc.setTextColor(levelColor[0], levelColor[1], levelColor[2]);
+      doc.text(levelLabels[outcomeLevel] || "Usikkert krav", margin + 10, y + 1);
+      y += 8;
+
+      // Forklaring
+      doc.setFontSize(10);
       doc.setFont(useFont, "normal");
       doc.setTextColor(71, 85, 105);
-      doc.text(summaryLines.slice(0, 6), margin + 3, y + 6 + titleLines.length * 5);
-      y += summaryBoxHeight + 4;
+      const explanationLines = doc.splitTextToSize(levelExplanations[outcomeLevel] || levelExplanations.YELLOW, safeWidth);
+      doc.text(explanationLines, margin, y);
+      y += explanationLines.length * 5 + 8;
+
+      // === SEKSJON A (del 2): ANBEFALT NESTE STEG ===
+      doc.setFontSize(12);
+      doc.setFont(useFont, "bold");
+      doc.setTextColor(30, 41, 59);
+      doc.text("Anbefalt neste steg", margin, y);
+      y += 7;
+
+      doc.setFontSize(10);
+      doc.setFont(useFont, "normal");
+      doc.setTextColor(71, 85, 105);
+      const nextStepText = "Send et formelt kravbrev til selger.\n\nBasert på vurderingen anbefales det å fremme kravet skriftlig, med tydelig henvisning til relevant lovverk og frister.";
+      const nextStepLines = doc.splitTextToSize(nextStepText, safeWidth);
+      doc.text(nextStepLines, margin, y);
+      y += nextStepLines.length * 5 + 10;
+
+      // === SEKSJON C: HANDLING / CTA ===
+      doc.setFontSize(10);
+      doc.setFont(useFont, "normal");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Ønsker du hjelp med dette steget?", margin, y);
+      y += 8;
+
+      // CTA-blokk
+      const ctaBoxHeight = 42;
+      doc.setDrawColor(16, 185, 129);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(margin, y, contentWidth, ctaBoxHeight, 2, 2, "S");
+
+      doc.setFontSize(11);
+      doc.setFont(useFont, "bold");
+      doc.setTextColor(30, 41, 59);
+      doc.text("Last ned ferdig kravbrev til selger", margin + 4, y + 7);
+
+      doc.setFontSize(10);
+      doc.setFont(useFont, "normal");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Pris: 99 kr", margin + 4, y + 14);
+
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105);
+      const ctaPoints = [
+        "– Juridisk korrekt formulert",
+        "– Henviser til relevante lovparagrafer",
+        "– Setter tydelige svarfrister",
+        "– Klar til å sendes direkte"
+      ];
+      let ctaY = y + 21;
+      ctaPoints.forEach((point) => {
+        doc.text(point, margin + 4, ctaY);
+        ctaY += 5;
+      });
+      y += ctaBoxHeight + 10;
+
+      // === RESTEN AV SIDE 1 ===
+      const boxW = (contentWidth - 4) / 3;
 
       // Parties
       doc.setTextColor(30, 41, 59);
@@ -164,7 +227,6 @@ function BetaltContent() {
       doc.line(margin, y, margin + 18, y);
       y += 5;
 
-      const boxW = (contentWidth - 4) / 3;
       drawBox(margin, y, boxW, 18, [248, 250, 252]);
       drawBox(margin + boxW + 2, y, boxW, 18, [248, 250, 252]);
       drawBox(margin + (boxW + 2) * 2, y, boxW, 18, [248, 250, 252]);
@@ -229,9 +291,18 @@ function BetaltContent() {
       doc.text(vehicle?.year || "-", margin + 2, y + 12);
       doc.text(vehicle?.km ? `${vehicle.km} km` : "-", margin + boxW + 4, y + 12);
       doc.text(vehicle?.price ? `${vehicle.price} kr` : "-", margin + (boxW + 2) * 2 + 2, y + 12);
-      y += 20;
+
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.text("harjegkravpå.no", margin, pageHeight - 8);
+      doc.text("Side 1/3", pageWidth - margin, pageHeight - 8, { align: "right" });
+
+      // PAGE 2
+      addPage();
 
       const halfW = (contentWidth - 2) / 2;
+
+      // Kjøpsdato og tid siden kjøp
       drawBox(margin, y, halfW, 18, [248, 250, 252]);
       drawBox(margin + halfW + 2, y, halfW, 18, [248, 250, 252]);
 
@@ -345,15 +416,9 @@ function BetaltContent() {
       doc.setFontSize(8);
       doc.setTextColor(100, 116, 139);
       doc.text(`Reklamasjonsfrist: ${warrantyText}`, margin + 3, y + 10);
+      y += 18;
 
-      doc.setFontSize(7);
-      doc.setTextColor(150, 150, 150);
-      doc.text("harjegkravpå.no", margin, pageHeight - 8);
-      doc.text("Side 1/3", pageWidth - margin, pageHeight - 8, { align: "right" });
-
-      // PAGE 2
-      addPage();
-
+      // Vurderingsgrunnlag
       doc.setFontSize(11);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
@@ -380,43 +445,16 @@ function BetaltContent() {
         doc.text(pointLines, margin + 6, y);
         y += pointLines.length * 4 + 3;
       });
-      y += 6;
 
-      checkPageBreak(30);
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Anbefalte neste steg", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 46, y);
-      y += 5;
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.text("harjegkravpå.no", margin, pageHeight - 8);
+      doc.text("Side 2/3", pageWidth - margin, pageHeight - 8, { align: "right" });
 
-      doc.setFontSize(8);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text("For å ta saken videre:", margin, y);
-      y += 6;
+      // PAGE 3
+      addPage();
 
-      const nextSteps = (outcome?.nextSteps as string[]) || [];
-      nextSteps.forEach((step: string, index: number) => {
-        checkPageBreak(10);
-        doc.setFillColor(16, 185, 129);
-        doc.circle(margin + 3, y, 3, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(7);
-        doc.setFont(useFont, "bold");
-        doc.text(String(index + 1), margin + 1.8, y + 1);
-        doc.setTextColor(30, 41, 59);
-        doc.setFontSize(8);
-        doc.setFont(useFont, "normal");
-        const stepLines = doc.splitTextToSize(step, safeWidth - 12);
-        doc.text(stepLines, margin + 10, y + 1);
-        y += stepLines.length * 4 + 4;
-      });
-      y += 6;
-
-      checkPageBreak(30);
+      // Juridisk grunnlag
       doc.setFontSize(11);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
@@ -461,16 +499,10 @@ function BetaltContent() {
       doc.setFont(useFont, "normal");
       doc.setTextColor(113, 63, 18);
       doc.text(tipLines.slice(0, 3), margin + 3, y + 11);
-
-      doc.setFontSize(7);
-      doc.setTextColor(150, 150, 150);
-      doc.text("harjegkravpå.no", margin, pageHeight - 8);
-      doc.text("Side 2/3", pageWidth - margin, pageHeight - 8, { align: "right" });
-
-      // PAGE 3
-      addPage();
+      y += tipHeight + 6;
 
       if (data.userDescription) {
+        checkPageBreak(40);
         doc.setFontSize(11);
         doc.setFont(useFont, "bold");
         doc.setTextColor(30, 41, 59);
@@ -490,6 +522,7 @@ function BetaltContent() {
         y += descHeight + 6;
       }
 
+      checkPageBreak(50);
       doc.setFontSize(11);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
@@ -516,23 +549,6 @@ function BetaltContent() {
       });
       y += 8;
 
-      checkPageBreak(28);
-      doc.setDrawColor(16, 185, 129);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(margin, y, contentWidth, 26, 2, 2, "S");
-      doc.setFontSize(10);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(16, 185, 129);
-      doc.text("Trenger du et ferdig kravbrev?", margin + 3, y + 6);
-      doc.setFontSize(8);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text(doc.splitTextToSize("Vi tilbyr kravbrev tilpasset din sak med juridisk korrekt språk, krav og frister.", safeWidth - 4), margin + 3, y + 12);
-      doc.setTextColor(16, 185, 129);
-      doc.setFont(useFont, "bold");
-      doc.text("Bestill på harjegkravpå.no", margin + 3, y + 22);
-      y += 32;
-
       checkPageBreak(14);
       drawBox(margin, y, contentWidth, 12, [241, 245, 249]);
       doc.setFontSize(8);
@@ -541,7 +557,7 @@ function BetaltContent() {
       doc.text("Viktig:", margin + 3, y + 5);
       doc.setFont(useFont, "normal");
       doc.setFontSize(7);
-      doc.text(truncate((outcome?.disclaimer as string) || "Veiledning, ikke juridisk rådgivning.", 80), margin + 16, y + 5);
+      doc.text(truncate((outcome?.disclaimer as string) || "Veiledningen er basert på opplysningene du har gitt.", 80), margin + 16, y + 5);
 
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
@@ -586,6 +602,11 @@ function BetaltContent() {
           <p className="font-semibold">Bilkjøp-rapport PDF</p>
           <p className="text-slate-400">49 kr</p>
         </div>
+
+        {/* B – UI FØR PDF */}
+        <p className="text-sm text-slate-400">
+          Du får en tydelig vurdering av om du har krav, og anbefalt neste steg basert på situasjonen.
+        </p>
 
         <button
           onClick={generatePDF}
