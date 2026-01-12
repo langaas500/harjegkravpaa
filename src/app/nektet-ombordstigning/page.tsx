@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2, XCircle, UserX } from "lucide-react";
+import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
 export default function NektetOmbordstigningPage() {
   const router = useRouter();
@@ -169,7 +170,7 @@ export default function NektetOmbordstigningPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
+        <div data-final-cta="true" className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">
             Ble du nektet ombordstigning?
           </h2>
@@ -209,6 +210,8 @@ export default function NektetOmbordstigningPage() {
           <span>Veiledende informasjon, ikke juridisk rådgivning</span>
         </div>
       </footer>
+
+      <SeoFloatingCTA href="/flyreiser" />
     </main>
   );
 }

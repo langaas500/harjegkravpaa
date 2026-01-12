@@ -1,23 +1,30 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function AppHeader() {
   const router = useRouter();
 
   return (
-    <header className="px-4 py-3 border-b border-white/5">
-      <div className="max-w-5xl mx-auto flex items-center justify-between">
-        <button 
+    <header className="h-11 md:h-12 px-4 border-b border-white/5 bg-transparent">
+      <div className="mx-auto flex h-full max-w-5xl items-center">
+        <button
+          type="button"
           onClick={() => router.push("/")}
-          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          aria-label="Gå til forsiden"
+          className="inline-flex items-center"
         >
-          <div className="text-5xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-            H
-          </div>
-          <span className="text-lg font-bold text-white">
-            harjegkravpå.no
-          </span>
+          <Image
+            src="/logo.png"
+            alt="harjegkravpå.no"
+            width={64}
+            height={64}
+            priority
+            unoptimized
+            className="h-12 md:h-14 w-auto"
+          />
+          <span className="-ml-6 text-white font-semibold text-lg">Harjegkravpå.no</span>
         </button>
       </div>
     </header>

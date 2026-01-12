@@ -18,7 +18,13 @@ export default function RootLayout({
   return (
     <html lang="no">
       <body className={inter.className}>
-        <AppHeader />
+        {/* Header-lag: isolert, ingen blur, alltid skarp */}
+        <div className="sticky top-0 z-50">
+          <div className="bg-slate-950/10 supports-[backdrop-filter]:bg-slate-950/10">
+            <AppHeader />
+          </div>
+        </div>
+
         {children}
       </body>
     </html>

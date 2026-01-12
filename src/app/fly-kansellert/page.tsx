@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
 export default function FlyKansellertPage() {
   const router = useRouter();
@@ -178,7 +179,7 @@ export default function FlyKansellertPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
+        <div data-final-cta="true" className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">
             Ble flyet ditt kansellert?
           </h2>
@@ -219,6 +220,8 @@ export default function FlyKansellertPage() {
           <span>Veiledende informasjon, ikke juridisk rådgivning</span>
         </div>
       </footer>
+
+      <SeoFloatingCTA href="/flyreiser" />
     </main>
   );
 }

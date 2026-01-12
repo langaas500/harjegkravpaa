@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2, Clock, XCircle, Briefcase } from "lucide-react";
+import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
 export default function MistetBagasjePage() {
   const router = useRouter();
@@ -198,7 +199,7 @@ export default function MistetBagasjePage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
+        <div data-final-cta="true" className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">
             Problemer med bagasjen?
           </h2>
@@ -230,6 +231,8 @@ export default function MistetBagasjePage() {
           <span>Veiledende informasjon, ikke juridisk rådgivning</span>
         </div>
       </footer>
+
+      <SeoFloatingCTA href="/flyreiser" />
     </main>
   );
 }

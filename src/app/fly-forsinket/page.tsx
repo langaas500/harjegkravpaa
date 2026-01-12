@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowRight, Clock, CheckCircle2, XCircle, Plane } from "lucide-react";
+import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
 export default function FlyForsinketPage() {
   const router = useRouter();
@@ -132,7 +133,7 @@ export default function FlyForsinketPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
+        <div data-final-cta="true" className="bg-teal-50 border border-teal-200 rounded-xl p-6 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">
             Er flyet ditt forsinket?
           </h2>
@@ -174,6 +175,8 @@ export default function FlyForsinketPage() {
           <span>Veiledende informasjon, ikke juridisk rådgivning</span>
         </div>
       </footer>
+
+      <SeoFloatingCTA href="/flyreiser" />
     </main>
   );
 }
