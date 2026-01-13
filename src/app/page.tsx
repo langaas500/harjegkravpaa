@@ -60,11 +60,11 @@ export default function HomePage() {
               <button
                 key={c.key}
                 onClick={() => router.push(c.href)}
-                className="group text-left rounded-2xl border border-teal-500/20 bg-teal-500/5 hover:bg-teal-500/10 transition-all p-4"
+                className="group text-left rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] transition-all p-4"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="rounded-xl border border-white/10 bg-white/5 p-2">
-                    <c.icon className="h-4 w-4 text-teal-400" />
+                    <c.icon className="h-4 w-4 text-slate-300" />
                   </div>
                 </div>
                 <p className="font-semibold text-white text-sm">{c.title}</p>
