@@ -30,7 +30,7 @@ export default function HomePage() {
 
         <button
           onClick={() => document.getElementById("kategorier")?.scrollIntoView({ behavior: "smooth" })}
-          className="group px-8 py-4 bg-teal-500 text-[#0c1220] font-semibold text-lg rounded-full hover:bg-teal-400 transition-all mb-4"
+          className="group px-8 py-4 bg-[#1F4F45] text-[#ECFDF5] font-semibold text-lg rounded-xl hover:bg-[#246457] transition-all mb-4"
         >
           <span className="flex items-center gap-3">
             Sjekk saken din

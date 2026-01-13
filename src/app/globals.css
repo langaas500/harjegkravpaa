@@ -4,8 +4,8 @@
   /* === CORE PALETTE === */
 
   /* Dark theme (wizard, homepage) */
-  --bg-dark: #0c1220;
-  --bg-dark-elevated: #111827;
+  --bg-dark: #2B2F36;
+  --bg-dark-elevated: #323844;
   --bg-dark-card: rgba(255, 255, 255, 0.03);
   --bg-dark-card-hover: rgba(255, 255, 255, 0.06);
 
@@ -110,17 +110,17 @@ body {
     /* Subtle radial glow in center */
     radial-gradient(
       ellipse 80% 50% at 50% 40%,
-      rgba(30, 58, 82, 0.35) 0%,
-      rgba(20, 40, 60, 0.15) 40%,
+      rgba(50, 56, 68, 0.4) 0%,
+      rgba(43, 47, 54, 0.2) 40%,
       transparent 70%
     ),
-    /* Base gradient - deep midnight */
+    /* Base gradient - neutral dark gray */
     linear-gradient(
       180deg,
-      #0a0f1a 0%,
-      #0c1220 15%,
-      #0d1424 50%,
-      #0b1018 100%
+      #252930 0%,
+      #2B2F36 15%,
+      #2D3139 50%,
+      #272B32 100%
     );
   background-attachment: fixed;
 }

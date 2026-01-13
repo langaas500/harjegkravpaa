@@ -63,7 +63,7 @@ export default function ForhandlerPage() {
           </p>
           <button
             onClick={() => router.push("/bilkjop")}
-            className="inline-flex items-center gap-2 bg-white text-[#0c1220] px-6 py-3 rounded-full font-semibold hover:bg-slate-200 transition"
+            className="inline-flex items-center gap-2 bg-[#1F4F45] text-[#ECFDF5] px-6 py-3 rounded-xl font-semibold hover:bg-[#246457] transition"
           >
             Sjekk saken din
             <ArrowRight className="h-5 w-5" />
@@ -215,7 +215,7 @@ export default function ForhandlerPage() {
           </p>
           <button
             onClick={() => router.push("/bilkjop")}
-            className="inline-flex items-center gap-2 bg-white text-[#0c1220] px-6 py-3 rounded-full font-semibold hover:bg-slate-200 transition"
+            className="inline-flex items-center gap-2 bg-[#1F4F45] text-[#ECFDF5] px-6 py-3 rounded-xl font-semibold hover:bg-[#246457] transition"
           >
             Sjekk saken din
             <ArrowRight className="h-5 w-5" />

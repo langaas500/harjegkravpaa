@@ -83,7 +83,7 @@ export default function SeoFloatingCTA({
     >
       <Link
         href={href}
-        className="inline-block rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold shadow-xl px-5 py-3 transition"
+        className="inline-block rounded-xl bg-[#1F4F45] hover:bg-[#246457] text-[#ECFDF5] font-semibold shadow-xl px-5 py-3 transition"
       >
         {label}
       </Link>
