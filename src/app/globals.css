@@ -107,6 +107,12 @@ body {
   min-height: 100vh;
   isolation: isolate;
   background:
+    /* Vignette - darker edges fading to center */
+    radial-gradient(
+      ellipse 100% 100% at 50% 50%,
+      transparent 30%,
+      rgba(0, 0, 0, 0.5) 100%
+    ),
     /* Subtle radial glow in center */
     radial-gradient(
       ellipse 80% 50% at 50% 40%,
@@ -141,4 +147,15 @@ body {
 .bg-nordic > * {
   position: relative;
   z-index: 1;
+}
+
+/* === SUBTLE NOISE TEXTURE (PREMIUM) === */
+.bg-nordic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  z-index: 0;
 }
