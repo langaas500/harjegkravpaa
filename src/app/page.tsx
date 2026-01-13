@@ -7,13 +7,13 @@ export default function HomePage() {
   const router = useRouter();
 
   const liveCats = [
-    { key: "bilkjop", icon: Car, title: "Bilkjøp", desc: "Kjøpt bil som er ødelagt?", href: "/bilkjop" },
-    { key: "flyreiser", icon: Plane, title: "Flyreiser", desc: "Forsinket eller kansellert fly?", href: "/flyreiser" },
+    { key: "bilkjop", icon: Car, title: "Kjøretøy", desc: "Bil eller MC med feil etter kjøp? Motor, gir, bremser eller annet – fortell hva som skjedde.", href: "/bilkjop" },
+    { key: "flyreiser", icon: Plane, title: "Flyreiser", desc: "Forsinket eller kansellert fly? Bagasje forsinket eller tapt – se hva du kan kreve.", href: "/flyreiser" },
   ] as const;
 
   const soonCats = [
-    { key: "handverker", icon: Wrench, title: "Håndverkere", desc: "Dårlig utført håndverkerjobb?" },
-    { key: "reklamasjon", icon: Package, title: "Reklamasjon", desc: "Feil på varer eller tjenester?" },
+    { key: "handverker", icon: Wrench, title: "Håndverkere", desc: "Dårlig arbeid, forsinkelse eller uventet pris? Finn ut hva du kan kreve og neste steg." },
+    { key: "reklamasjon", icon: Package, title: "Reklamasjon", desc: "Feil på vare eller tjeneste? Reklamasjon, frister og selger som avviser." },
   ] as const;
 
   return (
@@ -25,7 +25,7 @@ export default function HomePage() {
         </h1>
 
         <p className="text-lg md:text-xl text-slate-400 mb-8 max-w-lg">
-          før du gir opp eller betaler advokat
+          Svar på 6–8 spørsmål og få et klart svar: har du krav, og hva er neste steg.
         </p>
 
         <button
@@ -33,13 +33,13 @@ export default function HomePage() {
           className="group px-8 py-4 bg-[#1F4F45] text-[#ECFDF5] font-semibold text-lg rounded-xl hover:bg-[#246457] transition-all mb-4"
         >
           <span className="flex items-center gap-3">
-            Sjekk saken din
+            Få et klart svar
             <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </span>
         </button>
 
         <p className="text-sm text-slate-500">
-          Tar 2 minutter • Gratis vurdering • Rapport du kan bruke til å klage
+          Tar 2 minutter · Gratis vurdering · Rapport du kan bruke videre
         </p>
 
         <p className="mt-3 text-xs text-slate-600 max-w-lg">
@@ -50,7 +50,7 @@ export default function HomePage() {
         <div id="kategorier" className="mt-12 w-full max-w-3xl">
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="h-px w-10 bg-white/10" />
-            <p className="text-xs text-slate-500 uppercase tracking-widest">Kategorier</p>
+            <p className="text-xs text-slate-500 uppercase tracking-widest">Velg det som passer best for saken din – vi stiller riktige spørsmål videre.</p>
             <span className="h-px w-10 bg-white/10" />
           </div>
 
