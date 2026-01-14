@@ -1,50 +1,111 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
-import { useRouter } from "next/navigation";
-import { CheckCircle2, FileDown, Loader2 } from "lucide-react";
-import { jsPDF } from "jspdf";
+import React, { useEffect, useState, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  CheckCircle,
+  FileText,
+  Download,
+  Copy,
+  Check,
+  Loader2,
+  ArrowLeft,
+  AlertCircle,
+  Mail,
+  User,
+  Building,
+} from "lucide-react";
+
+interface ContactInfo {
+  customerName: string;
+  customerAddress: string;
+  customerPostcode: string;
+  customerCity: string;
+  customerPhone: string;
+  customerEmail: string;
+  contractorName: string;
+  contractorAddress: string;
+  contractorPostcode: string;
+  contractorCity: string;
+}
 
 function KravbrevBetaltContent() {
   const router = useRouter();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [downloaded, setDownloaded] = useState(false);
+  const searchParams = useSearchParams();
   const [data, setData] = useState<Record<string, unknown> | null>(null);
-  const [kravbrevText, setKravbrevText] = useState<string | null>(null);
-  const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
+  const [letter, setLetter] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [step, setStep] = useState<"contact" | "letter">("contact");
+  const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    customerName: "",
+    customerAddress: "",
+    customerPostcode: "",
+    customerCity: "",
+    customerPhone: "",
+    customerEmail: "",
+    contractorName: "",
+    contractorAddress: "",
+    contractorPostcode: "",
+    contractorCity: "",
+  });
+  const letterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("handverk-data");
     if (stored) {
-      const parsed = JSON.parse(stored);
-      setData(parsed);
-      generateKravbrev(parsed);
-    }
+      const parsedData = JSON.parse(stored);
+      setData(parsedData);
 
-    const loadFonts = async () => {
-      try {
-        const [regularRes, boldRes] = await Promise.all([
-          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf"),
-          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf"),
-        ]);
-        if (regularRes.ok && boldRes.ok) {
-          const [regularBuffer, boldBuffer] = await Promise.all([
-            regularRes.arrayBuffer(),
-            boldRes.arrayBuffer(),
-          ]);
-          const toBase64 = (buffer: ArrayBuffer) =>
-            btoa(new Uint8Array(buffer).reduce((d, byte) => d + String.fromCharCode(byte), ""));
-          setFontData({ regular: toBase64(regularBuffer), bold: toBase64(boldBuffer) });
-        }
-      } catch {
-        // Fall back to helvetica if fonts fail
+      // Pre-fill from existing data if available
+      const storedContact = localStorage.getItem("handverk-kravbrev-contact");
+      if (storedContact) {
+        const parsedContact = JSON.parse(storedContact);
+        setContactInfo(parsedContact);
+      } else {
+        // Pre-fill from wizard data
+        setContactInfo({
+          customerName: (parsedData.navn as string) || "",
+          customerAddress: "",
+          customerPostcode: "",
+          customerCity: "",
+          customerPhone: (parsedData.telefon as string) || "",
+          customerEmail: (parsedData.epost as string) || "",
+          contractorName: (parsedData.handverkerNavn as string) || "",
+          contractorAddress: "",
+          contractorPostcode: "",
+          contractorCity: "",
+        });
       }
-    };
-    loadFonts();
+    } else {
+      setError("Fant ikke saksdata. Vennligst start på nytt.");
+    }
   }, []);
 
-  const generateKravbrev = async (caseData: Record<string, unknown>) => {
+  const handleContactChange = (field: keyof ContactInfo, value: string) => {
+    setContactInfo((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleContactSubmit = () => {
+    if (!contactInfo.customerName || !contactInfo.customerAddress || !contactInfo.customerCity) {
+      setError("Vennligst fyll ut navn og adresse");
+      return;
+    }
+
+    localStorage.setItem("handverk-kravbrev-contact", JSON.stringify(contactInfo));
+    setStep("letter");
+    setError(null);
+
+    if (data) {
+      generateLetter({ ...data, contactInfo });
+    }
+  };
+
+  const generateLetter = async (caseData: Record<string, unknown>) => {
     setIsGenerating(true);
+    setError(null);
+
     try {
       const response = await fetch("/api/generate-handverk-kravbrev", {
         method: "POST",
@@ -52,194 +113,461 @@ function KravbrevBetaltContent() {
         body: JSON.stringify(caseData),
       });
 
-      if (!response.ok) throw new Error("API failed");
-
       const result = await response.json();
-      setKravbrevText(result.kravbrev);
-    } catch (error) {
-      console.error("Kravbrev generation failed:", error);
-      // Fallback kravbrev
-      const claimTypeText =
-        caseData.claimType === "retting"
-          ? "retting av arbeidet"
-          : caseData.claimType === "prisavslag"
-          ? `prisavslag${caseData.prisavslagBelop ? ` på kr ${caseData.prisavslagBelop}` : ""}`
-          : "heving av avtalen";
 
-      setKravbrevText(`${caseData.kundeAdresse || "[Din adresse]"}
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
 
-${new Date().toLocaleDateString("nb-NO", { day: "numeric", month: "long", year: "numeric" })}
-
-${caseData.handverkerAdresse || "[Håndverkerens adresse]"}
-
-REKLAMASJON OG KRAV – HÅNDVERKERTJENESTE
-
-Jeg viser til håndverkertjenesten utført av dere.
-
-Det foreligger mangel ved tjenesten. ${(caseData.problemer as string[])?.join(", ") || "Arbeidet er ikke i samsvar med det avtalte."}
-
-${caseData.dinHistorie ? `Nærmere beskrivelse:\n${caseData.dinHistorie}\n` : ""}
-Med hjemmel i håndverkertjenesteloven krever jeg ${claimTypeText}.
-
-Jeg ber om skriftlig tilbakemelding innen 14 dager fra mottak av dette brevet.
-
-Med vennlig hilsen
-
-${caseData.navn || "[Ditt navn]"}
-${caseData.telefon ? `Tlf: ${caseData.telefon}` : ""}
-${caseData.epost ? `E-post: ${caseData.epost}` : ""}`);
+      setLetter(result.kravbrev);
+      localStorage.setItem("handverk-kravbrev-text", result.kravbrev);
+    } catch (err) {
+      console.error("Generate error:", err);
+      setError("Kunne ikke opprette kravbrev. Prøv igjen.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const downloadKravbrev = () => {
-    if (!kravbrevText) return;
+  const handleCopy = async () => {
+    if (!letter) return;
 
     try {
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 25;
-      const contentWidth = pageWidth - margin * 2;
-
-      // Add fonts if available
-      if (fontData) {
-        doc.addFileToVFS("Roboto-Regular.ttf", fontData.regular);
-        doc.addFileToVFS("Roboto-Bold.ttf", fontData.bold);
-        doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-        doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
-        doc.setFont("Roboto");
-      }
-
-      let y = margin;
-
-      // Header
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text("Harjegkravpå.no", margin, y);
-      doc.text(new Date().toLocaleDateString("nb-NO"), pageWidth - margin, y, { align: "right" });
-      y += 15;
-
-      // Title
-      doc.setFontSize(18);
-      doc.setTextColor(0);
-      if (fontData) doc.setFont("Roboto", "bold");
-      doc.text("KRAVBREV", margin, y);
-      y += 5;
-
-      doc.setFontSize(11);
-      doc.setTextColor(80);
-      if (fontData) doc.setFont("Roboto", "normal");
-      doc.text("Reklamasjon etter håndverkertjenesteloven", margin, y);
-      y += 15;
-
-      // Divider
-      doc.setDrawColor(200);
-      doc.line(margin, y, pageWidth - margin, y);
-      y += 10;
-
-      // Kravbrev content
-      doc.setFontSize(11);
-      doc.setTextColor(30);
-
-      const lines = doc.splitTextToSize(kravbrevText, contentWidth);
-
-      for (const line of lines) {
-        if (y > pageHeight - margin - 20) {
-          doc.addPage();
-          y = margin;
-        }
-        doc.text(line, margin, y);
-        y += 6;
-      }
-
-      // Footer
-      y = pageHeight - 15;
-      doc.setFontSize(8);
-      doc.setTextColor(150);
-      doc.text("Generert av Harjegkravpå.no – Din juridiske assistent", pageWidth / 2, y, { align: "center" });
-
-      doc.save(`kravbrev-handverker-${new Date().toISOString().split("T")[0]}.pdf`);
-      setDownloaded(true);
-    } catch (error) {
-      console.error("PDF generation failed:", error);
-      alert("Kunne ikke generere PDF");
+      await navigator.clipboard.writeText(letter);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Copy failed:", err);
     }
   };
 
-  if (!data || isGenerating) {
+  const handleDownloadTxt = () => {
+    if (!letter) return;
+
+    const blob = new Blob([letter], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `kravbrev-handverker-${new Date().toISOString().split("T")[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadDocx = async () => {
+    if (!letter) return;
+
+    const { Document, Packer, Paragraph, TextRun } = await import("docx");
+
+    const paragraphs = letter.split("\n\n").map((para) => {
+      const lines = para.split("\n");
+      return new Paragraph({
+        children: lines.flatMap((line, idx) => [
+          new TextRun({ text: line }),
+          ...(idx < lines.length - 1 ? [new TextRun({ break: 1 })] : []),
+        ]),
+        spacing: { after: 200 },
+      });
+    });
+
+    const doc = new Document({
+      sections: [{ children: paragraphs }],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `kravbrev-handverker-${new Date().toISOString().split("T")[0]}.docx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!letter) return;
+
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF({
+      unit: "mm",
+      format: "a4",
+    });
+
+    const fileName = `kravbrev-handverker-${new Date().toISOString().split("T")[0]}.pdf`;
+
+    const marginX = 15;
+    const marginY = 18;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const maxWidth = pageWidth - marginX * 2;
+
+    doc.setFont("times", "normal");
+    doc.setFontSize(11);
+
+    const paragraphs = letter.replace(/\r\n/g, "\n").split("\n\n");
+
+    let y = marginY;
+
+    for (let p = 0; p < paragraphs.length; p++) {
+      const para = paragraphs[p];
+      const lines = para.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        const wrapped = doc.splitTextToSize(lines[i] || " ", maxWidth);
+        for (let w = 0; w < wrapped.length; w++) {
+          if (y > pageHeight - marginY) {
+            doc.addPage();
+            y = marginY;
+          }
+          doc.text(wrapped[w], marginX, y);
+          y += 6;
+        }
+      }
+
+      y += 4;
+      if (y > pageHeight - marginY) {
+        doc.addPage();
+        y = marginY;
+      }
+    }
+
+    doc.save(fileName);
+  };
+
+  if (error && !data) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-white" />
-          <p>{isGenerating ? "Genererer kravbrev..." : "Laster..."}</p>
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+          <p className="text-red-400">{error}</p>
+          <button
+            onClick={() => router.push("/handverkere")}
+            className="text-slate-400 hover:text-white transition"
+          >
+            Start på nytt
+          </button>
         </div>
       </div>
     );
   }
 
+  const contractorName = contactInfo.contractorName || (data?.handverkerNavn as string) || "Håndverker";
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 space-y-6">
-      <div className="space-y-6 text-center">
-        <div className="mx-auto w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
-          <CheckCircle2 className="h-8 w-8 text-emerald-400" />
-        </div>
+    <div className="mx-auto max-w-3xl px-4 py-10 space-y-6">
+      <button
+        onClick={() => router.push("/handverkere")}
+        className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Tilbake til oversikt
+      </button>
 
+      <div className="flex items-center gap-4 p-4 rounded-xl border border-green-500/30 bg-green-500/10">
+        <CheckCircle className="h-8 w-8 text-green-500 shrink-0" />
         <div>
-          <h1 className="text-3xl font-bold mb-2">Kravbrev klart!</h1>
-          <p className="text-slate-400">Takk for kjøpet. Ditt kravbrev er klart til nedlasting.</p>
-        </div>
-
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-left">
-          <p className="text-sm text-slate-500 mb-1">Ordre</p>
-          <p className="font-semibold">Juridisk kravbrev til håndverker</p>
-          <p className="text-slate-400">99 kr</p>
-        </div>
-
-        {kravbrevText && (
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left">
-            <p className="text-sm text-slate-500 mb-2">Forhåndsvisning:</p>
-            <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono max-h-60 overflow-y-auto">
-              {kravbrevText.slice(0, 800)}
-              {kravbrevText.length > 800 && "..."}
-            </pre>
-          </div>
-        )}
-
-        <button
-          onClick={downloadKravbrev}
-          disabled={!kravbrevText}
-          className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition disabled:opacity-60"
-        >
-          <FileDown className="h-5 w-5" />
-          Last ned kravbrev (PDF)
-        </button>
-
-        {downloaded && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
-            <p className="text-emerald-400 text-sm">Kravbrevet er lastet ned!</p>
-          </div>
-        )}
-
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-left">
-          <p className="text-amber-400 font-semibold text-sm mb-1">Husk:</p>
-          <ul className="text-xs text-slate-300 space-y-1">
-            <li>• Send brevet rekommandert eller med sporbar e-post</li>
-            <li>• Ta vare på kopi og sendingsbevis</li>
-            <li>• Gi håndverkeren rimelig tid til å svare (14 dager)</li>
-          </ul>
-        </div>
-
-        <div className="pt-4">
-          <button
-            onClick={() => router.push("/")}
-            className="text-slate-500 hover:text-slate-300 text-sm"
-          >
-            Tilbake til forsiden
-          </button>
+          <h1 className="text-xl font-bold text-green-400">Betaling mottatt!</h1>
+          <p className="text-sm text-slate-400">
+            {step === "contact"
+              ? "Fyll ut kontaktinfo for å lage et send-klart brev"
+              : "Utarbeider ditt kravbrev..."}
+          </p>
         </div>
       </div>
+
+      {step === "contact" && (
+        <div className="space-y-6">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-6 space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <User className="h-5 w-5 text-emerald-400" />
+              <h2 className="font-semibold">Din kontaktinformasjon</h2>
+            </div>
+
+            <div className="grid gap-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Fullt navn *</label>
+                <input
+                  type="text"
+                  value={contactInfo.customerName}
+                  onChange={(e) => handleContactChange("customerName", e.target.value)}
+                  placeholder="Ola Nordmann"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Adresse *</label>
+                <input
+                  type="text"
+                  value={contactInfo.customerAddress}
+                  onChange={(e) => handleContactChange("customerAddress", e.target.value)}
+                  placeholder="Gateveien 123"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1">Postnummer *</label>
+                  <input
+                    type="text"
+                    value={contactInfo.customerPostcode}
+                    onChange={(e) => handleContactChange("customerPostcode", e.target.value)}
+                    placeholder="0123"
+                    maxLength={4}
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1">Poststed *</label>
+                  <input
+                    type="text"
+                    value={contactInfo.customerCity}
+                    onChange={(e) => handleContactChange("customerCity", e.target.value)}
+                    placeholder="Oslo"
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1">Telefon</label>
+                  <input
+                    type="tel"
+                    value={contactInfo.customerPhone}
+                    onChange={(e) => handleContactChange("customerPhone", e.target.value)}
+                    placeholder="912 34 567"
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1">E-post</label>
+                  <input
+                    type="email"
+                    value={contactInfo.customerEmail}
+                    onChange={(e) => handleContactChange("customerEmail", e.target.value)}
+                    placeholder="ola@example.no"
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 p-6 space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <Building className="h-5 w-5 text-blue-400" />
+              <h2 className="font-semibold">Håndverkers adresse</h2>
+              {contactInfo.contractorName && (
+                <span className="text-sm text-slate-500">({contactInfo.contractorName})</span>
+              )}
+            </div>
+
+            <p className="text-sm text-slate-400 mb-4">
+              Hvis du har håndverkers adresse, fyll den inn under. Hvis ikke, kan du la feltene stå tomme og legge det
+              til manuelt senere.
+            </p>
+
+            <div className="grid gap-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Firma/navn</label>
+                <input
+                  type="text"
+                  value={contactInfo.contractorName}
+                  onChange={(e) => handleContactChange("contractorName", e.target.value)}
+                  placeholder="Håndverker AS"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Adresse</label>
+                <input
+                  type="text"
+                  value={contactInfo.contractorAddress}
+                  onChange={(e) => handleContactChange("contractorAddress", e.target.value)}
+                  placeholder="Verkstedveien 456"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1">Postnummer</label>
+                  <input
+                    type="text"
+                    value={contactInfo.contractorPostcode}
+                    onChange={(e) => handleContactChange("contractorPostcode", e.target.value)}
+                    placeholder="0456"
+                    maxLength={4}
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-400 mb-1">Poststed</label>
+                  <input
+                    type="text"
+                    value={contactInfo.contractorCity}
+                    onChange={(e) => handleContactChange("contractorCity", e.target.value)}
+                    placeholder="Oslo"
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {error && (
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-red-500/30 bg-red-500/10">
+              <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+              <p className="text-sm text-red-400">{error}</p>
+            </div>
+          )}
+
+          <button
+            onClick={handleContactSubmit}
+            className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+          >
+            Lag kravbrev
+          </button>
+        </div>
+      )}
+
+      {step === "letter" && (
+        <>
+          <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5 text-slate-400" />
+                <span className="font-medium">Ditt kravbrev</span>
+              </div>
+
+              {letter && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setStep("contact")}
+                    className="px-3 py-1.5 rounded-lg text-sm border border-white/10 hover:border-white/30 transition"
+                  >
+                    Endre info
+                  </button>
+                  <button
+                    onClick={handleCopy}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border border-white/10 hover:border-white/30 transition"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-4 w-4 text-green-500" />
+                        Kopiert!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        Kopier
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div ref={letterRef} className="p-6 min-h-[400px] max-h-[600px] overflow-y-auto">
+              {isGenerating ? (
+                <div className="flex flex-col items-center justify-center h-64 gap-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                  <p className="text-slate-400">Konstruerer kravbrev...</p>
+                  <p className="text-xs text-slate-600">Vent litt</p>
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center h-64 gap-4">
+                  <AlertCircle className="h-8 w-8 text-red-500" />
+                  <p className="text-red-400">{error}</p>
+                  <button
+                    onClick={() => data && generateLetter({ ...data, contactInfo })}
+                    className="px-4 py-2 rounded-lg border border-white/10 hover:border-white/30 transition"
+                  >
+                    Prøv igjen
+                  </button>
+                </div>
+              ) : letter ? (
+                <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-300">
+                  {letter}
+                </pre>
+              ) : null}
+            </div>
+          </div>
+
+          {letter && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={handleDownloadDocx}
+                  className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/10 hover:border-white/30 hover:bg-white/5 transition"
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Last ned .docx</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadTxt}
+                  className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/10 hover:border-white/30 hover:bg-white/5 transition"
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Last ned .txt</span>
+                </button>
+              </div>
+
+              <button
+                onClick={handleDownloadPdf}
+                className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-white/10 hover:border-white/30 hover:bg-white/5 transition"
+              >
+                <Download className="h-5 w-5" />
+                <span>Last ned PDF</span>
+              </button>
+
+              <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <Mail className="h-5 w-5 text-slate-400 mt-0.5 shrink-0" />
+                  <div className="space-y-1">
+                    <p className="font-medium text-sm">Slik sender du brevet</p>
+                    <ul className="text-xs text-slate-400 space-y-1">
+                      <li>- E-post: Send som vedlegg og be om lesebekreftelse</li>
+                      <li>- Rekommandert post: Gir dokumentasjon på at brevet er mottatt</li>
+                      <li>- Ta vare på kopi: Lagre alltid en kopi av alt du sender</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+                <p className="text-sm text-amber-200">
+                  <strong>Hva skjer nå?</strong> Håndverkeren har 14 dager på seg til å svare. Hvis du ikke får svar eller
+                  tilbudet er uakseptabelt, kan du klage til{" "}
+                  <a
+                    href="https://www.forbrukerradet.no"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-white"
+                  >
+                    Forbrukerrådet
+                  </a>
+                  .
+                </p>
+              </div>
+
+              <div className="text-center text-xs text-slate-600 pt-4">
+                <p>
+                  Veiledende dokument utarbeidet av harjegkravpå.no.
+                  <br />
+                  Ikke juridisk rådgivning. Kontakt advokat for bindende råd.
+                </p>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
