@@ -711,7 +711,7 @@ function BetaltContent() {
         <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-left">
           <p className="text-sm text-slate-500 mb-1">Ordre</p>
           <p className="font-semibold">Bilkjøp-rapport PDF</p>
-          <p className="text-slate-400">49 kr</p>
+          <p className="text-slate-400">39 kr</p>
         </div>
 
         {/* B – UI FØR PDF */}
@@ -764,7 +764,7 @@ function BetaltContent() {
                   onClick={() => router.push("/bilkjop/kravbrev")}
                   className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
                 >
-                  Bestill kravbrev - 149 kr
+                  Bestill kravbrev - 99 kr
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>

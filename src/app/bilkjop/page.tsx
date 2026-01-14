@@ -288,7 +288,7 @@ export default function BilkjopPage() {
             <div className="text-sm text-slate-500 space-y-1">
               <p>• Tar ca. 2 minutter</p>
               <p>• Gratis vurdering</p>
-              <p>• Valgfri PDF-rapport (49 kr)</p>
+              <p>• Valgfri PDF-rapport (39 kr)</p>
             </div>
 
             <p className="text-xs text-slate-600 text-center">

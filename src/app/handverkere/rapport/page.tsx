@@ -5,34 +5,34 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, CreditCard, FileText } from "lucide-react";
 
 interface ReportData {
-  sellerType: "PRIVATE" | "DEALER";
-  vehicle: any;
-  buyerName: string;
-  sellerName: string;
-  issues: string[];
-  outcome: any;
+  caseType: string;
+  fag: string[];
+  problemer: string[];
+  prisAvtalt: string | null;
+  prisSkriftlig: boolean | null;
+  prisform: string | null;
+  dinHistorie: string;
+  navn: string | null;
+  handverkerNavn: string | null;
+  outcome: {
+    level: "GREEN" | "YELLOW" | "RED";
+    title: string;
+    summary: string;
+    keyPoints: string[];
+  } | null;
 }
 
-export default function RapportPage() {
+export default function HandverkRapportPage() {
   const router = useRouter();
   const [data, setData] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("bilkjop-data");
+    const stored = localStorage.getItem("handverk-data");
     if (stored) {
       setData(JSON.parse(stored));
     }
   }, []);
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "Ikke oppgitt";
-    return new Date(dateString).toLocaleDateString("nb-NO", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
 
   const handlePayment = async () => {
     setIsLoading(true);
@@ -40,16 +40,16 @@ export default function RapportPage() {
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productType: "rapport" }),
+        body: JSON.stringify({ productType: "handverk-rapport" }),
       });
 
       const { url, error } = await response.json();
-      
+
       if (error) {
         alert("Feil: " + error);
         return;
       }
-      
+
       if (url) {
         window.location.href = url;
       }
@@ -98,24 +98,24 @@ export default function RapportPage() {
 
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Kjøper</span>
-              <span>{data.buyerName || "Ikke oppgitt"}</span>
+              <span className="text-slate-500">Kunde</span>
+              <span>{data.navn || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Selger</span>
-              <span>{data.sellerName || "Ikke oppgitt"}</span>
+              <span className="text-slate-500">Håndverker</span>
+              <span>{data.handverkerNavn || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Bil</span>
-              <span>{data.vehicle?.make} {data.vehicle?.model}</span>
+              <span className="text-slate-500">Fag</span>
+              <span>{data.fag?.join(", ") || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Kjøpsdato</span>
-              <span>{formatDate(data.vehicle?.purchaseDate)}</span>
+              <span className="text-slate-500">Problem</span>
+              <span className="text-right max-w-[200px]">{data.problemer?.join(", ") || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2">
               <span className="text-slate-500">Lov</span>
-              <span>{data.sellerType === "DEALER" ? "Forbrukerkjøpsloven" : "Kjøpsloven"}</span>
+              <span>Håndverkertjenesteloven</span>
             </div>
           </div>
 
@@ -128,7 +128,7 @@ export default function RapportPage() {
                   </div>
                   <div>
                     <p className="font-semibold">Komplett PDF-rapport</p>
-                    <p className="text-xs text-slate-500">3 sider med vurdering og lovhenvisninger</p>
+                    <p className="text-xs text-slate-500">Vurdering med lovhenvisninger</p>
                   </div>
                 </div>
                 <p className="text-2xl font-bold">39 kr</p>

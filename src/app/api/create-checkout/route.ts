@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       cancelUrl: string;
     }> = {
       rapport: {
-        amount: 4900,
+        amount: 3900,
         name: "Bilkjøp-rapport PDF",
         desc: "Juridisk vurdering av din bilkjøp-sak",
         successUrl: "/bilkjop/betalt",
@@ -34,6 +34,20 @@ export async function POST(req: NextRequest) {
         desc: "Juridisk vurdering av din flyreise-sak",
         successUrl: "/flyreiser/betalt",
         cancelUrl: "/flyreiser/rapport?canceled=true",
+      },
+      "handverk-rapport": {
+        amount: 3900,
+        name: "Håndverker-rapport PDF",
+        desc: "Juridisk vurdering av din håndverkersak",
+        successUrl: "/handverkere/betalt",
+        cancelUrl: "/handverkere/rapport?canceled=true",
+      },
+      "handverk-kravbrev": {
+        amount: 9900,
+        name: "Juridisk kravbrev til håndverker",
+        desc: "Ferdig formulert kravbrev",
+        successUrl: "/handverkere/kravbrev/betalt",
+        cancelUrl: "/handverkere/kravbrev?canceled=true",
       },
     };
 
