@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Wrench,
   ArrowRight,
@@ -22,6 +23,9 @@ import {
   Sparkles,
   Loader2,
   CheckCircle2,
+  ShieldAlert,
+  Calculator,
+  Target,
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 
@@ -29,8 +33,11 @@ type Step =
   | "INTRO"
   | "FAG"
   | "PROBLEM"
+  | "ALVORLIGHET"
   | "AVTALE"
   | "TIDSLINJE"
+  | "OMFANG_KOST"
+  | "KRAVMAL"
   | "DOKUMENTASJON"
   | "HISTORIE"
   | "SVAR"
@@ -40,6 +47,7 @@ type Step =
 
 interface OutcomeType {
   level: "GREEN" | "YELLOW" | "RED";
+  headline: string;
   title: string;
   summary: string;
   confidence: string;
@@ -48,6 +56,13 @@ interface OutcomeType {
   nextSteps: string[];
   proTip: string;
   disclaimer: string;
+  recommendedClaim?: "retting" | "prisavslag" | "heving" | "erstatning";
+  severity?: "lav" | "middels" | "høy";
+  strengthFactors?: string[];
+  riskFactors?: string[];
+  evidenceChecklist?: string[];
+  whatToWriteNow?: string;
+  deadlineSuggestion?: string;
 }
 
 const FAG_OPTIONS = [
@@ -76,6 +91,21 @@ const DOK_OPTIONS = [
   { id: "ingen", label: "Ingen dokumentasjon" },
 ];
 
+const TYPE_FEIL_OPTIONS = [
+  { id: "estetisk", label: "Estetisk (ser stygt ut)" },
+  { id: "funksjonell", label: "Funksjonell (fungerer dårlig)" },
+  { id: "strukturell", label: "Strukturell (konstruksjon/holdbarhet)" },
+  { id: "forskrift", label: "Brudd på forskrift/standard" },
+];
+
+const ONSKER_OPTIONS = [
+  { id: "retting", label: "At håndverkeren retter arbeidet" },
+  { id: "prisavslag", label: "Prisavslag / tilbakebetaling" },
+  { id: "heving", label: "Heve avtalen helt" },
+  { id: "erstatning", label: "Erstatning for følgeskader" },
+  { id: "vet_ikke", label: "Usikker – trenger veiledning" },
+];
+
 export default function HandverkerePage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("INTRO");
@@ -85,6 +115,13 @@ export default function HandverkerePage() {
   const [fagAnnetTekst, setFagAnnetTekst] = useState("");
   const [problemValg, setProblemValg] = useState<string[]>([]);
   const [problemAnnetTekst, setProblemAnnetTekst] = useState("");
+
+  // ALVORLIGHET (nytt)
+  const [funkerIkke, setFunkerIkke] = useState<boolean | null>(null);
+  const [sikkerhetsrisiko, setSikkerhetsrisiko] = useState<boolean | null>(null);
+  const [typeFeil, setTypeFeil] = useState<string[]>([]);
+  const [maltDokAvvik, setMaltDokAvvik] = useState<boolean | null>(null);
+  const [beskrivelsetilleggKort, setBeskrivelsetilleggKort] = useState("");
 
   // Avtale & pris
   const [prisAvtalt, setPrisAvtalt] = useState<"ja" | "nei" | "usikker" | null>(null);
@@ -99,6 +136,22 @@ export default function HandverkerePage() {
   const [harReklamert, setHarReklamert] = useState<boolean | null>(null);
   const [reklamertDato, setReklamertDato] = useState("");
 
+  // OMFANG_KOST (nytt)
+  const [kontraktssum, setKontraktssum] = useState("");
+  const [fakturaSum, setFakturaSum] = useState("");
+  const [utbedringEstimert, setUtbedringEstimert] = useState("");
+  const [innhentetTilbud, setInnhentetTilbud] = useState<boolean | null>(null);
+  const [tilbudSum, setTilbudSum] = useState("");
+  const [holdtTilbakeBetaling, setHoldtTilbakeBetaling] = useState<boolean | null>(null);
+  const [gjenstarArbeid, setGjenstarArbeid] = useState<boolean | null>(null);
+
+  // KRAVMAL (nytt)
+  const [onsker, setOnsker] = useState<string[]>([]);
+  const [frist, setFrist] = useState("");
+  const [vilHaSkriftlig, setVilHaSkriftlig] = useState<boolean | null>(null);
+  const [harBedtOmRett, setHarBedtOmRett] = useState<boolean | null>(null);
+  const [onskerBefaring, setOnskerBefaring] = useState<boolean | null>(null);
+
   // Dokumentasjon
   const [dokumentasjon, setDokumentasjon] = useState<string[]>([]);
 
@@ -112,6 +165,7 @@ export default function HandverkerePage() {
   const [telefon, setTelefon] = useState("");
   const [adresse, setAdresse] = useState("");
   const [handverkerNavn, setHandverkerNavn] = useState("");
+  const [handverkerAdresse, setHandverkerAdresse] = useState("");
 
   // Upload
   const [uploadedFiles, setUploadedFiles] = useState<{ key: string; name: string; type: string; publicUrl: string }[]>([]);
@@ -132,6 +186,18 @@ export default function HandverkerePage() {
     );
   };
 
+  const toggleTypeFeil = (id: string) => {
+    setTypeFeil((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleOnsker = (id: string) => {
+    setOnsker((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
   const toggleDok = (id: string) => {
     if (id === "ingen") {
       setDokumentasjon(["ingen"]);
@@ -145,8 +211,11 @@ export default function HandverkerePage() {
 
   const canProceedFag = fagValg.length > 0 && (fagValg.includes("annet") ? fagAnnetTekst.trim() : true);
   const canProceedProblem = problemValg.length > 0 && (problemValg.includes("annet") ? problemAnnetTekst.trim() : true);
+  const canProceedAlvorlighet = funkerIkke !== null || sikkerhetsrisiko !== null || typeFeil.length > 0;
   const canProceedAvtale = prisAvtalt !== null && prisform !== null;
   const canProceedTidslinje = harReklamert !== null;
+  const canProceedOmfangKost = true; // Alt er valgfritt
+  const canProceedKravmal = onsker.length > 0;
   const canProceedDok = dokumentasjon.length > 0;
   const canProceedHistorie = dinHistorie.trim().length >= 50;
 
@@ -167,27 +236,60 @@ export default function HandverkerePage() {
         DOK_OPTIONS.find((o) => o.id === id)?.label || id
       );
 
+      const typeFeilLabels = typeFeil.map((id) =>
+        TYPE_FEIL_OPTIONS.find((o) => o.id === id)?.label || id
+      );
+
+      const onskerLabels = onsker.map((id) =>
+        ONSKER_OPTIONS.find((o) => o.id === id)?.label || id
+      );
+
       const context = {
         caseType: "HANDVERK",
         fag: fagLabels,
         problemer: problemLabels,
+        // Alvorlighet
+        funkerIkke,
+        sikkerhetsrisiko,
+        typeFeil: typeFeilLabels,
+        maltDokAvvik,
+        beskrivelsetilleggKort: beskrivelsetilleggKort || null,
+        // Avtale
         prisAvtalt,
         prisSkriftlig: prisAvtalt === "ja" ? prisSkriftlig : null,
         prisform,
+        // Tidslinje
         jobbStartDato: jobbStartDato || null,
         hadFerdigDato,
         ferdigDato: hadFerdigDato ? ferdigDato : null,
         oppdagetDato: oppdagetDato || null,
         harReklamert,
         reklamertDato: harReklamert ? reklamertDato : null,
+        // Omfang & kostnad
+        kontraktssum: kontraktssum || null,
+        fakturaSum: fakturaSum || null,
+        utbedringEstimert: utbedringEstimert || null,
+        innhentetTilbud,
+        tilbudSum: innhentetTilbud ? tilbudSum : null,
+        holdtTilbakeBetaling,
+        gjenstarArbeid,
+        // Kravmål
+        onsker: onskerLabels,
+        frist: frist || null,
+        vilHaSkriftlig,
+        harBedtOmRett,
+        onskerBefaring,
+        // Dokumentasjon
         dokumentasjon: dokLabels,
         dinHistorie,
         handverkerSvar: handverkerSvar || null,
+        // Personalia
         navn: navn || null,
         epost: epost || null,
         telefon: telefon || null,
         adresse: adresse || null,
         handverkerNavn: handverkerNavn || null,
+        handverkerAdresse: handverkerAdresse || null,
         uploadedFiles,
       };
 
@@ -206,6 +308,7 @@ export default function HandverkerePage() {
       console.error("Handverk analysis failed:", error);
       setOutcome({
         level: "YELLOW",
+        headline: "USIKKERT",
         title: "Vurdering fullført",
         summary: "Basert på informasjonen du har oppgitt, kan det se ut til at du har grunnlag for en reklamasjon. Vi anbefaler å dokumentere alt og kontakte håndverkeren skriftlig.",
         confidence: "Middels",
@@ -230,6 +333,8 @@ export default function HandverkerePage() {
         ],
         proTip: "Jo raskere du reklamerer, desto sterkere står saken din.",
         disclaimer: "Dette er veiledning, ikke juridisk rådgivning.",
+        recommendedClaim: onsker.includes("retting") ? "retting" : onsker.includes("prisavslag") ? "prisavslag" : "retting",
+        severity: sikkerhetsrisiko ? "høy" : funkerIkke ? "middels" : "lav",
       });
       setStep("RESULT");
     } finally {
@@ -252,27 +357,60 @@ export default function HandverkerePage() {
       DOK_OPTIONS.find((o) => o.id === id)?.label || id
     );
 
+    const typeFeilLabels = typeFeil.map((id) =>
+      TYPE_FEIL_OPTIONS.find((o) => o.id === id)?.label || id
+    );
+
+    const onskerLabels = onsker.map((id) =>
+      ONSKER_OPTIONS.find((o) => o.id === id)?.label || id
+    );
+
     const data = {
       caseType: "HANDVERK",
       fag: fagLabels,
       problemer: problemLabels,
+      // Alvorlighet
+      funkerIkke,
+      sikkerhetsrisiko,
+      typeFeil: typeFeilLabels,
+      maltDokAvvik,
+      beskrivelsetilleggKort,
+      // Avtale
       prisAvtalt,
       prisSkriftlig: prisAvtalt === "ja" ? prisSkriftlig : null,
       prisform,
+      // Tidslinje
       jobbStartDato: jobbStartDato || null,
       hadFerdigDato,
       ferdigDato: hadFerdigDato ? ferdigDato : null,
       oppdagetDato: oppdagetDato || null,
       harReklamert,
       reklamertDato: harReklamert ? reklamertDato : null,
+      // Omfang & kostnad
+      kontraktssum,
+      fakturaSum,
+      utbedringEstimert,
+      innhentetTilbud,
+      tilbudSum,
+      holdtTilbakeBetaling,
+      gjenstarArbeid,
+      // Kravmål
+      onsker: onskerLabels,
+      frist,
+      vilHaSkriftlig,
+      harBedtOmRett,
+      onskerBefaring,
+      // Dokumentasjon
       dokumentasjon: dokLabels,
       dinHistorie,
       handverkerSvar: handverkerSvar || null,
+      // Personalia
       navn,
       epost,
       telefon,
       adresse,
       handverkerNavn,
+      handverkerAdresse,
       uploadedFiles,
       outcome,
     };
@@ -298,7 +436,7 @@ export default function HandverkerePage() {
             </p>
 
             <div className="text-sm text-slate-500 space-y-1">
-              <p>• Tar ca. 2–3 minutter</p>
+              <p>• Tar ca. 3–4 minutter</p>
               <p>• Gratis vurdering</p>
               <p>• Valgfri PDF-rapport (39 kr)</p>
             </div>
@@ -415,8 +553,158 @@ export default function HandverkerePage() {
                 Tilbake
               </button>
               <button
-                onClick={() => setStep("AVTALE")}
+                onClick={() => setStep("ALVORLIGHET")}
                 disabled={!canProceedProblem}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "ALVORLIGHET" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <ShieldAlert className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-bold">Alvorlighetsgrad</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Hjelper oss å forstå hvor alvorlig problemet er
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Fungerer tingen/installasjonen som den skal?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setFunkerIkke(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      funkerIkke === true
+                        ? "border-red-500 bg-red-500/10 text-red-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei, fungerer ikke
+                  </button>
+                  <button
+                    onClick={() => setFunkerIkke(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      funkerIkke === false
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja, fungerer
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Er det en sikkerhetsrisiko?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setSikkerhetsrisiko(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      sikkerhetsrisiko === true
+                        ? "border-red-500 bg-red-500/10 text-red-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja, mulig risiko
+                  </button>
+                  <button
+                    onClick={() => setSikkerhetsrisiko(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      sikkerhetsrisiko === false
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Hva slags type feil er det? (velg alle som passer)</p>
+                <div className="space-y-2">
+                  {TYPE_FEIL_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => toggleTypeFeil(opt.id)}
+                      className={`w-full rounded-xl border p-3 text-left text-sm transition ${
+                        typeFeil.includes(opt.id)
+                          ? "border-white bg-white/10"
+                          : "border-white/10 hover:border-white/20"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Avviker arbeidet fra avtale/tegninger/beskrivelse?</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => setMaltDokAvvik(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      maltDokAvvik === true
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setMaltDokAvvik(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      maltDokAvvik === false
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                  <button
+                    onClick={() => setMaltDokAvvik(null)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      maltDokAvvik === null
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Usikker
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-500 mb-2">Kort tilleggsbeskrivelse (valgfritt)</label>
+                <input
+                  type="text"
+                  value={beskrivelsetilleggKort}
+                  onChange={(e) => setBeskrivelsetilleggKort(e.target.value)}
+                  placeholder="F.eks. vannlekkasje, kortslutning..."
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("PROBLEM")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("AVTALE")}
+                disabled={!canProceedAlvorlighet}
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
@@ -508,7 +796,7 @@ export default function HandverkerePage() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setStep("PROBLEM")}
+                onClick={() => setStep("ALVORLIGHET")}
                 className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -640,8 +928,301 @@ export default function HandverkerePage() {
                 Tilbake
               </button>
               <button
-                onClick={() => setStep("DOKUMENTASJON")}
+                onClick={() => setStep("OMFANG_KOST")}
                 disabled={!canProceedTidslinje}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "OMFANG_KOST" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <Calculator className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-bold">Omfang og kostnader</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Hjelper oss å vurdere sakens økonomiske omfang (alt er valgfritt)
+            </p>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm text-slate-500 mb-2">Avtalt kontraktssum (kr)</label>
+                  <input
+                    type="number"
+                    value={kontraktssum}
+                    onChange={(e) => setKontraktssum(e.target.value)}
+                    placeholder="F.eks. 150000"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-500 mb-2">Fakturert beløp (kr)</label>
+                  <input
+                    type="number"
+                    value={fakturaSum}
+                    onChange={(e) => setFakturaSum(e.target.value)}
+                    placeholder="F.eks. 180000"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-500 mb-2">Estimert utbedringskostnad (kr)</label>
+                <input
+                  type="number"
+                  value={utbedringEstimert}
+                  onChange={(e) => setUtbedringEstimert(e.target.value)}
+                  placeholder="F.eks. 25000"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Har du innhentet tilbud fra annen håndverker?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setInnhentetTilbud(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      innhentetTilbud === true
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setInnhentetTilbud(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      innhentetTilbud === false
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                </div>
+              </div>
+
+              {innhentetTilbud && (
+                <div>
+                  <label className="block text-sm text-slate-500 mb-2">Tilbudssum fra annen håndverker (kr)</label>
+                  <input
+                    type="number"
+                    value={tilbudSum}
+                    onChange={(e) => setTilbudSum(e.target.value)}
+                    placeholder="F.eks. 30000"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  />
+                </div>
+              )}
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Har du holdt tilbake betaling?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setHoldtTilbakeBetaling(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      holdtTilbakeBetaling === true
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setHoldtTilbakeBetaling(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      holdtTilbakeBetaling === false
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Gjenstår det arbeid som ikke er utført?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setGjenstarArbeid(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      gjenstarArbeid === true
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setGjenstarArbeid(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      gjenstarArbeid === false
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("TIDSLINJE")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("KRAVMAL")}
+                disabled={!canProceedOmfangKost}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "KRAVMAL" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <Target className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-bold">Hva ønsker du?</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Velg hva du primært ønsker å oppnå (kan velge flere)
+            </p>
+
+            <div className="space-y-2">
+              {ONSKER_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => toggleOnsker(opt.id)}
+                  className={`w-full rounded-xl border p-4 text-left text-sm transition ${
+                    onsker.includes(opt.id)
+                      ? "border-white bg-white/10"
+                      : "border-white/10 hover:border-white/20"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-4 pt-2">
+              <div>
+                <label className="block text-sm text-slate-500 mb-2">Ønsket frist for løsning (valgfritt)</label>
+                <input
+                  type="date"
+                  value={frist}
+                  onChange={(e) => setFrist(e.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Vil du ha skriftlig svar fra håndverkeren?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setVilHaSkriftlig(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      vilHaSkriftlig === true
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setVilHaSkriftlig(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      vilHaSkriftlig === false
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ikke nødvendig
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Har du bedt håndverkeren rette feilen?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setHarBedtOmRett(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      harBedtOmRett === true
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setHarBedtOmRett(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      harBedtOmRett === false
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Ønsker du befaring/inspeksjon?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setOnskerBefaring(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      onskerBefaring === true
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setOnskerBefaring(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      onskerBefaring === false
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("OMFANG_KOST")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("DOKUMENTASJON")}
+                disabled={!canProceedKravmal}
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
               >
                 Neste
@@ -679,7 +1260,7 @@ export default function HandverkerePage() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setStep("TIDSLINJE")}
+                onClick={() => setStep("KRAVMAL")}
                 className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -726,6 +1307,20 @@ export default function HandverkerePage() {
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
             />
             <p className="text-xs text-slate-600">{dinHistorie.length} / 5000 tegn (minimum 50)</p>
+
+            <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4">
+              <p className="text-sm text-teal-400">
+                <Upload className="inline h-4 w-4 mr-2" />
+                Har du bilder eller kontrakt?
+                <Link
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); setStep("UPLOAD"); }}
+                  className="underline ml-1 hover:text-teal-300"
+                >
+                  Hopp til opplasting
+                </Link>
+              </p>
+            </div>
 
             <div className="flex gap-3">
               <button
@@ -841,7 +1436,7 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Adresse (valgfritt)</label>
+                <label className="block text-sm text-slate-500 mb-1">Din adresse (valgfritt - for kravbrev)</label>
                 <textarea
                   value={adresse}
                   onChange={(e) => setAdresse(e.target.value)}
@@ -859,6 +1454,17 @@ export default function HandverkerePage() {
                   onChange={(e) => setHandverkerNavn(e.target.value)}
                   placeholder="Elektriker AS / Ola Rørlegger"
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-500 mb-1">Håndverkerens adresse (valgfritt - for kravbrev)</label>
+                <textarea
+                  value={handverkerAdresse}
+                  onChange={(e) => setHandverkerAdresse(e.target.value)}
+                  placeholder="Håndverkerveien 1&#10;0456 Oslo"
+                  rows={2}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none resize-none"
                 />
               </div>
             </div>
@@ -956,16 +1562,56 @@ export default function HandverkerePage() {
                       : "text-red-400"
                   }`}
                 >
-                  {outcome.level === "GREEN"
+                  {outcome.headline || (outcome.level === "GREEN"
                     ? "Sannsynlig krav"
                     : outcome.level === "YELLOW"
                     ? "Usikkert"
-                    : "Lite sannsynlig"}
+                    : "Lite sannsynlig")}
                 </span>
               </div>
               <h2 className="text-xl font-bold mb-2">{outcome.title}</h2>
               <p className="text-slate-300">{outcome.summary}</p>
             </div>
+
+            {outcome.recommendedClaim && (
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm text-slate-500 uppercase tracking-wide mb-1">Anbefalt kravtype</p>
+                <p className="text-white font-medium">
+                  {outcome.recommendedClaim === "retting" && "Retting av arbeidet"}
+                  {outcome.recommendedClaim === "prisavslag" && "Prisavslag"}
+                  {outcome.recommendedClaim === "heving" && "Heving av avtalen"}
+                  {outcome.recommendedClaim === "erstatning" && "Erstatning"}
+                </p>
+              </div>
+            )}
+
+            {outcome.strengthFactors && outcome.strengthFactors.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-emerald-400 uppercase tracking-wide">Det som styrker saken</p>
+                <ul className="text-slate-300 space-y-1">
+                  {outcome.strengthFactors.map((factor, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                      {factor}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {outcome.riskFactors && outcome.riskFactors.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-amber-400 uppercase tracking-wide">Mulige risikofaktorer</p>
+                <ul className="text-slate-300 space-y-1">
+                  {outcome.riskFactors.map((factor, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                      {factor}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="space-y-2">
               <p className="text-sm text-slate-500 uppercase tracking-wide">Nøkkelpunkter</p>
@@ -975,6 +1621,20 @@ export default function HandverkerePage() {
                 ))}
               </ul>
             </div>
+
+            {outcome.whatToWriteNow && (
+              <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4">
+                <p className="text-sm text-teal-400 font-medium mb-1">Hva du bør skrive nå</p>
+                <p className="text-slate-300 text-sm">{outcome.whatToWriteNow}</p>
+              </div>
+            )}
+
+            {outcome.deadlineSuggestion && (
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm text-slate-500 mb-1">Anbefalt frist</p>
+                <p className="text-white">{outcome.deadlineSuggestion}</p>
+              </div>
+            )}
 
             <div className="flex gap-3">
               <button
