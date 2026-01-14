@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, FileDown, Loader2 } from "lucide-react";
+import { jsPDF } from "jspdf";
 
 function KravbrevBetaltContent() {
   const router = useRouter();
@@ -10,6 +11,7 @@ function KravbrevBetaltContent() {
   const [downloaded, setDownloaded] = useState(false);
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [kravbrevText, setKravbrevText] = useState<string | null>(null);
+  const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("handverk-data");
@@ -18,6 +20,27 @@ function KravbrevBetaltContent() {
       setData(parsed);
       generateKravbrev(parsed);
     }
+
+    const loadFonts = async () => {
+      try {
+        const [regularRes, boldRes] = await Promise.all([
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf"),
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf"),
+        ]);
+        if (regularRes.ok && boldRes.ok) {
+          const [regularBuffer, boldBuffer] = await Promise.all([
+            regularRes.arrayBuffer(),
+            boldRes.arrayBuffer(),
+          ]);
+          const toBase64 = (buffer: ArrayBuffer) =>
+            btoa(new Uint8Array(buffer).reduce((d, byte) => d + String.fromCharCode(byte), ""));
+          setFontData({ regular: toBase64(regularBuffer), bold: toBase64(boldBuffer) });
+        }
+      } catch {
+        // Fall back to helvetica if fonts fail
+      }
+    };
+    loadFonts();
   }, []);
 
   const generateKravbrev = async (caseData: Record<string, unknown>) => {
@@ -73,16 +96,76 @@ ${caseData.epost ? `E-post: ${caseData.epost}` : ""}`);
   const downloadKravbrev = () => {
     if (!kravbrevText) return;
 
-    const blob = new Blob([kravbrevText], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `kravbrev-handverker-${new Date().toISOString().split("T")[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    setDownloaded(true);
+    try {
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 25;
+      const contentWidth = pageWidth - margin * 2;
+
+      // Add fonts if available
+      if (fontData) {
+        doc.addFileToVFS("Roboto-Regular.ttf", fontData.regular);
+        doc.addFileToVFS("Roboto-Bold.ttf", fontData.bold);
+        doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+        doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
+        doc.setFont("Roboto");
+      }
+
+      let y = margin;
+
+      // Header
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text("Harjegkravpå.no", margin, y);
+      doc.text(new Date().toLocaleDateString("nb-NO"), pageWidth - margin, y, { align: "right" });
+      y += 15;
+
+      // Title
+      doc.setFontSize(18);
+      doc.setTextColor(0);
+      if (fontData) doc.setFont("Roboto", "bold");
+      doc.text("KRAVBREV", margin, y);
+      y += 5;
+
+      doc.setFontSize(11);
+      doc.setTextColor(80);
+      if (fontData) doc.setFont("Roboto", "normal");
+      doc.text("Reklamasjon etter håndverkertjenesteloven", margin, y);
+      y += 15;
+
+      // Divider
+      doc.setDrawColor(200);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 10;
+
+      // Kravbrev content
+      doc.setFontSize(11);
+      doc.setTextColor(30);
+
+      const lines = doc.splitTextToSize(kravbrevText, contentWidth);
+
+      for (const line of lines) {
+        if (y > pageHeight - margin - 20) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(line, margin, y);
+        y += 6;
+      }
+
+      // Footer
+      y = pageHeight - 15;
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text("Generert av Harjegkravpå.no – Din juridiske assistent", pageWidth / 2, y, { align: "center" });
+
+      doc.save(`kravbrev-handverker-${new Date().toISOString().split("T")[0]}.pdf`);
+      setDownloaded(true);
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      alert("Kunne ikke generere PDF");
+    }
   };
 
   if (!data || isGenerating) {
@@ -130,7 +213,7 @@ ${caseData.epost ? `E-post: ${caseData.epost}` : ""}`);
           className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition disabled:opacity-60"
         >
           <FileDown className="h-5 w-5" />
-          Last ned kravbrev
+          Last ned kravbrev (PDF)
         </button>
 
         {downloaded && (
