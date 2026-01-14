@@ -64,18 +64,38 @@ function KravbrevBetaltContent() {
         const parsedContact = JSON.parse(storedContact);
         setContactInfo(parsedContact);
       } else {
-        // Pre-fill from wizard data
+        // Pre-fill from wizard data - parse adresse hvis mulig
+        const kundeAdresse = (parsedData.adresse as string) || "";
+        const handverkerAdr = (parsedData.handverkerAdresse as string) || "";
+
+        // Prøv å parse "Gateveien 1, 0123 Oslo" format
+        const parseAddress = (addr: string) => {
+          if (!addr) return { street: "", postcode: "", city: "" };
+          const parts = addr.split(",").map((p: string) => p.trim());
+          const street = parts[0] || "";
+          const postcodeCity = parts[1] || "";
+          const match = postcodeCity.match(/^(\d{4})\s+(.+)$/);
+          return {
+            street,
+            postcode: match ? match[1] : "",
+            city: match ? match[2] : postcodeCity
+          };
+        };
+
+        const kundeParsed = parseAddress(kundeAdresse);
+        const handverkerParsed = parseAddress(handverkerAdr);
+
         setContactInfo({
           customerName: (parsedData.navn as string) || "",
-          customerAddress: "",
-          customerPostcode: "",
-          customerCity: "",
+          customerAddress: kundeParsed.street,
+          customerPostcode: kundeParsed.postcode,
+          customerCity: kundeParsed.city,
           customerPhone: (parsedData.telefon as string) || "",
           customerEmail: (parsedData.epost as string) || "",
           contractorName: (parsedData.handverkerNavn as string) || "",
-          contractorAddress: "",
-          contractorPostcode: "",
-          contractorCity: "",
+          contractorAddress: handverkerParsed.street,
+          contractorPostcode: handverkerParsed.postcode,
+          contractorCity: handverkerParsed.city,
         });
       }
     } else {
@@ -98,7 +118,26 @@ function KravbrevBetaltContent() {
     setError(null);
 
     if (data) {
-      generateLetter({ ...data, contactInfo });
+      // Bygg fullstendige adresser for API-en
+      const kundeAdresse = [
+        contactInfo.customerAddress,
+        `${contactInfo.customerPostcode} ${contactInfo.customerCity}`.trim()
+      ].filter(Boolean).join(", ");
+
+      const handverkerAdresse = [
+        contactInfo.contractorAddress,
+        `${contactInfo.contractorPostcode} ${contactInfo.contractorCity}`.trim()
+      ].filter(Boolean).join(", ");
+
+      generateLetter({
+        ...data,
+        navn: contactInfo.customerName,
+        epost: contactInfo.customerEmail || data.epost,
+        telefon: contactInfo.customerPhone || data.telefon,
+        kundeAdresse,
+        handverkerNavn: contactInfo.contractorName || data.handverkerNavn,
+        handverkerAdresse,
+      });
     }
   };
 
