@@ -1,9 +1,23 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Lazy initialization to avoid build errors when env vars are missing
+let _supabase: SupabaseClient | null = null;
+
+function getSupabase(): SupabaseClient | null {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn("Supabase env vars missing - database features disabled");
+    return null;
+  }
+  if (!_supabase) {
+    _supabase = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return _supabase;
+}
+
+export const supabase = getSupabase();
 
 export type CaseType = "BIL" | "HANDVERK" | "FLYREISER";
 export type CaseStatus = "draft" | "completed" | "paid";
@@ -22,7 +36,13 @@ export async function createCase(
   caseType: CaseType,
   payload: Record<string, unknown>
 ): Promise<{ id: string } | null> {
-  const { data, error } = await supabase
+  const client = getSupabase();
+  if (!client) {
+    console.warn("Supabase not configured - skipping createCase");
+    return null;
+  }
+
+  const { data, error } = await client
     .from("cases")
     .insert({
       case_type: caseType,
@@ -54,7 +74,13 @@ export async function updateCase(
     status?: CaseStatus;
   }
 ): Promise<boolean> {
-  const { error } = await supabase
+  const client = getSupabase();
+  if (!client) {
+    console.warn("Supabase not configured - skipping updateCase");
+    return false;
+  }
+
+  const { error } = await client
     .from("cases")
     .update({
       ...updates,
@@ -71,7 +97,13 @@ export async function updateCase(
 }
 
 export async function getCase(id: string): Promise<CaseRecord | null> {
-  const { data, error } = await supabase
+  const client = getSupabase();
+  if (!client) {
+    console.warn("Supabase not configured - skipping getCase");
+    return null;
+  }
+
+  const { data, error } = await client
     .from("cases")
     .select("*")
     .eq("id", id)
