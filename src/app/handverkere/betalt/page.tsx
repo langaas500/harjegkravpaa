@@ -54,6 +54,90 @@ function BetaltContent() {
     return text.length > maxLen ? text.substring(0, maxLen - 2) + ".." : text;
   };
 
+  // Hjelpefunksjon: Omskriv brukerens fritekst til nøytral saksfremstilling
+  const reformulateUserText = (rawText: string): string => {
+    if (!rawText) return "";
+    // Fjern overdrevne tegnsettinger, rett opp vanlige skrivefeil, gjør nøytralt
+    let text = rawText
+      .replace(/!!+/g, ".")
+      .replace(/\?\?+/g, "?")
+      .replace(/\.\.\.+/g, ".")
+      .replace(/\s+/g, " ")
+      .trim();
+    // Sørg for at første bokstav er stor
+    if (text.length > 0) {
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    // Sørg for at teksten slutter med punktum
+    if (text.length > 0 && !text.match(/[.!?]$/)) {
+      text += ".";
+    }
+    return text;
+  };
+
+  // Hjelpefunksjon: Generer utvidet juridisk begrunnelse basert på problemtype
+  const getExtendedLegalAnalysis = (problemTypes: string[], hasWrittenAgreement: boolean, priceAgreed: string): string[] => {
+    const analyses: string[] = [];
+
+    analyses.push("Håndverkertjenesteloven (hvtjl.) regulerer avtaler mellom forbrukere og næringsdrivende om tjenester på ting og fast eiendom. Loven er ufravikelig i forbrukerforhold, jf. hvtjl. § 3, og håndverkeren kan ikke avtale seg bort fra forbrukerens rettigheter.");
+
+    if (problemTypes.includes("Dårlig utført arbeid") || problemTypes.includes("Feil og mangler")) {
+      analyses.push("Etter hvtjl. § 17 foreligger det en mangel dersom resultatet ikke svarer til det forbrukeren har rett til å kreve etter §§ 5, 6 og 9. Tjenesten skal utføres fagmessig, og resultatet skal svare til det som er avtalt og det forbrukeren med rimelighet kan forvente.");
+      analyses.push("Håndverkeren har en selvstendig plikt til å fraråde arbeid dersom det ikke vil tjene forbrukerens interesser, jf. hvtjl. § 7. Unnlatelse av frarådingsplikten kan i seg selv utgjøre en mangel ved tjenesten.");
+    }
+
+    if (problemTypes.includes("Forsinkelse")) {
+      analyses.push("Etter hvtjl. § 10 foreligger forsinkelse dersom tjenesten ikke er avsluttet innen den tid som er avtalt, eller innen rimelig tid dersom ingen frist er satt. Forbrukeren kan holde tilbake betaling, kreve oppfyllelse, heve avtalen eller kreve erstatning ved forsinkelse, jf. hvtjl. §§ 11-15.");
+    }
+
+    if (problemTypes.includes("Uventet høy pris") || problemTypes.includes("Prisuenighet")) {
+      if (priceAgreed === "nei") {
+        analyses.push("Der det ikke er avtalt pris, skal forbrukeren betale det som er rimelig i forhold til tjenestens art og omfang, jf. hvtjl. § 32 første ledd. Ved vurderingen skal det tas utgangspunkt i gjengs pris for tilsvarende tjenester på avtaletiden.");
+      }
+      analyses.push("Håndverkeren har plikt til å varsle forbrukeren dersom prisen vil bli vesentlig høyere enn det forbrukeren måtte vente, jf. hvtjl. § 32 tredje ledd. Unnlatelse av varslingsplikten kan medføre at forbrukeren ikke behøver å betale mer enn det som med rimelighet kunne forventes.");
+      if (hasWrittenAgreement) {
+        analyses.push("Ved fast pris eller prisoverslag er håndverkeren bundet av dette, med mindre det er tatt uttrykkelig forbehold. Et prisoverslag skal ikke overskrides vesentlig, og i alle tilfeller ikke med mer enn 15 prosent, jf. hvtjl. § 32 annet ledd.");
+      }
+    }
+
+    if (problemTypes.includes("Skade på eiendom")) {
+      analyses.push("Etter hvtjl. § 28 er håndverkeren erstatningsansvarlig for tap som følge av mangel eller forsinkelse, med mindre tapet skyldes hindring utenfor håndverkerens kontroll. Erstatningen omfatter både direkte og indirekte tap, herunder skade på annen eiendom enn den tjenesten gjelder.");
+    }
+
+    return analyses;
+  };
+
+  // Hjelpefunksjon: Generer konkrete handlingspunkter
+  const getActionPoints = (outcomeLevel: string): string[] => {
+    const points: string[] = [];
+
+    points.push("Send skriftlig reklamasjon til håndverkeren uten ugrunnet opphold. Reklamasjonen bør sendes rekommandert eller per e-post med lesebekreftelse for å sikre dokumentasjon på at den er mottatt.");
+    points.push("Reklamasjonen skal inneholde: (1) en klar beskrivelse av mangelen eller forsinkelsen, (2) hvilke krav du fremmer (retting, prisavslag, heving eller erstatning), og (3) en rimelig frist for tilbakemelding (normalt 14 dager).");
+    points.push("Dokumenter alle mangler med bilder, video og skriftlige beskrivelser. Ta gjerne bilder fra flere vinkler og sørg for god belysning. Dokumentasjon bør sikres så tidlig som mulig.");
+    points.push("Innhent gjerne en uavhengig vurdering fra en annen fagperson dersom det er uenighet om fagmessig utførelse. En slik vurdering kan være avgjørende bevis i en eventuell tvist.");
+
+    if (outcomeLevel === "GREEN") {
+      points.push("Gi håndverkeren anledning til å rette mangelen før du eventuelt engasjerer andre til å utbedre. Håndverkeren har etter hvtjl. § 24 rett til å rette mangelen dersom det kan skje uten vesentlig ulempe for deg.");
+    } else if (outcomeLevel === "YELLOW") {
+      points.push("Vurder å kontakte Forbrukerrådet for veiledning dersom håndverkeren avviser reklamasjonen. Forbrukerrådet tilbyr gratis mekling og kan bidra til løsning uten rettslige skritt.");
+    } else {
+      points.push("Selv om saken fremstår som utfordrende, bør du likevel fremme en skriftlig reklamasjon. Håndverkerens respons kan gi grunnlag for å vurdere saken på nytt.");
+    }
+
+    return points;
+  };
+
+  // Hjelpefunksjon: Generer konsekvenstekst
+  const getConsequenceText = (outcomeLevel: string): string => {
+    if (outcomeLevel === "GREEN") {
+      return "Dersom håndverkeren ikke besvarer reklamasjonen innen fristen, eller avviser kravet uten saklig grunn, kan saken bringes inn for Forbrukerrådet for mekling. Fører ikke mekling frem, kan saken bringes inn for Forbrukerklageutvalget eller de alminnelige domstoler. Håndverkeren risikerer i så fall å måtte dekke dine sakskostnader i tillegg til kravet.";
+    } else if (outcomeLevel === "YELLOW") {
+      return "Håndverkerens respons på reklamasjonen vil være avgjørende for hvordan saken bør håndteres videre. Dersom håndverkeren erkjenner forholdet helt eller delvis, kan partene ofte finne en minnelig løsning. Ved uenighet kan Forbrukerrådets meklingstjeneste være et godt alternativ før eventuell rettslig behandling.";
+    } else {
+      return "Selv om saken fremstår som krevende, er det viktig å fremme reklamasjonen skriftlig. Håndverkerens respons kan belyse forhold som endrer vurderingen. I enkelte tilfeller viser det seg at håndverkeren likevel erkjenner ansvar når kravet blir formalisert.";
+    }
+  };
+
   const generatePDF = async () => {
     if (!data) return;
     setIsGenerating(true);
@@ -66,6 +150,8 @@ function BetaltContent() {
       const contentWidth = pageWidth - margin * 2;
       const safeWidth = contentWidth - 4;
       let y = 0;
+      let currentPage = 1;
+      let totalPages = 5; // Estimat, oppdateres til slutt
 
       if (fontData) {
         doc.addFileToVFS("Roboto-Regular.ttf", fontData.regular);
@@ -79,23 +165,28 @@ function BetaltContent() {
       const fag = data.fag as string[] | undefined;
       const problemer = data.problemer as string[] | undefined;
 
+      // Forbedret header med sidetall
+      const addPageHeader = (pageNum: number) => {
+        doc.setFillColor(30, 41, 59);
+        doc.rect(0, 0, pageWidth, 22, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(11);
+        doc.setFont(useFont, "bold");
+        doc.text("JURIDISK VURDERING – HÅNDVERKERTJENESTE", margin, 14);
+        doc.setFontSize(8);
+        doc.setFont(useFont, "normal");
+        doc.text(`Side ${pageNum}`, pageWidth - margin, 14, { align: "right" });
+        y = 30;
+      };
+
       const addPage = () => {
         doc.addPage();
-        y = margin;
-        doc.setFillColor(30, 41, 59);
-        doc.rect(0, 0, pageWidth, 25, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(14);
-        doc.setFont(useFont, "bold");
-        doc.text("HÅNDVERKER-RAPPORT", margin, 16);
-        doc.setFontSize(9);
-        doc.setFont(useFont, "normal");
-        doc.text(new Date().toLocaleDateString("nb-NO"), pageWidth - margin, 16, { align: "right" });
-        y = 35;
+        currentPage++;
+        addPageHeader(currentPage);
       };
 
       const checkPageBreak = (needed: number) => {
-        if (y + needed > pageHeight - 25) addPage();
+        if (y + needed > pageHeight - 20) addPage();
       };
 
       const drawBox = (x: number, yPos: number, width: number, height: number, fillColor: number[]) => {
@@ -103,310 +194,476 @@ function BetaltContent() {
         doc.roundedRect(x, yPos, width, height, 2, 2, "F");
       };
 
-      // PAGE 1 - Header
-      doc.setFillColor(30, 41, 59);
-      doc.rect(0, 0, pageWidth, 30, "F");
-      doc.setFillColor(16, 185, 129);
-      doc.roundedRect(margin, 8, 14, 14, 2, 2, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(12);
-      doc.setFont(useFont, "bold");
-      doc.text("H", margin + 5, 17);
-      doc.setFontSize(18);
-      doc.text("HÅNDVERKER-RAPPORT", margin + 20, 17);
-      doc.setFontSize(9);
-      doc.setFont(useFont, "normal");
-      doc.text(new Date().toLocaleDateString("nb-NO"), margin + 20, 24);
-
-      y = 40;
-
-      // Vurdering av krav
-      const levelColors: Record<string, number[]> = { GREEN: [34, 197, 94], YELLOW: [234, 179, 8], RED: [239, 68, 68] };
-      const levelLabels: Record<string, string> = { GREEN: "Sannsynlig krav", YELLOW: "Usikkert krav", RED: "Svakt krav" };
-      const levelExplanations: Record<string, string> = {
-        GREEN: "Basert på opplysningene i saken er det høy sannsynlighet for at du har et gyldig krav mot håndverkeren.",
-        YELLOW: "Basert på opplysningene i saken er det usikkert om du har et gyldig krav mot håndverkeren.",
-        RED: "Basert på opplysningene i saken er det lav sannsynlighet for at du har et gyldig krav mot håndverkeren."
+      const addSectionTitle = (title: string) => {
+        checkPageBreak(15);
+        doc.setFontSize(12);
+        doc.setFont(useFont, "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text(title, margin, y);
+        y += 2;
+        doc.setDrawColor(16, 185, 129);
+        doc.setLineWidth(0.8);
+        doc.line(margin, y, margin + doc.getTextWidth(title) + 5, y);
+        y += 6;
       };
-      const outcomeLevel = outcome?.level as string || "YELLOW";
+
+      const addParagraph = (text: string, fontSize: number = 9) => {
+        doc.setFontSize(fontSize);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        const lines = doc.splitTextToSize(text, safeWidth);
+        lines.forEach((line: string) => {
+          checkPageBreak(5);
+          doc.text(line, margin, y);
+          y += 4.5;
+        });
+        y += 2;
+      };
+
+      const outcomeLevel = (outcome?.level as string) || "YELLOW";
+      const kundeNavn = (data.navn as string) || "Forbruker";
+      const handverkerNavn = (data.handverkerNavn as string) || "Håndverker";
+      const fagListe = fag?.join(", ") || "ikke spesifisert";
+      const problemListe = problemer || [];
+      const harSkriftligAvtale = data.prisSkriftlig === true;
+      const prisAvtalt = (data.prisAvtalt as string) || "usikker";
+
+      // ===== SIDE 1: FORSIDE OG SAMMENDRAG =====
+      // Profesjonell forside
+      doc.setFillColor(30, 41, 59);
+      doc.rect(0, 0, pageWidth, 70, "F");
+
+      // Logo-område
+      doc.setFillColor(16, 185, 129);
+      doc.roundedRect(margin, 20, 12, 12, 2, 2, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont(useFont, "bold");
+      doc.text("H", margin + 4, 28);
+
+      doc.setFontSize(22);
+      doc.setFont(useFont, "bold");
+      doc.text("JURIDISK VURDERING", margin + 18, 28);
+
+      doc.setFontSize(12);
+      doc.setFont(useFont, "normal");
+      doc.text("Håndverkertjeneste – Reklamasjonssak", margin + 18, 36);
+
+      doc.setFontSize(9);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Utarbeidet: ${new Date().toLocaleDateString("nb-NO", { day: "numeric", month: "long", year: "numeric" })}`, margin + 18, 45);
+      doc.text(`Referanse: HV-${Date.now().toString().slice(-8)}`, margin + 18, 51);
+
+      y = 80;
+
+      // Sammendrag-boks med tydelig konklusjon
+      const levelColors: Record<string, number[]> = {
+        GREEN: [22, 163, 74],
+        YELLOW: [202, 138, 4],
+        RED: [220, 38, 38]
+      };
+      const levelLabels: Record<string, string> = {
+        GREEN: "KRAVET HAR GODT GRUNNLAG",
+        YELLOW: "KRAVET KREVER NÆRMERE VURDERING",
+        RED: "KRAVET HAR BEGRENSET GRUNNLAG"
+      };
       const levelColor = levelColors[outcomeLevel] || levelColors.YELLOW;
 
-      doc.setFontSize(14);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Vurdering av krav", margin, y);
-      y += 8;
+      drawBox(margin, y, contentWidth, 45, [248, 250, 252]);
+      doc.setDrawColor(levelColor[0], levelColor[1], levelColor[2]);
+      doc.setLineWidth(1);
+      doc.line(margin, y, margin, y + 45);
 
-      doc.setFillColor(levelColor[0], levelColor[1], levelColor[2]);
-      doc.circle(margin + 3, y, 3, "F");
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont(useFont, "bold");
+      doc.setTextColor(100, 116, 139);
+      doc.text("KONKLUSJON", margin + 5, y + 8);
+
+      doc.setFontSize(13);
       doc.setTextColor(levelColor[0], levelColor[1], levelColor[2]);
-      doc.text(levelLabels[outcomeLevel] || "Usikkert krav", margin + 10, y + 1);
-      y += 8;
-
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      const explanationLines = doc.splitTextToSize(levelExplanations[outcomeLevel] || levelExplanations.YELLOW, safeWidth);
-      doc.text(explanationLines, margin, y);
-      y += explanationLines.length * 5 + 8;
-
-      // Anbefalt neste steg
-      doc.setFontSize(12);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Anbefalt neste steg", margin, y);
-      y += 7;
-
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      const nextStepText = "Send en skriftlig reklamasjon til håndverkeren.\n\nBasert på vurderingen anbefales det å fremme kravet skriftlig, med tydelig beskrivelse av problemet og hva du krever.";
-      const nextStepLines = doc.splitTextToSize(nextStepText, safeWidth);
-      doc.text(nextStepLines, margin, y);
-      y += nextStepLines.length * 5 + 10;
-
-      // CTA-blokk
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text("Ønsker du hjelp med dette steget?", margin, y);
-      y += 8;
-
-      const ctaBoxHeight = 42;
-      doc.setDrawColor(16, 185, 129);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(margin, y, contentWidth, ctaBoxHeight, 2, 2, "S");
-
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Last ned ferdig kravbrev til håndverkeren", margin + 4, y + 7);
-
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text("Pris: 99 kr", margin + 4, y + 14);
+      doc.text(levelLabels[outcomeLevel], margin + 5, y + 18);
 
       doc.setFontSize(9);
-      const ctaPoints = [
-        "– Juridisk korrekt formulert",
-        "– Henviser til håndverkertjenesteloven",
-        "– Setter tydelige svarfrister",
-        "– Klar til å sendes direkte"
-      ];
-      let ctaY = y + 21;
-      ctaPoints.forEach((point) => {
-        doc.text(point, margin + 4, ctaY);
-        ctaY += 5;
-      });
-      y += ctaBoxHeight + 10;
+      doc.setFont(useFont, "normal");
+      doc.setTextColor(51, 65, 85);
+      const summaryText = outcomeLevel === "GREEN"
+        ? `Basert på de fremlagte opplysningene fremstår ${kundeNavn}s krav mot ${handverkerNavn} som velbegrunnet. Saken gjelder ${fagListe} der det er påberopt ${problemListe.join(", ").toLowerCase()}. Det anbefales å fremme skriftlig reklamasjon med konkrete krav.`
+        : outcomeLevel === "YELLOW"
+        ? `Saken reiser flere spørsmål som krever nærmere vurdering. Det er påberopt ${problemListe.join(", ").toLowerCase()} ved ${fagListe}. Styrken av kravet vil avhenge av dokumentasjonen og håndverkerens tilsvar.`
+        : `Saken fremstår som utfordrende å vinne frem med basert på de opplysningene som er gitt. Det anbefales likevel å fremme skriftlig reklamasjon for å avklare håndverkerens standpunkt.`;
 
-      // Parter og detaljer
-      const boxW = (contentWidth - 4) / 3;
+      const summaryLines = doc.splitTextToSize(summaryText, safeWidth - 10);
+      doc.text(summaryLines.slice(0, 4), margin + 5, y + 28);
 
-      doc.setTextColor(30, 41, 59);
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.text("Parter", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.setLineWidth(0.5);
-      doc.line(margin, y, margin + 18, y);
-      y += 5;
+      y += 55;
 
-      drawBox(margin, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + boxW + 2, y, boxW * 2 + 2, 18, [248, 250, 252]);
+      // Saksopplysninger i kompakt format
+      addSectionTitle("1. Saksopplysninger");
+
+      const boxW = (contentWidth - 4) / 2;
+      drawBox(margin, y, boxW, 22, [248, 250, 252]);
+      drawBox(margin + boxW + 4, y, boxW, 22, [248, 250, 252]);
 
       doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
       doc.setFont(useFont, "normal");
-      doc.text("Kunde", margin + 2, y + 4);
-      doc.text("Håndverker", margin + boxW + 4, y + 4);
+      doc.text("FORBRUKER", margin + 3, y + 5);
+      doc.text("HÅNDVERKER/TJENESTEYTER", margin + boxW + 7, y + 5);
 
-      doc.setFontSize(9);
+      doc.setFontSize(10);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate((data.navn as string) || "Ikke oppgitt", 18), margin + 2, y + 12);
-      doc.text(truncate((data.handverkerNavn as string) || "Ikke oppgitt", 30), margin + boxW + 4, y + 12);
-      y += 22;
+      doc.text(kundeNavn, margin + 3, y + 14);
+      doc.text(handverkerNavn, margin + boxW + 7, y + 14);
 
-      // Fag og problem
-      doc.setFontSize(11);
+      y += 28;
+
+      // Tjenestens art
+      drawBox(margin, y, contentWidth, 18, [248, 250, 252]);
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.setFont(useFont, "normal");
+      doc.text("TJENESTENS ART", margin + 3, y + 5);
+      doc.setFontSize(10);
       doc.setFont(useFont, "bold");
-      doc.text("Saken gjelder", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 30, y);
-      y += 5;
+      doc.setTextColor(30, 41, 59);
+      doc.text(fagListe.charAt(0).toUpperCase() + fagListe.slice(1), margin + 3, y + 13);
+      y += 24;
 
-      drawBox(margin, y, contentWidth / 2 - 1, 18, [248, 250, 252]);
-      drawBox(margin + contentWidth / 2 + 1, y, contentWidth / 2 - 1, 18, [248, 250, 252]);
+      // Påberopte forhold
+      drawBox(margin, y, contentWidth, 18, [248, 250, 252]);
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.setFont(useFont, "normal");
+      doc.text("PÅBEROPTE FORHOLD", margin + 3, y + 5);
+      doc.setFontSize(10);
+      doc.setFont(useFont, "bold");
+      doc.setTextColor(30, 41, 59);
+      doc.text(problemListe.join(", ") || "Ikke spesifisert", margin + 3, y + 13);
+      y += 24;
+
+      // Avtaleforhold
+      const avtaleBoxW = (contentWidth - 6) / 3;
+      drawBox(margin, y, avtaleBoxW, 18, [248, 250, 252]);
+      drawBox(margin + avtaleBoxW + 3, y, avtaleBoxW, 18, [248, 250, 252]);
+      drawBox(margin + (avtaleBoxW + 3) * 2, y, avtaleBoxW, 18, [248, 250, 252]);
 
       doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
       doc.setFont(useFont, "normal");
-      doc.text("Fag", margin + 2, y + 4);
-      doc.text("Problem", margin + contentWidth / 2 + 3, y + 4);
+      doc.text("PRIS AVTALT", margin + 3, y + 5);
+      doc.text("SKRIFTLIG AVTALE", margin + avtaleBoxW + 6, y + 5);
+      doc.text("PRISFORM", margin + (avtaleBoxW + 3) * 2 + 3, y + 5);
 
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate(fag?.join(", ") || "-", 30), margin + 2, y + 12);
-      doc.text(truncate(problemer?.join(", ") || "-", 30), margin + contentWidth / 2 + 3, y + 12);
-      y += 22;
+      doc.text(prisAvtalt === "ja" ? "Ja" : prisAvtalt === "nei" ? "Nei" : "Uavklart", margin + 3, y + 13);
+      doc.text(harSkriftligAvtale ? "Ja" : "Nei", margin + avtaleBoxW + 6, y + 13);
+      doc.text(truncate((data.prisform as string) || "Ikke oppgitt", 15), margin + (avtaleBoxW + 3) * 2 + 3, y + 13);
 
-      // Avtale
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.text("Avtaleforhold", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 30, y);
-      y += 5;
-
-      drawBox(margin, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + boxW + 2, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + (boxW + 2) * 2, y, boxW, 18, [248, 250, 252]);
-
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      doc.setFont(useFont, "normal");
-      doc.text("Pris avtalt", margin + 2, y + 4);
-      doc.text("Skriftlig", margin + boxW + 4, y + 4);
-      doc.text("Prisform", margin + (boxW + 2) * 2 + 2, y + 4);
-
-      doc.setFontSize(9);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text(data.prisAvtalt === "ja" ? "Ja" : data.prisAvtalt === "nei" ? "Nei" : "Usikker", margin + 2, y + 12);
-      doc.text(data.prisSkriftlig === true ? "Ja" : data.prisSkriftlig === false ? "Nei" : "-", margin + boxW + 4, y + 12);
-      doc.text(truncate((data.prisform as string) || "-", 12), margin + (boxW + 2) * 2 + 2, y + 12);
-
+      // Footer side 1
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
-      doc.text("harjegkravpå.no", margin, pageHeight - 8);
-      doc.text("Side 1/2", pageWidth - margin, pageHeight - 8, { align: "right" });
+      doc.text("harjegkravpå.no – Juridisk veiledning for forbrukere", margin, pageHeight - 8);
+      doc.text("Konfidensielt", pageWidth - margin, pageHeight - 8, { align: "right" });
 
-      // PAGE 2
+      // ===== SIDE 2: SAKSFREMSTILLING =====
       addPage();
 
-      // Din beskrivelse
+      addSectionTitle("2. Saksfremstilling");
+
+      addParagraph("Nedenfor følger en gjennomgang av saksforholdet slik det er beskrevet av forbrukeren. Fremstillingen er bearbeidet til en nøytral saksfremstilling egnet som grunnlag for reklamasjon.");
+      y += 3;
+
       if (data.dinHistorie) {
-        doc.setFontSize(11);
+        const reformulatedText = reformulateUserText(data.dinHistorie as string);
+
+        doc.setFontSize(10);
         doc.setFont(useFont, "bold");
         doc.setTextColor(30, 41, 59);
-        doc.text("Din beskrivelse", margin, y);
-        y += 2;
-        doc.setDrawColor(16, 185, 129);
-        doc.line(margin, y, margin + 36, y);
+        doc.text("Forbrukerens beskrivelse av forholdet:", margin, y);
+        y += 6;
+
+        // Saksfremstillingen i innrammet boks
+        const historyLines = doc.splitTextToSize(reformulatedText, safeWidth - 8);
+        const boxHeight = Math.max(40, 10 + historyLines.length * 4.5);
+
+        checkPageBreak(boxHeight + 10);
+        drawBox(margin, y, contentWidth, boxHeight, [248, 250, 252]);
+        doc.setDrawColor(100, 116, 139);
+        doc.setLineWidth(0.3);
+        doc.line(margin + 3, y + 3, margin + 3, y + boxHeight - 3);
+
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        let textY = y + 8;
+        historyLines.forEach((line: string) => {
+          if (textY < y + boxHeight - 5) {
+            doc.text(line, margin + 8, textY);
+            textY += 4.5;
+          }
+        });
+
+        y += boxHeight + 8;
+      }
+
+      // Identifiserte mangler/forhold
+      addSectionTitle("3. Faktiske forhold og konsekvenser");
+
+      addParagraph("Basert på den fremlagte beskrivelsen kan følgende forhold identifiseres som grunnlag for reklamasjon:");
+      y += 2;
+
+      problemListe.forEach((problem, index) => {
+        checkPageBreak(25);
+
+        doc.setFontSize(10);
+        doc.setFont(useFont, "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text(`${index + 1}. ${problem}`, margin, y);
         y += 5;
 
-        const descLines = doc.splitTextToSize(`"${data.dinHistorie}"`, safeWidth - 4);
-        const descHeight = Math.min(50, 6 + descLines.length * 4);
-        drawBox(margin, y, contentWidth, descHeight, [248, 250, 252]);
-        doc.setFontSize(8);
-        doc.setFont(useFont, "normal");
-        doc.setTextColor(71, 85, 105);
-        doc.text(descLines.slice(0, 12), margin + 3, y + 5);
-        y += descHeight + 8;
-      }
+        // Beskriv konsekvens for hver problemtype
+        let consequence = "";
+        if (problem.toLowerCase().includes("dårlig") || problem.toLowerCase().includes("feil") || problem.toLowerCase().includes("mangel")) {
+          consequence = "Dette forholdet utgjør en mangel etter håndverkertjenesteloven § 17, da tjenesten ikke svarer til det forbrukeren har rett til å kreve. Mangelen kan gi grunnlag for krav om retting, prisavslag eller i alvorlige tilfeller heving av avtalen.";
+        } else if (problem.toLowerCase().includes("forsink")) {
+          consequence = "Forsinkelse foreligger når tjenesten ikke er ferdigstilt til avtalt tid eller innen rimelig tid. Dette gir forbrukeren rett til å holde tilbake betaling, kreve oppfyllelse, og eventuelt heve avtalen ved vesentlig forsinkelse.";
+        } else if (problem.toLowerCase().includes("pris")) {
+          consequence = "Uenighet om pris kan gi grunnlag for krav dersom håndverkeren har unnlatt varslingsplikten etter § 32, eller dersom prisen overstiger det som er rimelig for tilsvarende tjenester.";
+        } else if (problem.toLowerCase().includes("skade")) {
+          consequence = "Skade på forbrukerens eiendom gir grunnlag for erstatningskrav etter § 28. Håndverkeren er ansvarlig for tap som følge av mangel, med mindre det skyldes forhold utenfor hans kontroll.";
+        } else {
+          consequence = "Forholdet kan utgjøre en mangel eller forsinkelse etter håndverkertjenesteloven, og bør vurderes nærmere i lys av den konkrete dokumentasjonen.";
+        }
 
-      // Nøkkelpunkter
-      const keyPoints = (outcome?.keyPoints as string[]) || [];
-      if (keyPoints.length > 0) {
-        checkPageBreak(40);
-        doc.setFontSize(11);
-        doc.setFont(useFont, "bold");
-        doc.setTextColor(30, 41, 59);
-        doc.text("Vurderingsgrunnlag", margin, y);
+        addParagraph(consequence);
         y += 2;
-        doc.setDrawColor(16, 185, 129);
-        doc.line(margin, y, margin + 42, y);
-        y += 6;
+      });
 
-        keyPoints.forEach((point: string) => {
-          checkPageBreak(10);
-          doc.setFillColor(16, 185, 129);
-          doc.circle(margin + 2, y - 1, 1.2, "F");
-          doc.setTextColor(30, 41, 59);
-          doc.setFontSize(8);
-          const pointLines = doc.splitTextToSize(point, safeWidth - 8);
-          doc.text(pointLines, margin + 6, y);
-          y += pointLines.length * 4 + 3;
+      // ===== SIDE 3: JURIDISK VURDERING =====
+      addPage();
+
+      addSectionTitle("4. Juridisk grunnlag");
+
+      addParagraph("Avtaleforholdet reguleres av lov om håndverkertjenester m.m. for forbrukere av 16. juni 1989 nr. 63 (håndverkertjenesteloven). Nedenfor følger en gjennomgang av de relevante bestemmelsene og hvordan disse kommer til anvendelse i saken.");
+      y += 4;
+
+      // Utvidet juridisk analyse
+      const legalAnalyses = getExtendedLegalAnalysis(problemListe, harSkriftligAvtale, prisAvtalt);
+
+      legalAnalyses.forEach((analysis, index) => {
+        checkPageBreak(20);
+
+        // Nummerert avsnitt med innrykk
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+
+        const analysisLines = doc.splitTextToSize(analysis, safeWidth - 5);
+        analysisLines.forEach((line: string) => {
+          checkPageBreak(5);
+          doc.text(line, margin, y);
+          y += 4.5;
         });
         y += 4;
-      }
+      });
 
-      // Juridisk grunnlag
-      const legalRefs = (outcome?.legalRefs as Array<{ heading: string; refs: string[] }>) || [];
-      if (legalRefs.length > 0) {
-        checkPageBreak(30);
-        doc.setFontSize(11);
-        doc.setFont(useFont, "bold");
-        doc.setTextColor(30, 41, 59);
-        doc.text("Juridisk grunnlag", margin, y);
-        y += 2;
-        doc.setDrawColor(16, 185, 129);
-        doc.line(margin, y, margin + 38, y);
-        y += 6;
+      // Forbrukerens rettigheter
+      checkPageBreak(40);
+      addSectionTitle("5. Forbrukerens rettigheter");
 
-        legalRefs.forEach((section) => {
-          checkPageBreak(16);
-          doc.setFontSize(9);
-          doc.setFont(useFont, "bold");
-          doc.setTextColor(30, 41, 59);
-          doc.text(section.heading, margin, y);
-          y += 5;
-          (section.refs || []).forEach((ref: string) => {
-            checkPageBreak(8);
-            doc.setFillColor(30, 41, 59);
-            doc.circle(margin + 2, y - 1, 0.8, "F");
-            doc.setFontSize(8);
-            doc.setFont(useFont, "normal");
-            doc.setTextColor(71, 85, 105);
-            const refLines = doc.splitTextToSize(ref, safeWidth - 8);
-            doc.text(refLines, margin + 6, y);
-            y += refLines.length * 4 + 2;
-          });
-          y += 3;
-        });
-      }
+      addParagraph("Ved mangel eller forsinkelse har forbrukeren følgende beføyelser etter håndverkertjenesteloven:");
+      y += 2;
 
-      // Pro-tip
-      const proTip = outcome?.proTip as string;
-      if (proTip) {
-        checkPageBreak(22);
-        const tipLines = doc.splitTextToSize(proTip, safeWidth - 6);
-        const tipHeight = Math.max(18, 10 + tipLines.length * 4);
-        drawBox(margin, y, contentWidth, tipHeight, [254, 249, 195]);
+      const rights = [
+        { title: "Tilbakeholdsrett (§ 13/23)", desc: "Forbrukeren kan holde tilbake så mye av betalingen som er nødvendig for å sikre at kravet blir dekket." },
+        { title: "Rett til retting (§ 24)", desc: "Forbrukeren kan kreve at håndverkeren retter mangelen uten kostnad, med mindre det vil være urimelig." },
+        { title: "Prisavslag (§ 25)", desc: "Dersom mangelen ikke rettes, kan forbrukeren kreve prisavslag tilsvarende kostnadene ved å få mangelen rettet." },
+        { title: "Heving (§ 26)", desc: "Ved vesentlig mangel kan forbrukeren heve avtalen. Hva som er vesentlig beror på en helhetsvurdering." },
+        { title: "Erstatning (§ 28)", desc: "Forbrukeren kan kreve erstatning for tap som følge av mangelen, herunder utgifter til utbedring og følgeskader." }
+      ];
+
+      rights.forEach((right) => {
+        checkPageBreak(15);
         doc.setFontSize(9);
         doc.setFont(useFont, "bold");
-        doc.setTextColor(133, 77, 14);
-        doc.text("Tips", margin + 3, y + 5);
-        doc.setFontSize(8);
+        doc.setTextColor(30, 41, 59);
+        doc.text(right.title, margin, y);
+        y += 4;
+
         doc.setFont(useFont, "normal");
-        doc.setTextColor(113, 63, 18);
-        doc.text(tipLines.slice(0, 3), margin + 3, y + 11);
-        y += tipHeight + 6;
-      }
+        doc.setTextColor(51, 65, 85);
+        const rightLines = doc.splitTextToSize(right.desc, safeWidth);
+        rightLines.forEach((line: string) => {
+          doc.text(line, margin, y);
+          y += 4;
+        });
+        y += 3;
+      });
 
-      // Disclaimer
-      checkPageBreak(14);
-      drawBox(margin, y, contentWidth, 12, [241, 245, 249]);
-      doc.setFontSize(8);
+      // ===== SIDE 4: ANBEFALT HANDLING =====
+      addPage();
+
+      addSectionTitle("6. Anbefalt fremgangsmåte");
+
+      addParagraph("For å ivareta dine rettigheter anbefales følgende fremgangsmåte. Punktene bør følges i den angitte rekkefølgen:");
+      y += 4;
+
+      const actionPoints = getActionPoints(outcomeLevel);
+
+      actionPoints.forEach((point, index) => {
+        checkPageBreak(20);
+
+        // Nummerert punkt med grønn indikator
+        doc.setFillColor(16, 185, 129);
+        doc.circle(margin + 3, y + 1, 3, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.setFont(useFont, "bold");
+        doc.text(`${index + 1}`, margin + 1.5, y + 2.5);
+
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        const pointLines = doc.splitTextToSize(point, safeWidth - 12);
+        let pointY = y;
+        pointLines.forEach((line: string) => {
+          checkPageBreak(5);
+          doc.text(line, margin + 10, pointY + 2);
+          pointY += 4.5;
+        });
+        y = pointY + 4;
+      });
+
+      // Konsekvenser dersom håndverker ikke følger opp
+      y += 4;
+      addSectionTitle("7. Konsekvenser ved manglende oppfølging");
+
+      const consequenceText = getConsequenceText(outcomeLevel);
+      addParagraph(consequenceText);
+
+      // Tidsfrister
+      y += 4;
+      checkPageBreak(35);
+      drawBox(margin, y, contentWidth, 30, [254, 249, 195]);
+      doc.setDrawColor(202, 138, 4);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, margin, y + 30);
+
+      doc.setFontSize(10);
       doc.setFont(useFont, "bold");
-      doc.setTextColor(100, 116, 139);
-      doc.text("Viktig:", margin + 3, y + 5);
-      doc.setFont(useFont, "normal");
-      doc.setFontSize(7);
-      doc.text("Veiledningen er basert på opplysningene du har gitt og er ikke juridisk rådgivning.", margin + 16, y + 5);
+      doc.setTextColor(133, 77, 14);
+      doc.text("Viktige frister", margin + 5, y + 8);
 
+      doc.setFontSize(8);
+      doc.setFont(useFont, "normal");
+      doc.setTextColor(113, 63, 18);
+      const deadlineText = "Reklamasjon må fremsettes innen rimelig tid etter at mangelen ble eller burde blitt oppdaget. Den absolutte reklamasjonsfristen er fem år fra tjenesten ble avsluttet, jf. hvtjl. § 22. Det anbefales å reklamere skriftlig så snart som mulig.";
+      const deadlineLines = doc.splitTextToSize(deadlineText, safeWidth - 10);
+      doc.text(deadlineLines, margin + 5, y + 15);
+
+      y += 38;
+
+      // ===== SIDE 5: AVSLUTNING OG VIDERE PROSESS =====
+      addPage();
+
+      addSectionTitle("8. Dokumentasjon og bevisføring");
+
+      addParagraph("For å styrke saken anbefales det å samle og sikre følgende dokumentasjon:");
+      y += 2;
+
+      const docPoints = [
+        "Avtalen mellom partene (skriftlig avtale, e-post, SMS eller annen korrespondanse)",
+        "Kvitteringer og fakturaer for utført arbeid og materialer",
+        "Bilder og video som dokumenterer manglene (ta bilder fra flere vinkler med god belysning)",
+        "Skriftlig korrespondanse med håndverkeren (e-post, meldinger, brev)",
+        "Eventuelle uttalelser eller rapporter fra andre fagfolk",
+        "Oversikt over egne utlegg og tap som følge av mangelen"
+      ];
+
+      docPoints.forEach((point) => {
+        checkPageBreak(8);
+        doc.setFillColor(30, 41, 59);
+        doc.circle(margin + 2, y, 1, "F");
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        const pointLines = doc.splitTextToSize(point, safeWidth - 8);
+        doc.text(pointLines, margin + 6, y + 1);
+        y += pointLines.length * 4.5 + 2;
+      });
+
+      y += 6;
+      addSectionTitle("9. Tvisteløsning");
+
+      addParagraph("Dersom reklamasjonen ikke fører frem, finnes følgende muligheter for tvisteløsning:");
+      y += 2;
+
+      const disputeOptions = [
+        { title: "Forbrukerrådet", desc: "Tilbyr gratis mekling mellom forbruker og næringsdrivende. Meklingen er frivillig, men mange saker løses på dette stadiet." },
+        { title: "Forbrukerklageutvalget", desc: "Behandler klager på håndverkertjenester dersom mekling ikke fører frem. Utvalgets avgjørelser er bindende dersom de ikke bringes inn for domstolene innen fire uker." },
+        { title: "Domstolene", desc: "Saken kan bringes inn for forliksrådet eller tingretten. Ved forbrukertvister er det særlige regler om sakskostnader som beskytter forbrukeren." }
+      ];
+
+      disputeOptions.forEach((option) => {
+        checkPageBreak(18);
+        doc.setFontSize(9);
+        doc.setFont(useFont, "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text(option.title, margin, y);
+        y += 4;
+
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        const optionLines = doc.splitTextToSize(option.desc, safeWidth);
+        optionLines.forEach((line: string) => {
+          doc.text(line, margin, y);
+          y += 4;
+        });
+        y += 3;
+      });
+
+      // Avsluttende merknad
+      y += 6;
+      addSectionTitle("10. Avsluttende merknad");
+
+      addParagraph("Denne vurderingen er utarbeidet på grunnlag av opplysningene som er gitt, og gir en foreløpig vurdering av saken. Den konkrete rettsstillingen vil avhenge av den fullstendige dokumentasjonen og eventuelle innsigelser fra motparten.");
+
+      addParagraph("Rapporten er ment som veiledning og utgjør ikke juridisk rådgivning i lovens forstand. Ved kompliserte saker eller store verdier anbefales det å konsultere advokat for en bindende vurdering.");
+
+      // CTA-boks for kravbrev - nøktern og profesjonell
+      y += 6;
+      checkPageBreak(35);
+      doc.setDrawColor(16, 185, 129);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(margin, y, contentWidth, 30, 2, 2, "S");
+
+      doc.setFontSize(10);
+      doc.setFont(useFont, "bold");
+      doc.setTextColor(30, 41, 59);
+      doc.text("Neste steg: Skriftlig reklamasjon", margin + 5, y + 8);
+
+      doc.setFontSize(9);
+      doc.setFont(useFont, "normal");
+      doc.setTextColor(51, 65, 85);
+      const ctaText = "For å fremme kravet formelt kan du bestille et ferdig utformet kravbrev basert på denne vurderingen. Brevet er tilpasset din sak, juridisk korrekt formulert, og klart til å sendes til håndverkeren.";
+      const ctaLines = doc.splitTextToSize(ctaText, safeWidth - 10);
+      doc.text(ctaLines, margin + 5, y + 15);
+
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Kravbrev kan bestilles på harjegkravpå.no", margin + 5, y + 26);
+
+      // Oppdater sidetall i footer på alle sider
+      totalPages = currentPage;
+
+      // Footer siste side
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
-      doc.text("harjegkravpå.no", margin, pageHeight - 8);
-      doc.text("Side 2/2", pageWidth - margin, pageHeight - 8, { align: "right" });
+      doc.text("harjegkravpå.no – Juridisk veiledning for forbrukere", margin, pageHeight - 8);
+      doc.text("Konfidensielt", pageWidth - margin, pageHeight - 8, { align: "right" });
 
       doc.save(`handverker-rapport-${new Date().toISOString().split("T")[0]}.pdf`);
       setDownloaded(true);
