@@ -30,16 +30,13 @@ export default function FileUpload({
 
   const uploadFile = async (file: File): Promise<UploadedFile | null> => {
     try {
-      // Get presigned URL
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("category", category);
+
       const response = await fetch("/api/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          category,
-        }),
+        body: formData,
       });
 
       const data = await response.json();
@@ -48,23 +45,10 @@ export default function FileUpload({
         throw new Error(data.error || "Opplasting feilet");
       }
 
-      // Upload directly to R2
-      const uploadResponse = await fetch(data.presignedUrl, {
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": file.type,
-        },
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("Kunne ikke laste opp fil");
-      }
-
       return {
         key: data.key,
         name: file.name,
-        type: file.type,
+        type: data.contentType,
         publicUrl: data.publicUrl,
       };
     } catch (err) {
