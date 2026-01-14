@@ -9,10 +9,10 @@ export default function HomePage() {
   const liveCats = [
     { key: "bilkjop", icon: Car, title: "Kjøretøy", desc: "Bil eller MC med feil etter kjøp? Motor, gir, bremser eller annet – fortell hva som skjedde.", href: "/bilkjop" },
     { key: "flyreiser", icon: Plane, title: "Flyreiser", desc: "Forsinket eller kansellert fly? Bagasje forsinket eller tapt – se hva du kan kreve.", href: "/flyreiser" },
+    { key: "handverker", icon: Wrench, title: "Håndverkere", desc: "Dårlig arbeid, forsinkelse eller uventet pris? Finn ut hva du kan kreve og neste steg.", href: "/handverkere" },
   ] as const;
 
   const soonCats = [
-    { key: "handverker", icon: Wrench, title: "Håndverkere", desc: "Dårlig arbeid, forsinkelse eller uventet pris? Finn ut hva du kan kreve og neste steg." },
     { key: "reklamasjon", icon: Package, title: "Reklamasjon", desc: "Feil på vare eller tjeneste? Reklamasjon, frister og selger som avviser." },
   ] as const;
 
