@@ -21,8 +21,8 @@ function BetaltContent() {
     const loadFonts = async () => {
       try {
         const [regularRes, boldRes] = await Promise.all([
-          fetch("https://cdn.jsdelivr.net/gh/nicholasmckinney/google-fonts-ttf@master/Roboto/Roboto-Regular.ttf"),
-          fetch("https://cdn.jsdelivr.net/gh/nicholasmckinney/google-fonts-ttf@master/Roboto/Roboto-Bold.ttf"),
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf"),
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf"),
         ]);
         if (regularRes.ok && boldRes.ok) {
           const [regularBuffer, boldBuffer] = await Promise.all([
@@ -34,7 +34,7 @@ function BetaltContent() {
           setFontData({ regular: toBase64(regularBuffer), bold: toBase64(boldBuffer) });
         }
       } catch {
-        console.log("Font load error");
+        // Fall back to helvetica if fonts fail to load
       }
     };
     loadFonts();

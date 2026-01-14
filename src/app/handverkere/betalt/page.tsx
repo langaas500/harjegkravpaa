@@ -15,14 +15,18 @@ function BetaltContent() {
   useEffect(() => {
     const stored = localStorage.getItem("handverk-data");
     if (stored) {
-      setData(JSON.parse(stored));
+      try {
+        setData(JSON.parse(stored));
+      } catch {
+        console.error("Could not parse handverk-data");
+      }
     }
 
     const loadFonts = async () => {
       try {
         const [regularRes, boldRes] = await Promise.all([
-          fetch("https://cdn.jsdelivr.net/gh/nicholasmckinney/google-fonts-ttf@master/Roboto/Roboto-Regular.ttf"),
-          fetch("https://cdn.jsdelivr.net/gh/nicholasmckinney/google-fonts-ttf@master/Roboto/Roboto-Bold.ttf"),
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf"),
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf"),
         ]);
         if (regularRes.ok && boldRes.ok) {
           const [regularBuffer, boldBuffer] = await Promise.all([
@@ -34,7 +38,7 @@ function BetaltContent() {
           setFontData({ regular: toBase64(regularBuffer), bold: toBase64(boldBuffer) });
         }
       } catch {
-        console.log("Font load error");
+        // Fall back to helvetica if fonts fail to load
       }
     };
     loadFonts();
@@ -416,11 +420,21 @@ function BetaltContent() {
 
   if (!data) {
     return (
-      <div className="bg-nordic text-white flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-white" />
-          <p>Laster rapport...</p>
+      <div className="mx-auto max-w-2xl px-4 py-12 space-y-6 text-center">
+        <div className="mx-auto w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center">
+          <FileText className="h-8 w-8 text-amber-400" />
         </div>
+        <h1 className="text-2xl font-bold">Ingen data funnet</h1>
+        <p className="text-slate-400">
+          Det ser ut til at saksdataene ikke ble lagret. Dette kan skje hvis du åpnet denne siden direkte.
+        </p>
+        <button
+          onClick={() => router.push("/handverkere")}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-teal-500 text-[#0c1220] font-semibold hover:bg-teal-400 transition"
+        >
+          Start på nytt
+          <ArrowRight className="h-4 w-4" />
+        </button>
       </div>
     );
   }
