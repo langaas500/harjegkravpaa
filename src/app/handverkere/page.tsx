@@ -28,6 +28,7 @@ import {
   Target,
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
+import { createCase, updateCase } from "@/lib/supabase";
 
 type Step =
   | "INTRO"
@@ -174,6 +175,9 @@ export default function HandverkerePage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
 
+  // Supabase case ID
+  const [caseId, setCaseId] = useState<string | null>(null);
+
   const toggleFag = (id: string) => {
     setFagValg((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
@@ -244,8 +248,7 @@ export default function HandverkerePage() {
         ONSKER_OPTIONS.find((o) => o.id === id)?.label || id
       );
 
-      const context = {
-        caseType: "HANDVERK",
+      const payload = {
         fag: fagLabels,
         problemer: problemLabels,
         // Alvorlighet
@@ -293,21 +296,37 @@ export default function HandverkerePage() {
         uploadedFiles,
       };
 
+      // Opprett case i Supabase
+      const supabaseCase = await createCase("HANDVERK", payload);
+      if (supabaseCase) {
+        setCaseId(supabaseCase.id);
+        console.log("Case opprettet i Supabase:", supabaseCase.id);
+      }
+
       const response = await fetch("/api/analyze-handverk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(context),
+        body: JSON.stringify({ caseType: "HANDVERK", ...payload }),
       });
 
       if (!response.ok) throw new Error("API failed");
 
       const result = await response.json();
       setOutcome(result.outcome);
+
+      // Oppdater case med outcome
+      if (supabaseCase) {
+        await updateCase(supabaseCase.id, {
+          outcome: result.outcome,
+          status: "completed",
+        });
+      }
+
       setStep("RESULT");
     } catch (error) {
       console.error("Handverk analysis failed:", error);
-      setOutcome({
-        level: "YELLOW",
+      const fallbackOutcome = {
+        level: "YELLOW" as const,
         headline: "USIKKERT",
         title: "Vurdering fullført",
         summary: "Basert på informasjonen du har oppgitt, kan det se ut til at du har grunnlag for en reklamasjon. Vi anbefaler å dokumentere alt og kontakte håndverkeren skriftlig.",
@@ -333,9 +352,10 @@ export default function HandverkerePage() {
         ],
         proTip: "Jo raskere du reklamerer, desto sterkere står saken din.",
         disclaimer: "Dette er veiledning, ikke juridisk rådgivning.",
-        recommendedClaim: onsker.includes("retting") ? "retting" : onsker.includes("prisavslag") ? "prisavslag" : "retting",
-        severity: sikkerhetsrisiko ? "høy" : funkerIkke ? "middels" : "lav",
-      });
+        recommendedClaim: (onsker.includes("retting") ? "retting" : onsker.includes("prisavslag") ? "prisavslag" : "retting") as "retting" | "prisavslag" | "heving" | "erstatning",
+        severity: (sikkerhetsrisiko ? "høy" : funkerIkke ? "middels" : "lav") as "lav" | "middels" | "høy",
+      };
+      setOutcome(fallbackOutcome);
       setStep("RESULT");
     } finally {
       setIsAnalyzing(false);
@@ -413,6 +433,7 @@ export default function HandverkerePage() {
       handverkerAdresse,
       uploadedFiles,
       outcome,
+      caseId,
     };
     localStorage.setItem("handverk-data", JSON.stringify(data));
     router.push("/handverkere/rapport");

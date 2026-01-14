@@ -33,7 +33,13 @@ export async function createCase(
     .single();
 
   if (error) {
-    console.error("Error creating case:", error);
+    console.error("Error creating case:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      full: error
+    });
     return null;
   }
 

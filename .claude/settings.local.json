@@ -9,7 +9,11 @@
       "Bash(npm run build:*)",
       "Bash(powershell -Command:*)",
       "Bash(dir:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(ping:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

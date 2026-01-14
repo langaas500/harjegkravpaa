@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
+import { createCase, updateCase } from "@/lib/supabase";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
 type VehicleType = "CAR" | "MOTORCYCLE" | null;
@@ -97,6 +98,7 @@ export default function BilkjopPage() {
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
+  const [caseId, setCaseId] = useState<string | null>(null);
 
   const toggleIssue = (id: string) => {
     setIssues((prev) =>
@@ -126,7 +128,7 @@ export default function BilkjopPage() {
       );
       const costLabel = COST_OPTIONS.find((o) => o.id === costBracket)?.label || costBracket;
 
-      const context = {
+      const payload = {
         vehicleType,
         sellerType,
         vehicle,
@@ -147,23 +149,40 @@ export default function BilkjopPage() {
         visibleDefect,
         hasWorkshopReport,
         workshopReportText: hasWorkshopReport ? workshopReportText : null,
+        uploadedFiles,
       };
+
+      // Opprett case i Supabase
+      const supabaseCase = await createCase("BIL", payload);
+      if (supabaseCase) {
+        setCaseId(supabaseCase.id);
+        console.log("Case opprettet i Supabase:", supabaseCase.id);
+      }
 
       const response = await fetch("/api/analyze-case", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(context),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error("API failed");
 
       const result = await response.json();
       setOutcome(result.outcome);
+
+      // Oppdater case med outcome
+      if (supabaseCase) {
+        await updateCase(supabaseCase.id, {
+          outcome: result.outcome,
+          status: "completed",
+        });
+      }
+
       setStep("RESULT");
     } catch (error) {
       console.error("Case analysis failed:", error);
-      setOutcome({
-        level: "YELLOW",
+      const fallbackOutcome = {
+        level: "YELLOW" as const,
         title: "Vurdering fullført",
         summary: "Basert på informasjonen du har oppgitt, ser det ut til at du kan ha en sak. Vi anbefaler å dokumentere alt og vurdere å kontakte selger skriftlig.",
         confidence: "Middels",
@@ -188,7 +207,8 @@ export default function BilkjopPage() {
         ],
         proTip: "Jo raskere du reklamerer, jo sterkere står saken din.",
         disclaimer: "Dette er veiledning, ikke juridisk rådgivning.",
-      });
+      };
+      setOutcome(fallbackOutcome);
       setStep("RESULT");
     } finally {
       setIsAnalyzing(false);
@@ -219,6 +239,7 @@ export default function BilkjopPage() {
       workshopReportText: hasWorkshopReport ? workshopReportText : null,
       uploadedFiles,
       outcome,
+      caseId,
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
     router.push("/bilkjop/rapport");
