@@ -17,6 +17,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
+import { createCase, updateCase } from "@/lib/supabase";
 
 type ProblemType = "DELAY" | "CANCELLED" | "DENIED_BOARDING" | "BAGGAGE" | null;
 type BaggageType = "delayed" | "lost" | "damaged" | null;
@@ -131,6 +132,10 @@ export default function FlyreiserPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
 
+  // Supabase case tracking
+  const [caseId, setCaseId] = useState<string | null>(null);
+  const [caseAccessToken, setCaseAccessToken] = useState<string | null>(null);
+
   const canProceedFlightDetails =
     flight.airline &&
     flight.flightNumber &&
@@ -191,6 +196,21 @@ export default function FlyreiserPage() {
 
       const result = await response.json();
       setOutcome(result.outcome);
+
+      // Save to Supabase
+      try {
+        const supabaseCase = await createCase("FLYREISER", {
+          ...context,
+          outcome: result.outcome,
+        });
+        if (supabaseCase) {
+          setCaseId(supabaseCase.id);
+          setCaseAccessToken(supabaseCase.access_token);
+        }
+      } catch (supabaseError) {
+        console.error("Supabase save failed:", supabaseError);
+      }
+
       setStep("RESULT");
     } catch (error) {
       console.error("Flight analysis failed:", error);
@@ -290,6 +310,9 @@ export default function FlyreiserPage() {
       airlineResponse: contactedAirline ? airlineResponse : null,
       userDescription,
       outcome,
+      // Supabase tracking
+      caseId,
+      access_token: caseAccessToken,
     };
     localStorage.setItem("flyreiser-data", JSON.stringify(data));
     router.push("/flyreiser/rapport");

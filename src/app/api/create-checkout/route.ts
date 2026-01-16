@@ -49,6 +49,13 @@ export async function POST(req: NextRequest) {
         successUrl: "/handverkere/kravbrev/betalt",
         cancelUrl: "/handverkere/kravbrev?canceled=true",
       },
+      "flyreiser-kravbrev": {
+        amount: 9900,
+        name: "Kravbrev – flyreise",
+        desc: "Juridisk kravbrev til flyselskap",
+        successUrl: "/flyreiser/kravbrev/betalt",
+        cancelUrl: "/flyreiser/kravbrev?canceled=true",
+      },
     };
 
     const product = prices[productType] || prices.rapport;

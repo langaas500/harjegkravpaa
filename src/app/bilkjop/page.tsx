@@ -99,6 +99,7 @@ export default function BilkjopPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
+  const [caseAccessToken, setCaseAccessToken] = useState<string | null>(null);
 
   const toggleIssue = (id: string) => {
     setIssues((prev) =>
@@ -156,6 +157,7 @@ export default function BilkjopPage() {
       const supabaseCase = await createCase("BIL", payload);
       if (supabaseCase) {
         setCaseId(supabaseCase.id);
+        setCaseAccessToken(supabaseCase.access_token);
         console.log("Case opprettet i Supabase:", supabaseCase.id);
       }
 
@@ -240,6 +242,7 @@ export default function BilkjopPage() {
       uploadedFiles,
       outcome,
       caseId,
+      access_token: caseAccessToken,
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
     router.push("/bilkjop/rapport");

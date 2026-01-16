@@ -11,19 +11,29 @@ export default function HandverkKravbrevPage() {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [kundeAdresse, setKundeAdresse] = useState("");
-  const [handverkerAdresse, setHandverkerAdresse] = useState("");
   const [claimType, setClaimType] = useState<ClaimType | null>(null);
   const [prisavslagBelop, setPrisavslagBelop] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("handverk-data");
     if (stored) {
-      setData(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      setData(parsed);
     }
   }, []);
 
-  const canProceed = kundeAdresse.trim() && handverkerAdresse.trim() && claimType;
+  // Hent adresser fra wizard-data
+  const kundeAdresse = data?.kundeAdresse as string || "";
+  const kundePostnummer = data?.kundePostnummer as string || "";
+  const kundePoststed = data?.kundePoststed as string || "";
+  const handverkerAdresse = data?.handverkerAdresse as string || "";
+  const handverkerPostnummer = data?.handverkerPostnummer as string || "";
+  const handverkerPoststed = data?.handverkerPoststed as string || "";
+
+  // Sjekk at alle nødvendige felt er fylt ut fra wizard
+  const hasAddresses = kundeAdresse && kundePostnummer && kundePoststed &&
+                       handverkerAdresse && handverkerPostnummer && handverkerPoststed;
+  const canProceed = hasAddresses && claimType;
 
   const handlePayment = async () => {
     if (!canProceed) return;
@@ -31,8 +41,6 @@ export default function HandverkKravbrevPage() {
 
     const updatedData = {
       ...data,
-      kundeAdresse,
-      handverkerAdresse,
       claimType,
       prisavslagBelop: claimType === "prisavslag" ? prisavslagBelop : null,
     };
@@ -93,43 +101,44 @@ export default function HandverkKravbrevPage() {
             </div>
           </div>
 
-          {/* Sammendrag */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm space-y-2">
+          {/* Sammendrag med adresser fra wizard */}
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm space-y-3">
             <div className="flex justify-between">
               <span className="text-slate-500">Sak</span>
               <span>{(data.fag as string[])?.join(", ") || "Håndverkertjeneste"}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500">Kunde</span>
-              <span>{(data.navn as string) || "Ikke oppgitt"}</span>
+
+            <div className="border-t border-white/10 pt-3">
+              <span className="text-slate-500 text-xs uppercase tracking-wide">Avsender</span>
+              <div className="mt-1 text-white">
+                <p>{(data.navn as string) || "Ikke oppgitt"}</p>
+                {kundeAdresse && <p>{kundeAdresse}</p>}
+                {kundePostnummer && kundePoststed && <p>{kundePostnummer} {kundePoststed}</p>}
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500">Håndverker</span>
-              <span>{(data.handverkerNavn as string) || "Ikke oppgitt"}</span>
+
+            <div className="border-t border-white/10 pt-3">
+              <span className="text-slate-500 text-xs uppercase tracking-wide">Mottaker</span>
+              <div className="mt-1 text-white">
+                <p>{(data.handverkerNavn as string) || "Ikke oppgitt"}</p>
+                {handverkerAdresse && <p>{handverkerAdresse}</p>}
+                {handverkerPostnummer && handverkerPoststed && <p>{handverkerPostnummer} {handverkerPoststed}</p>}
+              </div>
             </div>
           </div>
 
-          {/* Din adresse */}
-          <div className="space-y-2">
-            <label className="block text-sm text-slate-500">Din adresse</label>
-            <textarea
-              value={kundeAdresse}
-              onChange={(e) => setKundeAdresse(e.target.value)}
-              placeholder="Ola Nordmann&#10;Gateveien 123&#10;0123 Oslo"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30 min-h-[100px] resize-none"
-            />
-          </div>
-
-          {/* Håndverkers adresse */}
-          <div className="space-y-2">
-            <label className="block text-sm text-slate-500">Håndverkerens adresse</label>
-            <textarea
-              value={handverkerAdresse}
-              onChange={(e) => setHandverkerAdresse(e.target.value)}
-              placeholder="Elektriker AS&#10;Håndverkerveien 456&#10;0456 Oslo"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30 min-h-[100px] resize-none"
-            />
-          </div>
+          {/* Mangler adresse-varsel */}
+          {!hasAddresses && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+              <p>Adresseinformasjon mangler. Gå tilbake til wizard for å fylle ut adresser.</p>
+              <button
+                onClick={() => router.push("/handverkere")}
+                className="mt-2 text-amber-400 underline hover:text-amber-300"
+              >
+                Gå til wizard
+              </button>
+            </div>
+          )}
 
           {/* Hva krever du? */}
           <div className="space-y-3">

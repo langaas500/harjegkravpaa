@@ -503,6 +503,21 @@ function BetaltContent() {
         y += 3;
       });
 
+      // Tilbakeholdt betaling
+      if (data.holdtTilbakeBetaling === true) {
+        y += 4;
+        addParagraph("Forbrukeren har rett til å holde tilbake betaling inntil manglene er rettet, jf. håndverkertjenesteloven § 23.");
+      }
+
+      // Tredjepartsdokumentasjon
+      if (data.harTredjepartDokumentasjon === true) {
+        y += 4;
+        addParagraph("Foreliggende dokumentasjon fra uavhengig fagperson styrker saken betydelig.");
+      } else if (data.harTredjepartDokumentasjon === false) {
+        y += 4;
+        addParagraph("Dersom håndverkeren bestrider manglene, anbefales det å innhente en uavhengig faglig vurdering før saken bringes videre.");
+      }
+
       // ===== SIDE 4: ANBEFALT HANDLING =====
       addPage();
 

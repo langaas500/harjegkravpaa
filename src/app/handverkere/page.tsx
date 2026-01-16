@@ -145,6 +145,7 @@ export default function HandverkerePage() {
   const [tilbudSum, setTilbudSum] = useState("");
   const [holdtTilbakeBetaling, setHoldtTilbakeBetaling] = useState<boolean | null>(null);
   const [gjenstarArbeid, setGjenstarArbeid] = useState<boolean | null>(null);
+  const [harTredjepartDokumentasjon, setHarTredjepartDokumentasjon] = useState<boolean | null>(null);
 
   // KRAVMAL (nytt)
   const [onsker, setOnsker] = useState<string[]>([]);
@@ -164,9 +165,13 @@ export default function HandverkerePage() {
   const [navn, setNavn] = useState("");
   const [epost, setEpost] = useState("");
   const [telefon, setTelefon] = useState("");
-  const [adresse, setAdresse] = useState("");
+  const [gateadresse, setGateadresse] = useState("");
+  const [postnummer, setPostnummer] = useState("");
+  const [poststed, setPoststed] = useState("");
   const [handverkerNavn, setHandverkerNavn] = useState("");
-  const [handverkerAdresse, setHandverkerAdresse] = useState("");
+  const [handverkerGateadresse, setHandverkerGateadresse] = useState("");
+  const [handverkerPostnummer, setHandverkerPostnummer] = useState("");
+  const [handverkerPoststed, setHandverkerPoststed] = useState("");
 
   // Upload
   const [uploadedFiles, setUploadedFiles] = useState<{ key: string; name: string; type: string; publicUrl: string }[]>([]);
@@ -175,8 +180,9 @@ export default function HandverkerePage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
 
-  // Supabase case ID
+  // Supabase case ID og access token
   const [caseId, setCaseId] = useState<string | null>(null);
+  const [caseAccessToken, setCaseAccessToken] = useState<string | null>(null);
 
   const toggleFag = (id: string) => {
     setFagValg((prev) =>
@@ -276,6 +282,7 @@ export default function HandverkerePage() {
         tilbudSum: innhentetTilbud ? tilbudSum : null,
         holdtTilbakeBetaling,
         gjenstarArbeid,
+        harTredjepartDokumentasjon,
         // Kravmål
         onsker: onskerLabels,
         frist: frist || null,
@@ -290,9 +297,13 @@ export default function HandverkerePage() {
         navn: navn || null,
         epost: epost || null,
         telefon: telefon || null,
-        adresse: adresse || null,
+        kundeAdresse: gateadresse || null,
+        kundePostnummer: postnummer || null,
+        kundePoststed: poststed || null,
         handverkerNavn: handverkerNavn || null,
-        handverkerAdresse: handverkerAdresse || null,
+        handverkerAdresse: handverkerGateadresse || null,
+        handverkerPostnummer: handverkerPostnummer || null,
+        handverkerPoststed: handverkerPoststed || null,
         uploadedFiles,
       };
 
@@ -300,6 +311,7 @@ export default function HandverkerePage() {
       const supabaseCase = await createCase("HANDVERK", payload);
       if (supabaseCase) {
         setCaseId(supabaseCase.id);
+        setCaseAccessToken(supabaseCase.access_token);
         console.log("Case opprettet i Supabase:", supabaseCase.id);
       }
 
@@ -414,6 +426,7 @@ export default function HandverkerePage() {
       tilbudSum,
       holdtTilbakeBetaling,
       gjenstarArbeid,
+      harTredjepartDokumentasjon,
       // Kravmål
       onsker: onskerLabels,
       frist,
@@ -428,12 +441,17 @@ export default function HandverkerePage() {
       navn,
       epost,
       telefon,
-      adresse,
+      kundeAdresse: gateadresse,
+      kundePostnummer: postnummer,
+      kundePoststed: poststed,
       handverkerNavn,
-      handverkerAdresse,
+      handverkerAdresse: handverkerGateadresse,
+      handverkerPostnummer,
+      handverkerPoststed,
       uploadedFiles,
       outcome,
       caseId,
+      access_token: caseAccessToken,
     };
     localStorage.setItem("handverk-data", JSON.stringify(data));
     router.push("/handverkere/rapport");
@@ -1045,7 +1063,7 @@ export default function HandverkerePage() {
               )}
 
               <div>
-                <p className="text-sm text-slate-300 mb-3">Har du holdt tilbake betaling?</p>
+                <p className="text-sm text-slate-300 mb-3">Ønsker du å holde tilbake betaling inntil manglene er rettet?</p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setHoldtTilbakeBetaling(true)}
@@ -1061,6 +1079,33 @@ export default function HandverkerePage() {
                     onClick={() => setHoldtTilbakeBetaling(false)}
                     className={`rounded-xl border p-3 text-sm transition ${
                       holdtTilbakeBetaling === false
+                        ? "border-white bg-white/10"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei / allerede betalt / ikke aktuelt
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-300 mb-3">Har du dokumentasjon eller vurdering fra annen fagperson?</p>
+                <p className="text-xs text-slate-500 mb-3">Dette kan være en kort vurdering fra rørlegger, elektriker, takstmann eller annen fagperson. Det trenger ikke være en full rapport.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setHarTredjepartDokumentasjon(true)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      harTredjepartDokumentasjon === true
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                        : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setHarTredjepartDokumentasjon(false)}
+                    className={`rounded-xl border p-3 text-sm transition ${
+                      harTredjepartDokumentasjon === false
                         ? "border-white bg-white/10"
                         : "border-white/10 hover:border-white/20"
                     }`}
@@ -1457,36 +1502,91 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Din adresse (valgfritt - for kravbrev)</label>
-                <textarea
-                  value={adresse}
-                  onChange={(e) => setAdresse(e.target.value)}
-                  placeholder="Gateveien 123&#10;0123 Oslo"
-                  rows={2}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none resize-none"
+                <label className="block text-sm text-slate-500 mb-1">Din gateadresse <span className="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  value={gateadresse}
+                  onChange={(e) => setGateadresse(e.target.value)}
+                  placeholder="Gateveien 123"
+                  required
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm text-slate-500 mb-1">Postnummer <span className="text-red-400">*</span></label>
+                  <input
+                    type="text"
+                    value={postnummer}
+                    onChange={(e) => setPostnummer(e.target.value)}
+                    placeholder="0123"
+                    required
+                    maxLength={4}
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-500 mb-1">Poststed <span className="text-red-400">*</span></label>
+                  <input
+                    type="text"
+                    value={poststed}
+                    onChange={(e) => setPoststed(e.target.value)}
+                    placeholder="Oslo"
+                    required
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  />
+                </div>
+              </div>
+
               <div className="border-t border-white/10 pt-4">
-                <label className="block text-sm text-slate-500 mb-1">Håndverkerens navn/firma</label>
+                <label className="block text-sm text-slate-500 mb-1">Håndverkerens navn/firma <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   value={handverkerNavn}
                   onChange={(e) => setHandverkerNavn(e.target.value)}
                   placeholder="Elektriker AS / Ola Rørlegger"
+                  required
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Håndverkerens adresse (valgfritt - for kravbrev)</label>
-                <textarea
-                  value={handverkerAdresse}
-                  onChange={(e) => setHandverkerAdresse(e.target.value)}
-                  placeholder="Håndverkerveien 1&#10;0456 Oslo"
-                  rows={2}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none resize-none"
+                <label className="block text-sm text-slate-500 mb-1">Håndverkerens gateadresse <span className="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  value={handverkerGateadresse}
+                  onChange={(e) => setHandverkerGateadresse(e.target.value)}
+                  placeholder="Håndverkerveien 1"
+                  required
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm text-slate-500 mb-1">Postnummer <span className="text-red-400">*</span></label>
+                  <input
+                    type="text"
+                    value={handverkerPostnummer}
+                    onChange={(e) => setHandverkerPostnummer(e.target.value)}
+                    placeholder="0456"
+                    required
+                    maxLength={4}
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-500 mb-1">Poststed <span className="text-red-400">*</span></label>
+                  <input
+                    type="text"
+                    value={handverkerPoststed}
+                    onChange={(e) => setHandverkerPoststed(e.target.value)}
+                    placeholder="Oslo"
+                    required
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  />
+                </div>
               </div>
             </div>
 

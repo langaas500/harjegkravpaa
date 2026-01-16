@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, CreditCard, FileText, Clock, XCircle, UserX, Briefcase } from "lucide-react";
+import { ArrowLeft, Loader2, CreditCard, FileText, Clock, XCircle, UserX, Briefcase, Mail } from "lucide-react";
 
 interface FlightData {
   problemType: "DELAY" | "CANCELLED" | "DENIED_BOARDING" | "BAGGAGE";
@@ -30,6 +30,7 @@ export default function FlyreiserRapportPage() {
   const router = useRouter();
   const [data, setData] = useState<FlightData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingKravbrev, setIsLoadingKravbrev] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("flyreiser-data");
@@ -92,6 +93,10 @@ export default function FlyreiserRapportPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleKravbrevClick = () => {
+    router.push("/flyreiser/kravbrev");
   };
 
   if (!data) {
@@ -204,6 +209,36 @@ export default function FlyreiserRapportPage() {
 
             <p className="text-xs text-slate-600 text-center mt-3">
               Sikker betaling via Stripe. Rapporten lastes ned etter betaling.
+            </p>
+          </div>
+
+          {/* Kravbrev-seksjon */}
+          <div className="border-t border-white/10 pt-6">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 mb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl border border-white/10 bg-white/[0.03]">
+                    <Mail className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Kravbrev til flyselskapet</p>
+                    <p className="text-xs text-slate-500">Juridisk kravbrev basert på EU261/Montreal</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">99 kr</p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleKravbrevClick}
+              className="group w-full flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/[0.03] text-white py-4 font-bold text-lg hover:bg-white/10 transition"
+            >
+              <Mail className="h-5 w-5" />
+              Få kravbrev
+            </button>
+
+            <p className="text-xs text-slate-600 text-center mt-3">
+              Ferdig formulert brev du kan sende direkte til flyselskapet.
             </p>
           </div>
         </div>

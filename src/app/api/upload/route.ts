@@ -33,6 +33,16 @@ function getR2Client(): S3Client | null {
 
 export async function POST(req: NextRequest) {
   try {
+    // Debug: Logg R2 konfigurasjon (uten secrets)
+    console.log("R2 Config check:", {
+      hasAccountId: !!process.env.R2_ACCOUNT_ID,
+      hasAccessKey: !!process.env.R2_ACCESS_KEY_ID,
+      hasSecret: !!process.env.R2_SECRET_ACCESS_KEY,
+      bucket: process.env.R2_BUCKET_NAME,
+      domain: process.env.R2_PUBLIC_DOMAIN,
+      endpoint: process.env.R2_ACCOUNT_ID ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : "missing",
+    });
+
     const R2 = getR2Client();
     if (!R2) {
       return NextResponse.json(
@@ -116,6 +126,16 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Upload error:", error);
+
+    // Logg mer detaljer for debugging
+    if (error instanceof Error) {
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+      if ("$metadata" in error) {
+        console.error("AWS metadata:", (error as { $metadata: unknown }).$metadata);
+      }
+    }
+
     return NextResponse.json(
       { error: "Kunne ikke laste opp fil" },
       { status: 500 }

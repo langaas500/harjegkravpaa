@@ -11,11 +11,16 @@ function BetaltContent() {
   const [downloaded, setDownloaded] = useState(false);
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("flyreiser-data");
     if (stored) {
-      setData(JSON.parse(stored));
+      const parsedData = JSON.parse(stored);
+      setData(parsedData);
+      if (parsedData.access_token) {
+        setAccessToken(parsedData.access_token as string);
+      }
     }
 
     const loadFonts = async () => {
@@ -447,10 +452,44 @@ function BetaltContent() {
       </button>
 
       {downloaded && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
-          <p className="text-emerald-400 text-sm">
-            Rapporten er lastet ned! Sjekk nedlastingsmappen din.
+        <>
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <p className="text-emerald-400 text-sm">
+              Rapporten er lastet ned! Sjekk nedlastingsmappen din.
+            </p>
+          </div>
+
+          <button
+            onClick={() => router.push("/hva-na")}
+            className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+          >
+            Hva gjør jeg nå?
+          </button>
+        </>
+      )}
+
+      {accessToken && (
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+          <p className="text-sm text-slate-300">
+            Du kan komme tilbake til denne saken senere via denne lenken.
+            Lagre den hvis du vil ha tilgang til rapporten igjen.
           </p>
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
+            <input
+              type="text"
+              readOnly
+              value={`${typeof window !== "undefined" ? window.location.origin : ""}/sak/${accessToken}`}
+              className="flex-1 bg-transparent text-sm text-slate-400 outline-none"
+            />
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/sak/${accessToken}`);
+              }}
+              className="px-3 py-1.5 rounded-lg text-xs border border-white/10 hover:border-white/30 transition"
+            >
+              Kopier
+            </button>
+          </div>
         </div>
       )}
 

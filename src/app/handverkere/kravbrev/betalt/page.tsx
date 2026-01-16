@@ -38,6 +38,9 @@ function KravbrevBetaltContent() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState<"contact" | "letter">("contact");
+  const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
+  const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     customerName: "",
     customerAddress: "",
@@ -58,49 +61,59 @@ function KravbrevBetaltContent() {
       const parsedData = JSON.parse(stored);
       setData(parsedData);
 
-      // Pre-fill from existing data if available
-      const storedContact = localStorage.getItem("handverk-kravbrev-contact");
-      if (storedContact) {
-        const parsedContact = JSON.parse(storedContact);
-        setContactInfo(parsedContact);
-      } else {
-        // Pre-fill from wizard data - parse adresse hvis mulig
-        const kundeAdresse = (parsedData.adresse as string) || "";
-        const handverkerAdr = (parsedData.handverkerAdresse as string) || "";
+      // Bruk strukturerte adresser direkte fra wizard
+      setContactInfo({
+        customerName: (parsedData.navn as string) || "",
+        customerAddress: (parsedData.kundeAdresse as string) || "",
+        customerPostcode: (parsedData.kundePostnummer as string) || "",
+        customerCity: (parsedData.kundePoststed as string) || "",
+        customerPhone: (parsedData.telefon as string) || "",
+        customerEmail: (parsedData.epost as string) || "",
+        contractorName: (parsedData.handverkerNavn as string) || "",
+        contractorAddress: (parsedData.handverkerAdresse as string) || "",
+        contractorPostcode: (parsedData.handverkerPostnummer as string) || "",
+        contractorCity: (parsedData.handverkerPoststed as string) || "",
+      });
 
-        // Prøv å parse "Gateveien 1, 0123 Oslo" format
-        const parseAddress = (addr: string) => {
-          if (!addr) return { street: "", postcode: "", city: "" };
-          const parts = addr.split(",").map((p: string) => p.trim());
-          const street = parts[0] || "";
-          const postcodeCity = parts[1] || "";
-          const match = postcodeCity.match(/^(\d{4})\s+(.+)$/);
-          return {
-            street,
-            postcode: match ? match[1] : "",
-            city: match ? match[2] : postcodeCity
-          };
-        };
+      // Hent access_token fra saksdata
+      if (parsedData.access_token) {
+        setAccessToken(parsedData.access_token as string);
+      }
 
-        const kundeParsed = parseAddress(kundeAdresse);
-        const handverkerParsed = parseAddress(handverkerAdr);
+      // Sjekk om vi har alle nødvendige adresser fra wizard
+      const hasAllInfo = parsedData.kundeAdresse && parsedData.kundePostnummer && parsedData.kundePoststed &&
+                         parsedData.handverkerAdresse && parsedData.handverkerPostnummer && parsedData.handverkerPoststed;
 
-        setContactInfo({
-          customerName: (parsedData.navn as string) || "",
-          customerAddress: kundeParsed.street,
-          customerPostcode: kundeParsed.postcode,
-          customerCity: kundeParsed.city,
-          customerPhone: (parsedData.telefon as string) || "",
-          customerEmail: (parsedData.epost as string) || "",
-          contractorName: (parsedData.handverkerNavn as string) || "",
-          contractorAddress: handverkerParsed.street,
-          contractorPostcode: handverkerParsed.postcode,
-          contractorCity: handverkerParsed.city,
-        });
+      if (hasAllInfo) {
+        // Gå direkte til brev-generering
+        setStep("letter");
+        generateLetterFromWizardData(parsedData);
       }
     } else {
       setError("Fant ikke saksdata. Vennligst start på nytt.");
     }
+
+    // Load Roboto fonts for PDF
+    const loadFonts = async () => {
+      try {
+        const [regularRes, boldRes] = await Promise.all([
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf"),
+          fetch("https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf"),
+        ]);
+        if (regularRes.ok && boldRes.ok) {
+          const [regularBuffer, boldBuffer] = await Promise.all([
+            regularRes.arrayBuffer(),
+            boldRes.arrayBuffer(),
+          ]);
+          const toBase64 = (buffer: ArrayBuffer) =>
+            btoa(new Uint8Array(buffer).reduce((d, byte) => d + String.fromCharCode(byte), ""));
+          setFontData({ regular: toBase64(regularBuffer), bold: toBase64(boldBuffer) });
+        }
+      } catch {
+        // Fall back to helvetica if fonts fail to load
+      }
+    };
+    loadFonts();
   }, []);
 
   const handleContactChange = (field: keyof ContactInfo, value: string) => {
@@ -138,6 +151,50 @@ function KravbrevBetaltContent() {
         handverkerNavn: contactInfo.contractorName || data.handverkerNavn,
         handverkerAdresse,
       });
+    }
+  };
+
+  // Generer brev med data direkte fra wizard (strukturerte adresser)
+  const generateLetterFromWizardData = async (wizardData: Record<string, unknown>) => {
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      // Bygg fullstendige adresser for API-en
+      const kundeFullAdresse = [
+        wizardData.kundeAdresse,
+        `${wizardData.kundePostnummer} ${wizardData.kundePoststed}`.trim()
+      ].filter(Boolean).join("\n");
+
+      const handverkerFullAdresse = [
+        wizardData.handverkerAdresse,
+        `${wizardData.handverkerPostnummer} ${wizardData.handverkerPoststed}`.trim()
+      ].filter(Boolean).join("\n");
+
+      const response = await fetch("/api/generate-handverk-kravbrev", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...wizardData,
+          kundeAdresse: kundeFullAdresse,
+          handverkerAdresse: handverkerFullAdresse,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+
+      setLetter(result.kravbrev);
+      localStorage.setItem("handverk-kravbrev-text", result.kravbrev);
+    } catch (err) {
+      console.error("Generate error:", err);
+      setError("Kunne ikke opprette kravbrev. Prøv igjen.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -193,6 +250,7 @@ function KravbrevBetaltContent() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    setHasDownloaded(true);
   };
 
   const handleDownloadDocx = async () => {
@@ -224,6 +282,7 @@ function KravbrevBetaltContent() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    setHasDownloaded(true);
   };
 
   const handleDownloadPdf = async () => {
@@ -237,42 +296,121 @@ function KravbrevBetaltContent() {
 
     const fileName = `kravbrev-handverker-${new Date().toISOString().split("T")[0]}.pdf`;
 
-    const marginX = 15;
-    const marginY = 18;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const maxWidth = pageWidth - marginX * 2;
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let currentPage = 1;
 
-    doc.setFont("times", "normal");
-    doc.setFontSize(11);
+    // Load fonts
+    if (fontData) {
+      doc.addFileToVFS("Roboto-Regular.ttf", fontData.regular);
+      doc.addFileToVFS("Roboto-Bold.ttf", fontData.bold);
+      doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+      doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
+    }
 
+    const useFont = fontData ? "Roboto" : "helvetica";
+    const fagType = Array.isArray(data?.fag) ? (data.fag as string[]).join(", ") : "Håndverkertjeneste";
+
+    // Add header to first page
+    const addHeader = (isFirstPage: boolean) => {
+      doc.setFillColor(30, 41, 59);
+      doc.rect(0, 0, pageWidth, isFirstPage ? 30 : 25, "F");
+
+      if (isFirstPage) {
+        // Logo
+        doc.setFillColor(16, 185, 129);
+        doc.roundedRect(margin, 8, 14, 14, 2, 2, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont(useFont, "bold");
+        doc.text("H", margin + 5, 17);
+
+        // Title
+        doc.setFontSize(18);
+        doc.text("KRAVBREV", margin + 20, 17);
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.text(`Håndverkertjeneste - ${new Date().toLocaleDateString("nb-NO")}`, margin + 20, 24);
+      } else {
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14);
+        doc.setFont(useFont, "bold");
+        doc.text("KRAVBREV", margin, 16);
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.text(`Side ${currentPage}`, pageWidth - margin, 16, { align: "right" });
+      }
+    };
+
+    const addFooter = () => {
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.text("harjegkravpå.no", margin, pageHeight - 8);
+      doc.text(`Side ${currentPage}`, pageWidth - margin, pageHeight - 8, { align: "right" });
+    };
+
+    const addPage = () => {
+      addFooter();
+      doc.addPage();
+      currentPage++;
+      addHeader(false);
+      return 35;
+    };
+
+    // First page header
+    addHeader(true);
+    let y = 40;
+
+    // Parse and render letter content
     const paragraphs = letter.replace(/\r\n/g, "\n").split("\n\n");
 
-    let y = marginY;
+    doc.setFontSize(10);
+    doc.setFont(useFont, "normal");
+    doc.setTextColor(30, 41, 59);
 
     for (let p = 0; p < paragraphs.length; p++) {
-      const para = paragraphs[p];
+      const para = paragraphs[p].trim();
+      if (!para) continue;
+
       const lines = para.split("\n");
+
       for (let i = 0; i < lines.length; i++) {
-        const wrapped = doc.splitTextToSize(lines[i] || " ", maxWidth);
+        const line = lines[i];
+
+        // Check if it's a title line (REKLAMASJON, etc.)
+        const isTitle = line.startsWith("REKLAMASJON") || line.match(/^[A-ZÆØÅ\s\-–]+$/);
+
+        if (isTitle && line.length > 3) {
+          doc.setFont(useFont, "bold");
+          doc.setFontSize(12);
+        } else {
+          doc.setFont(useFont, "normal");
+          doc.setFontSize(10);
+        }
+
+        const wrapped = doc.splitTextToSize(line || " ", contentWidth);
         for (let w = 0; w < wrapped.length; w++) {
-          if (y > pageHeight - marginY) {
-            doc.addPage();
-            y = marginY;
+          if (y > pageHeight - 25) {
+            y = addPage();
           }
-          doc.text(wrapped[w], marginX, y);
-          y += 6;
+          doc.text(wrapped[w], margin, y);
+          y += isTitle ? 6 : 5;
         }
       }
 
-      y += 4;
-      if (y > pageHeight - marginY) {
-        doc.addPage();
-        y = marginY;
+      y += 3;
+      if (y > pageHeight - 25) {
+        y = addPage();
       }
     }
 
+    // Footer on last page
+    addFooter();
+
     doc.save(fileName);
+    setHasDownloaded(true);
   };
 
   if (error && !data) {
@@ -579,6 +717,40 @@ function KravbrevBetaltContent() {
                   </div>
                 </div>
               </div>
+
+              {hasDownloaded && (
+                <button
+                  onClick={() => router.push("/hva-na")}
+                  className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+                >
+                  Hva gjør jeg nå?
+                </button>
+              )}
+
+              {accessToken && (
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+                  <p className="text-sm text-slate-300">
+                    Du kan komme tilbake til denne saken senere via denne lenken.
+                    Lagre den hvis du vil ha tilgang til rapporten og kravbrevet igjen.
+                  </p>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
+                    <input
+                      type="text"
+                      readOnly
+                      value={`${typeof window !== "undefined" ? window.location.origin : ""}/sak/${accessToken}`}
+                      className="flex-1 bg-transparent text-sm text-slate-400 outline-none"
+                    />
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/sak/${accessToken}`);
+                      }}
+                      className="px-3 py-1.5 rounded-lg text-xs border border-white/10 hover:border-white/30 transition"
+                    >
+                      Kopier
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
                 <p className="text-sm text-amber-200">

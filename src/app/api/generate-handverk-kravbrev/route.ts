@@ -71,91 +71,195 @@ export async function POST(req: NextRequest) {
       year: "numeric"
     });
 
+    // Svarfrist dato
+    const svarfristDato = new Date(
+      Date.now() + parseInt(fristDager) * 24 * 60 * 60 * 1000
+    ).toLocaleDateString("nb-NO", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+
+    // Kontaktinfo
+    const kundeNavn = data.navn || "[Ditt navn]";
+    const kundeAdresse = data.kundeAdresse || data.adresse || "[Din adresse]";
+    const kundeTelefon = data.telefon || "";
+    const kundeEpost = data.epost || "";
+    const handverkerNavn = data.handverkerNavn || "[Håndverker]";
+    const handverkerAdresse = data.handverkerAdresse || "[Adresse]";
+
+    // Fagtype og problemer
+    const fagType = Array.isArray(data.fag) ? data.fag.join(", ") : "håndverkertjeneste";
+    const problemerListe = Array.isArray(data.problemer) ? data.problemer : [];
+
     // Bygg kravtekst basert på claimType
-    const hovedkravTekst = claimType === "retting"
-      ? "Retting av manglene uten kostnad for meg"
-      : claimType === "prisavslag"
-      ? `Prisavslag${prisavslagBelop ? ` på kr ${prisavslagBelop}` : " tilsvarende utbedringskostnaden"}`
-      : claimType === "heving"
-      ? "Heving av avtalen"
-      : claimType === "stanse_ekstraregning"
-      ? "Stansing av ekstraregning og skriftlig begrunnelse"
-      : "Retting av manglene, alternativt prisavslag";
+    let claimText: string;
+    let claimExplanation: string;
 
-    const prompt = `Du er en erfaren norsk forbrukerjurist. Skriv et stramt, sendeklart reklamasjonsbrev.
+    if (claimType === "heving") {
+      claimText = "heving av avtalen";
+      claimExplanation = "Manglene er av en slik karakter at de utgjør et vesentlig kontraktsbrudd. Jeg kan ikke lenger ha tillit til at arbeidet vil bli utført tilfredsstillende, og mener derfor at vilkårene for heving er oppfylt etter håndverkertjenesteloven § 26.";
+    } else if (claimType === "prisavslag") {
+      claimText = prisavslagBelop
+        ? `prisavslag på kr ${prisavslagBelop}`
+        : "et forholdsmessig prisavslag";
+      claimExplanation = "Jeg krever prisavslag tilsvarende kostnadene ved å få mangelen utbedret av annen fagperson, jf. håndverkertjenesteloven § 25. Alternativt er jeg åpen for at dere utbedrer mangelen for egen regning innen rimelig tid.";
+    } else if (claimType === "stanse_ekstraregning") {
+      claimText = "stansing av ekstraregning";
+      claimExplanation = "Ekstraregningen bestrides da den ikke er i samsvar med avtalen. Håndverkeren har plikt til å varsle forbrukeren dersom prisen vil bli vesentlig høyere enn forventet, jf. håndverkertjenesteloven § 32. Jeg ber om skriftlig begrunnelse for ekstraregningen.";
+    } else {
+      // retting eller kombinasjon
+      claimText = "retting av manglene";
+      claimExplanation = "Jeg krever at manglene utbedres uten kostnad for meg, jf. håndverkertjenesteloven § 24. Dersom retting ikke lar seg gjennomføre innen rimelig tid, forbeholder jeg meg retten til å kreve prisavslag eller heving.";
+    }
 
-KRITISKE REGLER:
-- MAKS 350 ord totalt (ekskludert header). Brevet skal passe på 1-2 sider.
-- Brevet er HANDLING, ikke forklaring. Rapporten forklarer - brevet krever.
-- Rolig, autoritativt, profesjonelt. Ingen trusler.
-- Ingen vage ord: "kanskje", "muligens", "kan tyde på", "eventuelt vurdere"
-- Bruk bestemt språk: "Jeg reklamerer...", "Jeg krever...", "Jeg ber om..."
-- IKKE gjengi skrivefeil. Reformuler alt til profesjonelt språk.
-- Velg kun de 2-4 viktigste manglene. Ikke alt.
+    // Tilbakeholdt betaling
+    const holdtTilbakeBetaling = data.holdtTilbakeBetaling === true;
+    const tilbakeholdtBetalingTekst = holdtTilbakeBetaling
+      ? "Jeg vil holde tilbake betaling i henhold til håndverkertjenesteloven § 23 inntil manglene er rettet eller det er oppnådd enighet om prisavslag."
+      : "";
 
-SAKSDATA:
-Avsender: ${data.navn || "[Navn]"}, ${data.kundeAdresse || data.adresse || "[Adresse]"}
-E-post: ${data.epost || "[E-post]"} | Tlf: ${data.telefon || "[Telefon]"}
-Mottaker: ${data.handverkerNavn || "[Håndverker]"}, ${data.handverkerAdresse || "[Adresse]"}
-Dato: ${dagensDato}
+    // Bygg signatur
+    const kundeSignatur = [
+      kundeNavn,
+      kundeAdresse,
+      kundeTelefon ? `Tlf: ${kundeTelefon}` : "",
+      kundeEpost ? `E-post: ${kundeEpost}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
 
-Oppdrag: ${Array.isArray(data.fag) ? data.fag.join(", ") : "Håndverkertjeneste"}
-Mangler: ${Array.isArray(data.problemer) ? data.problemer.join(", ") : "Ikke spesifisert"}
-Saksbakgrunn: ${bearbeidetHistorie || "Ikke oppgitt"}
-${bearbeidetSvar ? `Håndverkers svar: ${bearbeidetSvar}` : ""}
+    const systemPrompt = `✉️ KRAVBREV - Du er en norsk forbrukerjurist som skriver formelle, presise og profesjonelle reklamasjonsbrev for håndverkertjenester.
 
-Hovedkrav: ${hovedkravTekst}
-Svarfrist: ${fristDager} dager
+ROLLE:
+Du skriver kun reklamasjonsbrev til håndverker/tjenesteyter.
+Du skriver aldri vurderingsrapport og aldri forklaringer rettet mot forbrukeren.
 
-STRUKTUR (FØLG NØYAKTIG):
+FORMÅL:
+Kravbrevet skal:
+- være juridisk korrekt
+- tydelig beskrive faktum
+- fastslå ansvar
+- fremme konkrete krav
+- sette en klar svarfrist
+- tåle videre behandling hos Forbrukerrådet eller Forbrukerklageutvalget
 
-[HEADER - ikke tell med i ordgrense]
-${data.navn || "[Navn]"}
-${data.kundeAdresse || data.adresse || "[Adresse]"}
-${data.epost || "[E-post]"} | ${data.telefon || "[Telefon]"}
+MÅLGRUPPE:
+Mottaker er håndverker/tjenesteyter (potensiell motpart i tvist).
+Språket skal være: saklig, nøkternt, bestemt, følelsesløst.
 
+JURIDISK GRUNNLAG:
+- Håndverkertjenesteloven § 17 (mangel foreligger når resultatet ikke svarer til det forbrukeren har rett til å kreve)
+- Håndverkertjenesteloven § 24 (forbrukerens rett til retting)
+- Håndverkertjenesteloven § 25 (prisavslag)
+- Håndverkertjenesteloven § 26 (heving ved vesentlig mangel)
+- Håndverkertjenesteloven § 28 (erstatning for tap)
+- Håndverkertjenesteloven § 32 (prisberegning og varslingsplikt)
+
+OPPGAVE:
+Skriv et komplett, profesjonelt og send-klart reklamasjonsbrev på 450-550 ord. Brevet skal:
+- Ha profesjonelt juridisk språk (formelt, men forståelig)
+- Henvise til KONKRETE lovparagrafer
+- Kunne kopieres direkte og sendes til håndverker uten redigering
+- Være strukturert, logisk og overbevisende
+- Være saklig og følelsesløst (aldri aggressivt eller truende)
+
+KRAVBREVET SKAL ALDRI:
+❌ inneholde følelser eller emosjonelt språk
+❌ forklare juss pedagogisk (dette er for motpart, ikke læring for forbruker)
+❌ være for kort (minimum 450 ord)
+❌ være uklart om hva som kreves
+❌ være truende eller aggressivt
+
+STRUKTUR (MÅ FØLGES):
+
+1️⃣ FORMELL INNLEDNING (ÅPNING)
 ${dagensDato}
 
-${data.handverkerNavn || "[Håndverker]"}
-${data.handverkerAdresse || "[Adresse]"}
+${handverkerNavn}
+${handverkerAdresse}
 
-Reklamasjon og krav om ${claimType === "retting" ? "retting" : claimType === "prisavslag" ? "prisavslag" : claimType === "heving" ? "heving" : "retting"} – håndverkertjenesteloven
+REKLAMASJON – ${fagType.toUpperCase()}
 
-[A) ÅPNING - 1-2 setninger]
-"Jeg viser til avtale om [arbeid] og fremmer med dette reklamasjon."
+Identifiser partene og hva saken gjelder.
+"Jeg viser til avtale om ${fagType} og fremmer med dette formell reklamasjon på utført arbeid. Dette brevet er en skriftlig reklamasjon som dokumenterer mitt krav."
 
-[B) SAKSBAKGRUNN - maks 4-6 linjer]
-Kort, nøytral, bearbeidet. Ingen detaljer som hører i rapporten.
+2️⃣ FAKTISK HENDELSESBESKRIVELSE (kun fakta, kronologisk, ingen følelser)
+Beskriv oppdraget og hva som har skjedd. Vær konkret og faktabasert.
+Bearbeid brukerens beskrivelse til profesjonelt språk.
 
-[C) MANGLER - punktliste, 2-4 punkter]
-Kun de viktigste. Kort og konkret.
-Eksempel:
-- Arbeidet er ikke utført fagmessig
-- [Konkret mangel]
+3️⃣ MANGLER
+Beskriv de konkrete manglene som påberopes. List opp de viktigste (maks 4-5 punkter).
+Vær spesifikk om hva som er feil og hvorfor dette avviker fra fagmessig standard.
 
-[D) RETTSLIG GRUNNLAG - maks 2-3 setninger]
-"Forholdene utgjør mangel etter håndverkertjenesteloven § 17. Jeg har rett til ${claimType === "retting" ? "retting uten kostnad, jf. § 24" : claimType === "prisavslag" ? "prisavslag, jf. § 25" : "å heve avtalen, jf. § 26"}."
+4️⃣ JURIDISK GRUNNLAG
+Forklar hvorfor forholdet utgjør en mangel etter håndverkertjenesteloven § 17.
+Henvis til relevante paragrafer for det aktuelle kravet (§ 24 for retting, § 25 for prisavslag, § 26 for heving).
+Nevn § 32 hvis det gjelder prisoverskridelse eller manglende varsling.
 
-[E) MINE KRAV - nummerert, maks 3 punkter]
-1. ${hovedkravTekst}
-2. Skriftlig tilbakemelding innen ${fristDager} dager
-${claimType === "retting" ? "3. Forslag til tidspunkt for befaring/utbedring" : ""}
+5️⃣ KRAV (tydelig fremstilt)
+"På bakgrunn av ovennevnte reklamerer jeg herved og krever ${claimText}."
+${claimExplanation}
+${tilbakeholdtBetalingTekst ? `\n${tilbakeholdtBetalingTekst}` : ""}
 
-[F) VED MANGLENDE SVAR - 1-2 setninger]
-"Dersom jeg ikke mottar svar innen fristen, vil saken bli brakt inn for ekstern behandling."
+Oppgi sekundære krav dersom primærkrav ikke oppfylles innen rimelig tid.
 
-[G) AVSLUTNING - 1 setning]
-"Jeg ser frem til en konstruktiv løsning."
+6️⃣ FRIST OG VIDERE STEG (KONSEKVENS)
+Konkret svarfrist: ${svarfristDato} (${fristDager} dager)
+"Dersom jeg ikke mottar tilfredsstillende svar innen fristen, vil saken bli brakt inn for Forbrukerrådet for mekling, og eventuelt videre til Forbrukerklageutvalget eller de alminnelige domstoler."
+
+7️⃣ AVSLUTNING
+"Jeg håper vi kan finne en minnelig løsning. Ta gjerne kontakt dersom dere ønsker å diskutere saken eller avtale befaring."
 
 Med vennlig hilsen
-[Navn]
 
-Skriv BARE brevet. Ingen forklaringer.`;
+${kundeSignatur}
+
+KRITISKE REGLER:
+- Brevet skal være komplett og send-klart (450-550 ord)
+- INGEN punktlister inne i brødteksten (kun i mangel-seksjonen hvis nødvendig)
+- ALDRI referer til "rapport", "vurdering", "AI" eller "system"
+- Bruk faktisk informasjon, ikke plassholdere
+- Aktivt og klart språk
+- Ingen AI-floskler
+
+LEVERANSE:
+Returner KUN brevet. Ingen tekst før eller etter.`;
+
+    const userPrompt = `Skriv reklamasjonsbrev:
+
+KRAVTYPE: ${claimType.toUpperCase()}
+
+HÅNDVERKER/MOTTAKER:
+${handverkerNavn}
+${handverkerAdresse}
+
+FORBRUKER/AVSENDER:
+${kundeSignatur}
+
+TJENESTE:
+${fagType}
+
+PROBLEMENE:
+${problemerListe.length > 0 ? problemerListe.join(", ") : "Ikke spesifisert"}
+
+SAKSBESKRIVELSE FRA FORBRUKER:
+"${bearbeidetHistorie || "Det har oppstått problemer med utført håndverkertjeneste."}"
+
+${bearbeidetSvar ? `HÅNDVERKERS TIDLIGERE SVAR:\n"${bearbeidetSvar}"\n` : ""}
+
+KRAV: ${claimText}
+${holdtTilbakeBetaling ? `\nTILBAKEHOLDT BETALING: Ja - inkluder setning om tilbakeholdt betaling med henvisning til § 23.` : ""}
+
+SVARFRIST: ${fristDager} dager (${svarfristDato})
+
+Skriv brevet nå.`;
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
-      messages: [{ role: "user", content: prompt }],
+      max_tokens: 2000,
+      messages: [{ role: "user", content: userPrompt }],
+      system: systemPrompt,
     });
 
     const content = message.content[0];
@@ -163,45 +267,43 @@ Skriv BARE brevet. Ingen forklaringer.`;
 
     const brev = cleanText(content.text);
 
-    // Fallback hvis brevet er for kort - stramt, maks 2 sider
-    if (brev.length < 400) {
-      const fagType = Array.isArray(data.fag) ? data.fag.join(", ") : "håndverkertjeneste";
-      const problemerListe = Array.isArray(data.problemer) ? data.problemer.slice(0, 4) : [];
-
+    // Fallback hvis brevet er for kort
+    if (brev.length < 800) {
       return NextResponse.json({
-        kravbrev: `${data.navn || "[Navn]"}
-${data.kundeAdresse || data.adresse || "[Adresse]"}
-${data.epost || "[E-post]"} | ${data.telefon || "[Telefon]"}
+        kravbrev: `${dagensDato}
 
-${dagensDato}
-
-${data.handverkerNavn || "[Håndverker]"}
-${data.handverkerAdresse || "[Adresse]"}
+${handverkerNavn}
+${handverkerAdresse}
 
 
-Reklamasjon og krav om ${claimType === "retting" ? "retting" : claimType === "prisavslag" ? "prisavslag" : "retting"} – håndverkertjenesteloven
+REKLAMASJON – ${fagType.toUpperCase()}
 
-Jeg viser til avtale om ${fagType} og fremmer med dette reklamasjon på utført arbeid.
+Jeg viser til avtale om ${fagType} og fremmer med dette formell reklamasjon på utført arbeid. Dette brevet er en skriftlig reklamasjon som dokumenterer mitt krav.
 
-${bearbeidetHistorie || `Det ble inngått avtale om ${fagType}. Etter ferdigstillelse har jeg avdekket mangler ved arbeidet.`}
+${bearbeidetHistorie || `Det ble inngått avtale om ${fagType}. Etter at arbeidet ble utført, har jeg avdekket flere mangler som jeg ikke kan akseptere.`}
 
-Følgende mangler er konstatert:
-${problemerListe.length > 0 ? problemerListe.map((p) => `- ${p}`).join("\n") : "- Arbeidet er ikke utført fagmessig\n- [Konkret mangel]"}
+Følgende mangler er konstatert ved arbeidet:
+${problemerListe.length > 0 ? problemerListe.map((p: string) => `- ${p}`).join("\n") : "- Arbeidet er ikke utført i henhold til fagmessig standard\n- Resultatet avviker fra det som var avtalt"}
 
-Forholdene utgjør mangel etter håndverkertjenesteloven § 17. Jeg har etter loven rett til ${claimType === "retting" ? "retting uten kostnad, jf. § 24" : claimType === "prisavslag" ? "prisavslag, jf. § 25" : "retting uten kostnad, jf. § 24"}.
+Ovennevnte forhold utgjør mangel etter håndverkertjenesteloven § 17, da resultatet ikke svarer til det jeg som forbruker har rett til å kreve. Tjenesten skal utføres fagmessig og i samsvar med avtalen, jf. lovens §§ 5 og 6.
 
-Mine krav:
-1. ${hovedkravTekst}
-2. Skriftlig tilbakemelding innen ${fristDager} dager fra mottak
-${claimType === "retting" ? "3. Forslag til tidspunkt for befaring og utbedring" : ""}
+${claimType === "heving"
+  ? "Manglene er av en slik karakter at de utgjør et vesentlig kontraktsbrudd. Jeg krever derfor heving av avtalen etter håndverkertjenesteloven § 26."
+  : claimType === "prisavslag"
+  ? `Jeg krever prisavslag${prisavslagBelop ? ` på kr ${prisavslagBelop}` : ""} tilsvarende kostnadene ved å få mangelen utbedret, jf. håndverkertjenesteloven § 25.`
+  : "Jeg krever at manglene utbedres uten kostnad for meg, jf. håndverkertjenesteloven § 24. Dersom retting ikke gjennomføres innen rimelig tid, forbeholder jeg meg retten til å kreve prisavslag eller heving."}
 
-Dersom jeg ikke mottar svar innen fristen, vil saken bli brakt inn for ekstern behandling.
+På bakgrunn av ovennevnte reklamerer jeg herved og krever ${claimText}.
+${holdtTilbakeBetaling ? `\n${tilbakeholdtBetalingTekst}\n` : ""}
+Jeg ber om skriftlig tilbakemelding innen ${svarfristDato} (${fristDager} dager fra mottak av dette brevet).
 
-Jeg ser frem til en konstruktiv løsning.
+Dersom jeg ikke mottar tilfredsstillende svar innen fristen, vil saken bli brakt inn for Forbrukerrådet for mekling, og eventuelt videre til Forbrukerklageutvalget eller de alminnelige domstoler.
+
+Jeg håper vi kan finne en minnelig løsning på denne saken. Ta gjerne kontakt dersom dere ønsker å diskutere saken eller avtale befaring.
 
 Med vennlig hilsen
 
-${data.navn || "[Navn]"}`
+${kundeSignatur}`
       });
     }
 

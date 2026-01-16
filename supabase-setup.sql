@@ -7,14 +7,19 @@ create table if not exists cases (
   payload jsonb not null default '{}',
   outcome jsonb,
   status text not null default 'draft' check (status in ('draft', 'completed', 'paid')),
+  access_token text unique,
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
 );
+
+-- Legg til access_token hvis tabellen allerede eksisterer
+alter table cases add column if not exists access_token text unique;
 
 -- Index for rask oppslag
 create index if not exists idx_cases_case_type on cases(case_type);
 create index if not exists idx_cases_status on cases(status);
 create index if not exists idx_cases_created_at on cases(created_at desc);
+create index if not exists idx_cases_access_token on cases(access_token);
 
 -- RLS (Row Level Security) - tillater anonym tilgang
 alter table cases enable row level security;
