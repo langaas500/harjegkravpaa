@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
-import { CheckCircle2, FileDown, Loader2 } from "lucide-react";
+import { CheckCircle2, FileDown, Loader2, FileText, ArrowRight } from "lucide-react";
 
 function BetaltContent() {
   const router = useRouter();
@@ -459,12 +459,34 @@ function BetaltContent() {
             </p>
           </div>
 
-          <button
-            onClick={() => router.push("/hva-na")}
-            className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
-          >
-            Hva gjør jeg nå?
-          </button>
+          <div className="border-t border-white/10 pt-6 mt-2">
+            <div className="border border-white/10 bg-white/5 rounded-2xl p-5 text-left">
+              <div className="flex items-start gap-4">
+                <div className="p-2 rounded-xl border border-white/10 bg-white/5">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg mb-1">Trenger du et kravbrev?</h3>
+                  <p className="text-sm text-slate-400 mb-3">
+                    Få et ferdig formulert juridisk brev du kan sende direkte til flyselskapet.
+                    Spar tid og få et profesjonelt resultat.
+                  </p>
+                  <ul className="text-sm text-slate-300 space-y-1 mb-4">
+                    <li>Tilpasset din sak</li>
+                    <li>Juridisk korrekt språk</li>
+                    <li>Konkrete krav og frister</li>
+                  </ul>
+                  <button
+                    onClick={() => router.push("/flyreiser/kravbrev")}
+                    className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
+                  >
+                    Bestill kravbrev - 99 kr
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </>
       )}
 
