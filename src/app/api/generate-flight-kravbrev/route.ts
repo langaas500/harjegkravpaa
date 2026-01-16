@@ -110,14 +110,34 @@ export async function POST(req: NextRequest) {
     const flightDate = formatDate(flight?.flightDate || "");
     const departureAirport = safeStr(flight?.departureAirport, "[AVGANG]");
     const arrivalAirport = safeStr(flight?.arrivalAirport, "[DESTINASJON]");
-    const bookingReference = safeStr(data.bookingReference || contactInfo.bookingReference, "");
+    const bookingReference = safeStr(flight?.bookingReference || data.bookingReference || contactInfo.bookingReference, "");
 
-    // Tidspunkter for EU261-saker
-    const scheduledDeparture = safeStr(data.scheduledDeparture || contactInfo.scheduledDeparture, "");
-    const actualDeparture = safeStr(data.actualDeparture || contactInfo.actualDeparture, "");
-    const scheduledArrival = safeStr(data.scheduledArrival || contactInfo.scheduledArrival, "");
+    // Tidspunkter for EU261-saker (fra wizard flight-objekt eller direkte)
+    const scheduledDeparture = safeStr(flight?.scheduledDeparture || data.scheduledDeparture || contactInfo.scheduledDeparture, "");
+    const scheduledArrival = safeStr(flight?.scheduledArrival || data.scheduledArrival || contactInfo.scheduledArrival, "");
     const actualArrival = safeStr(data.actualArrival || contactInfo.actualArrival, "");
     const distanceCategory = safeStr(data.distanceCategory, ""); // short/medium/long
+
+    // Nye felter fra wizard
+    const cancellationNoticeDate = safeStr(data.cancellationNoticeDate, "");
+    const cancellationNoticeChannel = safeStr(data.cancellationNoticeChannel, "");
+    const alternativeAccepted = data.alternativeAccepted;
+    const additionalInfo = safeStr(data.additionalInfo, "");
+    const bankAccount = safeStr(data.bankAccount, "");
+
+    // Art. 9 utgifter (EU261)
+    const hadExpenses = data.hadExpenses;
+    const eu261ExpenseTypes = data.eu261ExpenseTypes as string[] | undefined;
+    const eu261ExpenseAmount = safeStr(data.eu261ExpenseAmount, "");
+    const eu261ExpenseDescription = safeStr(data.eu261ExpenseDescription, "");
+
+    // Map for EU261 expense types
+    const eu261ExpenseTypeMap: Record<string, string> = {
+      food: "mat/drikke",
+      hotel: "hotell",
+      transport: "transport",
+      phone: "telefon/kommunikasjon",
+    };
 
     // Bearbeid brukerens fritekst
     const bearbeidetBeskrivelse = reformulateText(data.userDescription || "");
@@ -326,6 +346,21 @@ Flyselskapet har objektivt ansvar – ingen unnskyldningsgrunnlag.
         : problemType === "CANCELLED" ? "INNSTILLING"
         : "NEKTET OMBORDSTIGNING";
 
+      // Build Art. 9 expense section if applicable
+      const eu261ExpenseList = eu261ExpenseTypes
+        ? eu261ExpenseTypes.map((t) => eu261ExpenseTypeMap[t] || t).join(", ")
+        : "";
+
+      // Build channel text
+      const channelMap: Record<string, string> = {
+        sms: "SMS",
+        email: "e-post",
+        app: "app-varsel",
+        phone: "telefon",
+        airport: "på flyplassen",
+      };
+      const noticeChannelText = cancellationNoticeChannel ? channelMap[cancellationNoticeChannel] || cancellationNoticeChannel : "";
+
       userPrompt = `GENERER KRAVBREV – ${problemTypeNorsk} (EU-FORORDNING 261/2004)
 
 ═══════════════════════════════════════════════════════════════
@@ -343,35 +378,41 @@ FLYVNING:
 • Flightnummer: ${flightNumber}
 • Rute: ${departureAirport} → ${arrivalAirport}
 • Dato: ${flightDate}
-${bookingReference ? `• Bookingreferanse: ${bookingReference}` : ""}
+${bookingReference ? `• Bookingreferanse (PNR): ${bookingReference}` : ""}
 
 TIDSPUNKTER:
 ${scheduledDeparture ? `• Planlagt avgang: ${scheduledDeparture}` : "• Planlagt avgang: [FYLL INN]"}
-${actualDeparture ? `• Faktisk avgang: ${actualDeparture}` : ""}
 ${scheduledArrival ? `• Planlagt ankomst: ${scheduledArrival}` : "• Planlagt ankomst: [FYLL INN]"}
-${actualArrival ? `• Faktisk ankomst (dør åpnet): ${actualArrival}` : "• Faktisk ankomst: [FYLL INN]"}
+${problemType === "DELAY" && actualArrival ? `• Faktisk ankomst (dør åpnet): ${actualArrival}` : problemType === "DELAY" ? "• Faktisk ankomst: [FYLL INN]" : ""}
 ${problemType === "DELAY" ? `• Forsinkelse ved ankomst: ${delayText || "[FYLL INN ANTALL TIMER]"}` : ""}
 ${problemType === "CANCELLED" ? `• Varsel om innstilling: ${cancellationNoticeText} før avgang` : ""}
+${problemType === "CANCELLED" && cancellationNoticeDate ? `• Varsel mottatt: ${formatDate(cancellationNoticeDate)}${noticeChannelText ? ` via ${noticeChannelText}` : ""}` : ""}
 
 KOMPENSASJONSKRAV:
-• Beløp: ${compensationAmount}
-• Hjemmel: EU-forordning 261/2004 art. 7
+• Standardkompensasjon: ${compensationAmount} (EU261 art. 7)
+${hadExpenses && eu261ExpenseAmount ? `• Tilleggsutgifter (art. 9): kr ${eu261ExpenseAmount}${eu261ExpenseList ? ` (${eu261ExpenseList})` : ""}` : ""}
+• Hjemmel: EU-forordning 261/2004 art. 5, 7${hadExpenses ? ", 9" : ""}
 
 SAKSBESKRIVELSE:
 ${bearbeidetBeskrivelse || `Flyvning ${flightNumber} ble ${problemType === "DELAY" ? "forsinket" : problemType === "CANCELLED" ? "innstilt" : "oversolgt, og passasjeren ble nektet ombordstigning"}.`}
+
+${additionalInfo ? `TILLEGGSINFORMASJON: ${reformulateText(additionalInfo)}` : ""}
 
 ${data.wasExtraordinary === true ? `
 FLYSELSKAPETS PÅSTAND OM EKSTRAORDINÆRE OMSTENDIGHETER:
 "${reformulateText(data.extraordinaryReason as string || "Ikke spesifisert")}"
 
 PASSASJERENS POSISJON:
-Flyselskapet har ikke fremlagt dokumentasjon som underbygger påstanden. Tekniske problemer, bemanningsproblemer og operative forsinkelser utgjør normal drift og fritar ikke for kompensasjonsansvar. Bevisbyrden ligger hos flyselskapet.
+Flyselskapet har ikke fremlagt dokumentasjon som underbygger påstanden. Tekniske problemer, bemanningsproblemer og operative forsinkelser utgjør normal drift og fritar ikke for kompensasjonsansvar. Bevisbyrden ligger hos flyselskapet (EU261 art. 5 nr. 3).
 ` : ""}
 
 ${bearbeidetAirlineResponse ? `FLYSELSKAPETS TIDLIGERE SVAR: "${bearbeidetAirlineResponse}"` : ""}
 
 ${data.offeredAlternative !== null ? `TILBUDT ALTERNATIV TRANSPORT: ${data.offeredAlternative ? "Ja" : "Nei"}` : ""}
 ${data.alternativeDetails ? `ALTERNATIVDETALJER: ${reformulateText(data.alternativeDetails as string)}` : ""}
+${alternativeAccepted !== null && data.offeredAlternative ? `AKSEPTERT: ${alternativeAccepted ? "Ja" : "Nei"}` : ""}
+
+${bankAccount ? `KONTONUMMER FOR UTBETALING: ${bankAccount}` : ""}
 
 BETALINGSFRIST: ${betalingsfristDato}
 
@@ -383,7 +424,10 @@ VIKTIGE KRAV TIL INNHOLDET:
 2. Flightnummer ${flightNumber} skal nevnes minst 2 ganger
 3. Angi presise tidspunkt for å dokumentere forsinkelsen
 4. Plasser bevisbyrden eksplisitt hos flyselskapet
-5. Avslutt med klar eskaleringsplan (Transportklagenemnda → rettslige skritt)
+5. Inkluder én rettskilde-henvisning (f.eks. Sturgeon C-402/07 for forsinkelse)
+6. Avslutt med klar eskaleringsplan (Transportklagenemnda → rettslige skritt)
+${hadExpenses && eu261ExpenseAmount ? `7. Inkluder Art. 9-utgifter (kr ${eu261ExpenseAmount}) i SPESIFISERT KRAV-seksjonen` : ""}
+${bankAccount ? `8. Inkluder kontonummer ${bankAccount} i betalingsinformasjonen` : ""}
 
 SPRÅKKRAV:
 - Nøkternt og autoritativt
@@ -551,14 +595,16 @@ Bevisbyrden for ekstraordinære omstendigheter ligger hos flyselskapet (art. 5 n
 SPESIFISERT KRAV
 
 1. Standardkompensasjon etter EU 261/2004 art. 7: ${compensationAmount}
+${hadExpenses && eu261ExpenseAmount ? `2. Dokumenterte tilleggsutgifter (art. 9): kr ${eu261ExpenseAmount}${eu261ExpenseDescription ? ` (${eu261ExpenseDescription})` : ""}` : ""}
 
-${data.additionalExpenses ? `2. Dokumenterte tilleggsutgifter: kr ${data.additionalExpenses}\n\nTotalt krav: ${compensationAmount} + kr ${data.additionalExpenses}` : `Totalt krav: ${compensationAmount}`}
+${hadExpenses && eu261ExpenseAmount ? `Totalt krav: ${compensationAmount} + kr ${eu261ExpenseAmount}` : `Totalt krav: ${compensationAmount}`}
 
 ────────────────────────────────────────────────────────────────
 
 BETALINGSFRIST OG ESKALERING
 
 Kravet forfaller til betaling innen ${betalingsfristDato}.
+${bankAccount ? `\nKontonummer for utbetaling: ${bankAccount}` : ""}
 
 Ved manglende betaling vil saken bli innklaget til Transportklagenemnda for flypassasjerer. Nemndas avgjørelser er rådgivende, men følges av de fleste flyselskaper. Dersom nemndsbehandling ikke fører frem, vil kravet bli forfulgt rettslig. Flyselskapet vil i så fall bli holdt ansvarlig for sakskostnader i tillegg til hovedkravet.
 
@@ -570,6 +616,7 @@ VEDLEGG
 - Boardingkort / bookingbekreftelse
 ${bookingReference ? `- Bookingreferanse: ${bookingReference}` : ""}
 - Dokumentasjon på forsinkelse/innstilling (skjermbilde, SMS, e-post)
+${hadExpenses ? "- Kvitteringer for tilleggsutgifter" : ""}
 ${bearbeidetAirlineResponse ? "- Tidligere korrespondanse med flyselskapet" : ""}
 
 ────────────────────────────────────────────────────────────────

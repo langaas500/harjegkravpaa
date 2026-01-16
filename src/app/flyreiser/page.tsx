@@ -37,6 +37,9 @@ interface FlightInfo {
   arrivalAirport: string;
   flightDate: string;
   bookedPrice: string;
+  bookingReference: string;
+  scheduledDeparture: string;
+  scheduledArrival: string;
 }
 
 interface OutcomeType {
@@ -82,6 +85,21 @@ const EXPENSE_TYPE_OPTIONS = [
   { id: "other", label: "Annet" },
 ];
 
+const EU261_EXPENSE_OPTIONS = [
+  { id: "food", label: "Mat/drikke" },
+  { id: "hotel", label: "Hotell" },
+  { id: "transport", label: "Transport" },
+  { id: "phone", label: "Telefon/kommunikasjon" },
+];
+
+const NOTICE_CHANNEL_OPTIONS = [
+  { id: "sms", label: "SMS" },
+  { id: "email", label: "E-post" },
+  { id: "app", label: "App" },
+  { id: "phone", label: "Telefon" },
+  { id: "airport", label: "På flyplassen" },
+];
+
 export default function FlyreiserPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("INTRO");
@@ -93,14 +111,33 @@ export default function FlyreiserPage() {
     arrivalAirport: "",
     flightDate: "",
     bookedPrice: "",
+    bookingReference: "",
+    scheduledDeparture: "",
+    scheduledArrival: "",
   });
   const [passengerName, setPassengerName] = useState("");
 
   // Problem-specific details
   const [delayDuration, setDelayDuration] = useState<string | null>(null);
+  const [actualArrival, setActualArrival] = useState(""); // Faktisk ankomsttid
   const [cancellationNotice, setCancellationNotice] = useState<string | null>(null);
+  const [cancellationNoticeDate, setCancellationNoticeDate] = useState(""); // Dato/tid for varsel
+  const [cancellationNoticeChannel, setCancellationNoticeChannel] = useState<string | null>(null); // SMS/epost/app
   const [offeredAlternative, setOfferedAlternative] = useState<boolean | null>(null);
+  const [alternativeAccepted, setAlternativeAccepted] = useState<boolean | null>(null);
   const [alternativeDetails, setAlternativeDetails] = useState("");
+
+  // Art. 9 utgifter (EU261) - mat, hotell, transport
+  const [hadExpenses, setHadExpenses] = useState<boolean | null>(null);
+  const [eu261ExpenseTypes, setEu261ExpenseTypes] = useState<string[]>([]);
+  const [eu261ExpenseAmount, setEu261ExpenseAmount] = useState("");
+  const [eu261ExpenseDescription, setEu261ExpenseDescription] = useState("");
+
+  // Kontonummer (valgfritt)
+  const [bankAccount, setBankAccount] = useState("");
+
+  // Fritekst avslutning
+  const [additionalInfo, setAdditionalInfo] = useState("");
 
   // Baggage-specific details
   const [baggageType, setBaggageType] = useState<BaggageType>(null);
@@ -164,12 +201,29 @@ export default function FlyreiserPage() {
         problemType,
         flight,
         passengerName,
+        // EU261 delay-specific
         delayDuration: problemType === "DELAY" ? delayDuration : null,
+        actualArrival: problemType === "DELAY" ? actualArrival : null,
+        // EU261 cancellation-specific
         cancellationNotice: problemType === "CANCELLED" ? cancellationNotice : null,
+        cancellationNoticeDate: problemType === "CANCELLED" ? cancellationNoticeDate : null,
+        cancellationNoticeChannel: problemType === "CANCELLED" ? cancellationNoticeChannel : null,
+        // Alternative transport
         offeredAlternative,
+        alternativeAccepted: offeredAlternative ? alternativeAccepted : null,
         alternativeDetails: offeredAlternative ? alternativeDetails : null,
+        // Extraordinary
         wasExtraordinary: problemType !== "BAGGAGE" ? wasExtraordinary : null,
         extraordinaryReason: wasExtraordinary ? extraordinaryReason : null,
+        // Art. 9 expenses (EU261)
+        hadExpenses: problemType !== "BAGGAGE" ? hadExpenses : null,
+        eu261ExpenseTypes: hadExpenses ? eu261ExpenseTypes : null,
+        eu261ExpenseAmount: hadExpenses ? eu261ExpenseAmount : null,
+        eu261ExpenseDescription: hadExpenses ? eu261ExpenseDescription : null,
+        // Bank account
+        bankAccount: bankAccount || null,
+        // Additional info
+        additionalInfo: additionalInfo || null,
         // Baggage-specific data
         baggageType: problemType === "BAGGAGE" ? baggageType : null,
         baggageDelayDuration: problemType === "BAGGAGE" && baggageType === "delayed" ? baggageDelayDuration : null,
@@ -288,12 +342,29 @@ export default function FlyreiserPage() {
       problemType,
       flight,
       passengerName,
+      // EU261 delay-specific
       delayDuration: problemType === "DELAY" ? delayDuration : null,
+      actualArrival: problemType === "DELAY" ? actualArrival : null,
+      // EU261 cancellation-specific
       cancellationNotice: problemType === "CANCELLED" ? cancellationNotice : null,
+      cancellationNoticeDate: problemType === "CANCELLED" ? cancellationNoticeDate : null,
+      cancellationNoticeChannel: problemType === "CANCELLED" ? cancellationNoticeChannel : null,
+      // Alternative transport
       offeredAlternative,
+      alternativeAccepted: offeredAlternative ? alternativeAccepted : null,
       alternativeDetails: offeredAlternative ? alternativeDetails : null,
+      // Extraordinary
       wasExtraordinary: problemType !== "BAGGAGE" ? wasExtraordinary : null,
       extraordinaryReason: wasExtraordinary ? extraordinaryReason : null,
+      // Art. 9 expenses (EU261)
+      hadExpenses: problemType !== "BAGGAGE" ? hadExpenses : null,
+      eu261ExpenseTypes: hadExpenses ? eu261ExpenseTypes : null,
+      eu261ExpenseAmount: hadExpenses ? eu261ExpenseAmount : null,
+      eu261ExpenseDescription: hadExpenses ? eu261ExpenseDescription : null,
+      // Bank account
+      bankAccount: bankAccount || null,
+      // Additional info
+      additionalInfo: additionalInfo || null,
       // Baggage-specific data
       baggageType: problemType === "BAGGAGE" ? baggageType : null,
       baggageDelayDuration: problemType === "BAGGAGE" && baggageType === "delayed" ? baggageDelayDuration : null,
@@ -504,18 +575,39 @@ export default function FlyreiserPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Billettpris (valgfritt)</label>
+                <label className="block text-sm text-slate-500 mb-1">Bookingreferanse (PNR)</label>
                 <input
                   type="text"
-                  placeholder="Kr"
-                  value={flight.bookedPrice}
-                  onChange={(e) => setFlight({ ...flight, bookedPrice: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  placeholder="ABC123"
+                  value={flight.bookingReference}
+                  onChange={(e) => setFlight({ ...flight, bookingReference: e.target.value.toUpperCase() })}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none font-mono"
                 />
               </div>
             </div>
 
-            <p className="text-xs text-slate-600">* Obligatoriske felter</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm text-slate-500 mb-1">Planlagt avgang (tid)</label>
+                <input
+                  type="time"
+                  value={flight.scheduledDeparture}
+                  onChange={(e) => setFlight({ ...flight, scheduledDeparture: e.target.value })}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-slate-500 mb-1">Planlagt ankomst (tid)</label>
+                <input
+                  type="time"
+                  value={flight.scheduledArrival}
+                  onChange={(e) => setFlight({ ...flight, scheduledArrival: e.target.value })}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600">* Obligatoriske felter. Tidspunkter styrker kravbrevet.</p>
 
             <div className="flex gap-3">
               <button
@@ -572,6 +664,21 @@ export default function FlyreiserPage() {
                   ))}
                 </div>
 
+                {delayDuration && delayDuration !== "under2" && (
+                  <div>
+                    <label className="block text-sm text-slate-500 mb-1">
+                      Faktisk ankomsttid (når dør åpnet)
+                    </label>
+                    <input
+                      type="time"
+                      value={actualArrival}
+                      onChange={(e) => setActualArrival(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                    />
+                    <p className="text-xs text-slate-600 mt-1">Styrker kravbrevet. Sjekk flightstatus eller boardingkort.</p>
+                  </div>
+                )}
+
                 <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 text-sm">
                   <p className="font-semibold text-blue-400 mb-2">Viktig om forsinkelse</p>
                   <p className="text-slate-300">
@@ -611,6 +718,40 @@ export default function FlyreiserPage() {
                   ))}
                 </div>
 
+                {cancellationNotice && cancellationNotice !== "over14" && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm text-slate-500 mb-1">Dato for varsel</label>
+                        <input
+                          type="date"
+                          value={cancellationNoticeDate}
+                          onChange={(e) => setCancellationNoticeDate(e.target.value)}
+                          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-slate-500 mb-1">Hvordan fikk du beskjed?</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {NOTICE_CHANNEL_OPTIONS.slice(0, 3).map((opt) => (
+                            <button
+                              key={opt.id}
+                              onClick={() => setCancellationNoticeChannel(opt.id)}
+                              className={`rounded-lg border p-2 text-xs transition ${
+                                cancellationNoticeChannel === opt.id
+                                  ? "border-white bg-white/10"
+                                  : "border-white/10 hover:border-white/20"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <p className="text-sm text-slate-300 mb-3">Ble du tilbudt alternativ transport?</p>
                   <div className="flex gap-3">
@@ -634,18 +775,41 @@ export default function FlyreiserPage() {
                 </div>
 
                 {offeredAlternative === true && (
-                  <div>
-                    <label className="block text-sm text-slate-500 mb-2">
-                      Beskriv alternativet (valgfritt)
-                    </label>
-                    <textarea
-                      value={alternativeDetails}
-                      onChange={(e) => setAlternativeDetails(e.target.value)}
-                      placeholder="F.eks: Fikk ombooking til neste dag kl 14:00..."
-                      maxLength={500}
-                      rows={3}
-                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm text-slate-500 mb-2">
+                        Beskriv alternativet (dato, tid, rute)
+                      </label>
+                      <textarea
+                        value={alternativeDetails}
+                        onChange={(e) => setAlternativeDetails(e.target.value)}
+                        placeholder="F.eks: Fikk ombooking til neste dag kl 14:00 via København..."
+                        maxLength={500}
+                        rows={2}
+                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-300 mb-2">Aksepterte du alternativet?</p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setAlternativeAccepted(true)}
+                          className={`flex-1 rounded-xl border p-3 text-sm transition ${
+                            alternativeAccepted === true ? "border-white bg-white/10" : "border-white/10 hover:border-white/20"
+                          }`}
+                        >
+                          Ja
+                        </button>
+                        <button
+                          onClick={() => setAlternativeAccepted(false)}
+                          className={`flex-1 rounded-xl border p-3 text-sm transition ${
+                            alternativeAccepted === false ? "border-white bg-white/10" : "border-white/10 hover:border-white/20"
+                          }`}
+                        >
+                          Nei
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </>
@@ -1221,31 +1385,128 @@ export default function FlyreiserPage() {
           <section className="space-y-5">
             <div className="flex items-center gap-3">
               <Sparkles className="h-6 w-6 text-white" />
-              <h2 className="text-2xl font-bold">Beskriv situasjonen</h2>
-            </div>
-            <p className="text-sm text-slate-400">
-              Gi oss mer detaljer så blir analysen bedre. <span className="text-slate-600">(Valgfritt)</span>
-            </p>
-
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
-              <p className="font-medium text-slate-400 mb-1">Tips - inkluder gjerne:</p>
-              <ul className="space-y-0.5">
-                <li>• Hva skjedde og når du fikk vite om det</li>
-                <li>• Konsekvenser (tapte tilkoblinger, hotell, møter)</li>
-                <li>• Kommunikasjon med flyselskapet</li>
-                <li>• Ekstrautgifter du har hatt</li>
-              </ul>
+              <h2 className="text-2xl font-bold">Tilleggsinfo</h2>
             </div>
 
-            <textarea
-              value={userDescription}
-              onChange={(e) => setUserDescription(e.target.value)}
-              placeholder="Beskriv hva som skjedde..."
-              maxLength={2000}
-              rows={6}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
-            />
-            <p className="text-xs text-slate-600">{userDescription.length} / 2000 tegn</p>
+            {/* Art. 9 utgifter - kun for EU261-saker */}
+            {problemType !== "BAGGAGE" && (
+              <div className="space-y-3">
+                <p className="text-sm text-slate-300">Hadde du utgifter mens du ventet? (mat, hotell, transport)</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setHadExpenses(true)}
+                    className={`flex-1 rounded-xl border p-3 text-sm transition ${
+                      hadExpenses === true ? "border-white bg-white/10" : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Ja
+                  </button>
+                  <button
+                    onClick={() => setHadExpenses(false)}
+                    className={`flex-1 rounded-xl border p-3 text-sm transition ${
+                      hadExpenses === false ? "border-white bg-white/10" : "border-white/10 hover:border-white/20"
+                    }`}
+                  >
+                    Nei
+                  </button>
+                </div>
+
+                {hadExpenses === true && (
+                  <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-xs text-slate-500">Disse utgiftene kan kreves i tillegg til kompensasjon (EU261 art. 9)</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {EU261_EXPENSE_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setEu261ExpenseTypes((prev) =>
+                              prev.includes(opt.id)
+                                ? prev.filter((t) => t !== opt.id)
+                                : [...prev, opt.id]
+                            );
+                          }}
+                          className={`rounded-lg border p-2 text-xs transition ${
+                            eu261ExpenseTypes.includes(opt.id)
+                              ? "border-teal-500 bg-teal-500/10 text-teal-400"
+                              : "border-white/10 hover:border-white/20"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">Totalt beløp (NOK)</label>
+                        <input
+                          type="number"
+                          value={eu261ExpenseAmount}
+                          onChange={(e) => setEu261ExpenseAmount(e.target.value)}
+                          placeholder="F.eks: 850"
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">Kort beskrivelse</label>
+                        <input
+                          type="text"
+                          value={eu261ExpenseDescription}
+                          onChange={(e) => setEu261ExpenseDescription(e.target.value)}
+                          placeholder="Mat + taxi til hotell"
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm text-slate-400 mb-2">
+                Beskriv situasjonen <span className="text-slate-600">(valgfritt)</span>
+              </label>
+              <textarea
+                value={userDescription}
+                onChange={(e) => setUserDescription(e.target.value)}
+                placeholder="Beskriv hva som skjedde..."
+                maxLength={2000}
+                rows={4}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+              />
+              <p className="text-xs text-slate-600 mt-1">{userDescription.length} / 2000 tegn</p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-slate-400 mb-2">
+                Er det noe viktig du ikke har fått med? <span className="text-slate-600">(valgfritt)</span>
+              </label>
+              <textarea
+                value={additionalInfo}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
+                placeholder="Andre relevante opplysninger som kan styrke saken..."
+                maxLength={500}
+                rows={2}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-slate-400 mb-1">
+                Kontonummer for utbetaling <span className="text-slate-600">(valgfritt)</span>
+              </label>
+              <input
+                type="text"
+                value={bankAccount}
+                onChange={(e) => setBankAccount(e.target.value.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim())}
+                placeholder="1234 56 78901"
+                maxLength={13}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 font-mono focus:border-white/30 focus:outline-none"
+              />
+              <p className="text-xs text-slate-600 mt-1">
+                Oppgir du kontonummer nå slipper du å sende det separat til flyselskapet.
+              </p>
+            </div>
 
             <div className="flex gap-3">
               <button
