@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "Heving av MC-kjøp – når kan du heve? | Harjegkravpå.no",
   description:
-    "Finn ut når du kan heve et MC-kjøp og få pengene tilbake. Lær om vilkårene for heving av motorsykkelkjøp.",
+    "Når kan du heve et MC-kjøp og få pengene tilbake? Les om vilkårene for heving og hvordan du går frem. Gratis vurdering.",
   alternates: {
     canonical: "/mc-kjop/heving",
   },
@@ -19,22 +19,17 @@ const faqs = [
   {
     question: "Når kan jeg heve et MC-kjøp?",
     answer:
-      "Du kan heve kjøpet når mangelen er vesentlig og ikke kan rettes eller kompenseres med prisavslag.",
+      "Du kan heve når mangelen er vesentlig og ikke lar seg utbedre på rimelig måte.",
   },
   {
     question: "Hva betyr vesentlig mangel?",
     answer:
-      "En vesentlig mangel er en feil som er så alvorlig at du ikke ville kjøpt MC-en hvis du hadde visst om den.",
+      "En mangel som gjør at du ikke får det du betalte for. Alvorlighetsgrad, utbedringskostnader og konsekvenser vurderes.",
   },
   {
     question: "Får jeg alle pengene tilbake ved heving?",
     answer:
       "Ja, men det kan gjøres fradrag for den nytten du har hatt av MC-en.",
-  },
-  {
-    question: "Hva hvis selger nekter heving?",
-    answer:
-      "Du kan ta saken videre til Forbrukerklageutvalget ved forhandlerkjøp, eller forliksrådet ved privatkjøp.",
   },
 ];
 
@@ -43,13 +38,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     buildWebPageSchema({
       title: "Heving av MC-kjøp – når kan du heve?",
       description:
-        "Finn ut når du kan heve et MC-kjøp og få pengene tilbake.",
+        "Når kan du heve et MC-kjøp og få pengene tilbake? Les om vilkårene for heving.",
       url: "/mc-kjop/heving",
     }),
     buildBreadcrumbSchema([
       { name: "Hjem", url: "/" },
-      { name: "MC-kjøp", url: "/mc-kjop" },
-      { name: "Heving", url: "/mc-kjop/heving" },
+      { name: "Kjøretøy", url: "/bilkjop" },
+      { name: "Heving MC", url: "/mc-kjop/heving" },
     ]),
     buildFAQSchema(faqs),
   ];

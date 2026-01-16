@@ -7,9 +7,9 @@ import {
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "MC fra forhandler – dine rettigheter | Harjegkravpå.no",
+  title: "Kjøpt MC fra forhandler? Sterkt forbrukervern | Harjegkravpå.no",
   description:
-    "Kjøpte du MC fra forhandler og oppdaget feil? Finn ut om dine rettigheter etter forbrukerkjøpsloven.",
+    "Kjøpt MC fra forhandler og oppdaget feil? Du har sterkt forbrukervern. Les om dine rettigheter. Gratis vurdering.",
   alternates: {
     canonical: "/mc-kjop/forhandler",
   },
@@ -17,39 +17,34 @@ export const metadata: Metadata = {
 
 const faqs = [
   {
-    question: "Hva er forskjellen på forhandlerkjøp og privatkjøp?",
+    question: "Hvor lenge kan jeg reklamere på MC kjøpt fra forhandler?",
     answer:
-      "Ved forhandlerkjøp gjelder forbrukerkjøpsloven med sterkere vern: bevisregel innen seks måneder, lengre reklamasjonsfrist.",
+      "5 år for feil som forventes å vare. De første 12 månedene har du også omvendt bevisbyrde.",
   },
   {
-    question: "Hvor lenge kan jeg reklamere?",
+    question: "Hva betyr omvendt bevisbyrde?",
     answer:
-      "Den absolutte fristen er fem år for feil som forventes å vare over tid.",
+      "Det første året etter kjøpet antas feil å ha vært der fra starten. Forhandler må bevise det motsatte.",
   },
   {
-    question: "Hva betyr seks måneders-regelen?",
+    question: "Kan forhandler fraskrive seg ansvar?",
     answer:
-      "Hvis en feil viser seg innen seks måneder, antas det at feilen forelå ved leveringen.",
-  },
-  {
-    question: "Kan forhandler nekte å ta imot reklamasjon?",
-    answer:
-      "Forhandler kan avvise kravet, men det betyr ikke at avvisningen er riktig. Du kan ta saken videre til Forbrukerklageutvalget.",
+      "Nei, «som den er»-klausuler er ugyldige ved forbrukerkjøp fra forhandler.",
   },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const schemas = [
     buildWebPageSchema({
-      title: "MC fra forhandler – dine rettigheter",
+      title: "Kjøpt MC fra forhandler? Sterkt forbrukervern",
       description:
-        "Kjøpte du MC fra forhandler og oppdaget feil? Finn ut om dine rettigheter.",
+        "Kjøpt MC fra forhandler og oppdaget feil? Du har sterkt forbrukervern.",
       url: "/mc-kjop/forhandler",
     }),
     buildBreadcrumbSchema([
       { name: "Hjem", url: "/" },
-      { name: "MC-kjøp", url: "/mc-kjop" },
-      { name: "Forhandlerkjøp", url: "/mc-kjop/forhandler" },
+      { name: "Kjøretøy", url: "/bilkjop" },
+      { name: "Forhandlerkjøp MC", url: "/mc-kjop/forhandler" },
     ]),
     buildFAQSchema(faqs),
   ];

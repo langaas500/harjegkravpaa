@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "Feil på MC? Sjekk dine rettigheter | Harjegkravpå.no",
   description:
-    "Har du oppdaget feil på motorsykkelen etter kjøpet? Finn ut om du har krav på reklamasjon, prisavslag eller heving.",
+    "Har du oppdaget feil på motorsykkelen etter kjøpet? Finn ut om du har krav på reklamasjon, prisavslag eller heving. Gratis vurdering.",
   alternates: {
     canonical: "/mc-kjop/mc-feil",
   },
@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 
 const faqs = [
   {
-    question: "Hva regnes som en mangel på en MC?",
+    question: "Hva regnes som en mangel på en brukt MC?",
     answer:
-      "En mangel er et avvik fra det som ble avtalt eller det du kunne forvente ut fra MC-ens alder, kilometerstand og pris.",
+      "En mangel er et avvik fra det som ble avtalt eller det du kunne forvente ut fra motorsykkelens alder, kilometerstand og pris.",
   },
   {
     question: "Hvor lenge kan jeg reklamere på MC?",
@@ -32,9 +32,9 @@ const faqs = [
       "Du kan kreve retting, prisavslag, heving eller erstatning, avhengig av hvor alvorlig mangelen er.",
   },
   {
-    question: "Hva betyr «solgt som den er»?",
+    question: "Gjelder samme regler for MC som for bil?",
     answer:
-      "Det gir selger et visst vern, men beskytter ikke mot uriktige eller tilbakeholdte opplysninger.",
+      "Ja, kjøpsloven og forbrukerkjøpsloven gjelder likt for motorsykler og biler.",
   },
 ];
 
@@ -43,12 +43,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     buildWebPageSchema({
       title: "Feil på MC? Sjekk dine rettigheter",
       description:
-        "Har du oppdaget feil på motorsykkelen etter kjøpet? Finn ut om du har krav.",
+        "Har du oppdaget feil på motorsykkelen etter kjøpet? Finn ut om du har krav på reklamasjon, prisavslag eller heving.",
       url: "/mc-kjop/mc-feil",
     }),
     buildBreadcrumbSchema([
       { name: "Hjem", url: "/" },
-      { name: "MC-kjøp", url: "/mc-kjop" },
+      { name: "Kjøretøy", url: "/bilkjop" },
       { name: "Feil på MC", url: "/mc-kjop/mc-feil" },
     ]),
     buildFAQSchema(faqs),

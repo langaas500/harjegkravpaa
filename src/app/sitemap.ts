@@ -15,10 +15,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/bilkjop/privat-kjop",
     "/bilkjop/forhandler",
     // MC-kjop SEO pages
-    "/mc-kjop/heving",
-    "/mc-kjop/garanti",
     "/mc-kjop/mc-feil",
     "/mc-kjop/reklamasjon",
+    "/mc-kjop/garanti",
+    "/mc-kjop/heving",
     "/mc-kjop/privat-kjop",
     "/mc-kjop/forhandler",
     // Fly SEO pages
@@ -38,12 +38,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE_URL}/bilkjop`,
-      lastModified: now,
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/mc-kjop`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.9,
