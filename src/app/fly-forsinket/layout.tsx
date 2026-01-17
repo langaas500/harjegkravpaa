@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Ble flyet ditt forsinket mer enn 3 timer? Du kan ha krav på opptil 600 euro i kompensasjon. Sjekk dine rettigheter gratis.",
   alternates: {
-    canonical: "/fly-forsinket",
+    canonical: `${SITE_URL}/fly-forsinket`,
   },
 };
 

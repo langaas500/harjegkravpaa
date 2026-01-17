@@ -11,7 +11,8 @@ export interface FAQItem {
   answer: string;
 }
 
-const BASE_URL = "https://harjegkravpå.no";
+export const SITE_URL = "https://harjegkravpå.no";
+const BASE_URL = SITE_URL;
 
 export function buildWebPageSchema({
   title,

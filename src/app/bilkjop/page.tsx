@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Car,
   ArrowRight,
@@ -61,10 +61,21 @@ const COST_OPTIONS = [
   { id: "extreme", label: "Over 60 000 kr", desc: "Omfattende / totalskade" },
 ];
 
-export default function BilkjopPage() {
+function BilkjopPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>("INTRO");
   const [vehicleType, setVehicleType] = useState<VehicleType>(null);
+
+  // Preselect vehicle type from URL param (hydration-safe)
+  useEffect(() => {
+    const vehicleParam = searchParams.get("vehicle");
+    if (vehicleParam === "motorcycle") {
+      setVehicleType("MOTORCYCLE");
+    } else if (vehicleParam === "car") {
+      setVehicleType("CAR");
+    }
+  }, [searchParams]);
   const [sellerType, setSellerType] = useState<SellerType>(null);
   const [vehicle, setVehicle] = useState<VehicleInfo>({
     make: "",
@@ -1314,5 +1325,13 @@ export default function BilkjopPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function BilkjopPage() {
+  return (
+    <Suspense fallback={<div className="bg-nordic min-h-screen" />}>
+      <BilkjopPageContent />
+    </Suspense>
   );
 }

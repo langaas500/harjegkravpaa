@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Har du oppdaget feil på motorsykkelen etter kjøpet? Finn ut om du har krav på reklamasjon, prisavslag eller heving. Gratis vurdering.",
   alternates: {
-    canonical: "/mc-kjop/mc-feil",
+    canonical: `${SITE_URL}/mc-kjop/mc-feil`,
   },
 };
 

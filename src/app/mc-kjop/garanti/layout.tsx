@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Hva dekker garantien på motorsykkel? Les om forskjellen på garanti og reklamasjon, og hva du kan kreve. Gratis vurdering.",
   alternates: {
-    canonical: "/mc-kjop/garanti",
+    canonical: `${SITE_URL}/mc-kjop/garanti`,
   },
 };
 

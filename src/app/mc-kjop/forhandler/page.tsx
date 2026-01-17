@@ -14,7 +14,7 @@ export default function McForhandlerPage() {
         <div className="max-w-3xl mx-auto px-4 py-3 flex justify-end">
           <div className="flex items-center gap-8 text-base">
             <button
-              onClick={() => router.push("/bilkjop")}
+              onClick={() => router.push("/bilkjop?vehicle=motorcycle")}
               className="text-white font-medium hover:text-slate-300 transition"
             >
               Kjøretøy
@@ -26,7 +26,7 @@ export default function McForhandlerPage() {
               Flyreiser
             </button>
             <button
-              onClick={() => router.push("/bilkjop")}
+              onClick={() => router.push("/bilkjop?vehicle=motorcycle")}
               className="text-white hover:text-slate-300 transition"
             >
               Sjekk saken din →
@@ -153,7 +153,7 @@ export default function McForhandlerPage() {
             Svar på noen spørsmål og få en vurdering av dine rettigheter.
           </p>
           <button
-            onClick={() => router.push("/bilkjop")}
+            onClick={() => router.push("/bilkjop?vehicle=motorcycle")}
             className="inline-flex items-center gap-2 bg-[#1F4F45] text-[#ECFDF5] px-6 py-3 rounded-xl font-semibold hover:bg-[#246457] transition"
           >
             Sjekk saken din
@@ -173,7 +173,7 @@ export default function McForhandlerPage() {
         </div>
       </footer>
 
-      <SeoFloatingCTA href="/bilkjop" />
+      <SeoFloatingCTA href="/bilkjop?vehicle=motorcycle" />
     </main>
   );
 }

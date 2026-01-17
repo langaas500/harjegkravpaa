@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Forstå forskjellen mellom garanti og reklamasjon ved bilkjøp. Lær hva garantien dekker og hva du har krav på uansett.",
   alternates: {
-    canonical: "/bilkjop/garanti",
+    canonical: `${SITE_URL}/bilkjop/garanti`,
   },
 };
 

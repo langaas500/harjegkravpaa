@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Ble du nektet ombordstigning på grunn av overbooking? Du kan ha krav på opptil 600 euro i kompensasjon.",
   alternates: {
-    canonical: "/nektet-ombordstigning",
+    canonical: `${SITE_URL}/nektet-ombordstigning`,
   },
 };
 

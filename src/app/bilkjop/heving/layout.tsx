@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Finn ut når du kan heve et bilkjøp og få pengene tilbake. Lær om vilkårene for heving og hvordan du går frem.",
   alternates: {
-    canonical: "/bilkjop/heving",
+    canonical: `${SITE_URL}/bilkjop/heving`,
   },
 };
 

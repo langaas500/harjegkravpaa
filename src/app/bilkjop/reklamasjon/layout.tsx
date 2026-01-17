@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Lær om reklamasjonsrett ved bilkjøp. Finn ut når du kan reklamere, hvilke frister som gjelder, og hva du kan kreve.",
   alternates: {
-    canonical: "/bilkjop/reklamasjon",
+    canonical: `${SITE_URL}/bilkjop/reklamasjon`,
   },
 };
 

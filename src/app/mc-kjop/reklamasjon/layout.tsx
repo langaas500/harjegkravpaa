@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Vil du reklamere på motorsykkel? Les om reklamasjonsfrister, hva du kan kreve og hvordan du går frem. Gratis vurdering.",
   alternates: {
-    canonical: "/mc-kjop/reklamasjon",
+    canonical: `${SITE_URL}/mc-kjop/reklamasjon`,
   },
 };
 

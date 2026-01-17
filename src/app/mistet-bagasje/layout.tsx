@@ -4,6 +4,7 @@ import {
   buildWebPageSchema,
   buildBreadcrumbSchema,
   buildFAQSchema,
+  SITE_URL,
 } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description:
     "Mistet, forsinket eller skadet bagasje? Du kan ha krav på opptil 16 000 kr i erstatning. Sjekk dine rettigheter.",
   alternates: {
-    canonical: "/mistet-bagasje",
+    canonical: `${SITE_URL}/mistet-bagasje`,
   },
 };
 
