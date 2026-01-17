@@ -97,7 +97,7 @@ export default function HomePage() {
       {/* Footer - minimal */}
       <footer className="border-t border-white/5 py-2 md:py-1.5 px-4">
         <div className="max-w-2xl mx-auto text-center text-xs text-slate-600 space-y-1">
-          <span><a href="/bruksvilkar" className="hover:text-slate-400">Bruksvilkår</a> • <a href="/personvern" className="hover:text-slate-400">Personvern</a> • <a href="/kontakt" className="hover:text-slate-400">Kontakt oss</a></span>
+          <span><a href="/bruksvilkar" className="hover:text-slate-400">Bruksvilkår</a> • <a href="/personvern" className="hover:text-slate-400">Personvern</a> • <a href="/kontakt" className="hover:text-slate-400">Kontakt oss</a> • <a href="/om-oss" className="hover:text-slate-400">Om oss</a></span>
           <div>
             Solutions by Langaas • Org.nr: 936 977 774 • <a href="mailto:kontakt@harjegkravpå.no" className="hover:text-slate-400">kontakt@harjegkravpå.no</a>
           </div>
