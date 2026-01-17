@@ -26,6 +26,11 @@ export async function POST(request: NextRequest) {
     const hasWorkshopReport = data.hasWorkshopReport;
     const workshopReportText = data.workshopReportText || "";
 
+    // Annonse/bevis-felt
+    const finnUrl = data.finnUrl || "";
+    const adEvidenceFiles = data.adEvidenceFiles || [];
+    const adClaims = data.adClaims || "";
+
     // Kontaktinfo fra skjema
     const contactInfo = data.contactInfo || {};
     const buyerName = contactInfo.buyerName || "[Ditt navn]";
@@ -263,7 +268,7 @@ ${buyerSignature}
 
 Vedlegg:
 - Kopi av kjøpekontrakt
-- [Andre relevante vedlegg]
+${adEvidenceFiles.length > 0 ? "- Dokumentasjon av annonsen (skjermbilder/PDF)\n" : ""}${finnUrl ? `- Referanse til annonse: ${finnUrl}\n` : ""}- [Andre relevante vedlegg]
 
 KRITISKE REGLER:
 - Brevet skal være komplett og send-klart
@@ -316,6 +321,11 @@ ${visibleDefect === true ? `- ⚠️ Synlig feil ved kjøp: JA - Feilen kunne se
 ${hasWorkshopReport === true && workshopReportText ? `- Verkstedsrapport foreligger:\n${workshopReportText}` : ""}
 ${hasWorkshopReport === false ? `- Verkstedsrapport: Ikke undersøkt ennå (anbefal å få dette gjort)` : ""}
 
+${adClaims || finnUrl || adEvidenceFiles.length > 0 ? `ANNONSE OG DOKUMENTASJON:
+${adClaims ? `- Hva annonsen lovet: "${adClaims}" (Bruk dette som grunnlag for mangelsanførselen dersom det viste seg å være feil)` : ""}
+${finnUrl ? `- Referanse til annonse: ${finnUrl}` : ""}
+${adEvidenceFiles.length > 0 ? `- Annonsedokumentasjon: ${adEvidenceFiles.length} fil(er) vedlagt (skjermbilder/PDF)` : ""}
+` : ""}
 SELGERS RESPONS: ${sellerContact.response || "Ingen"}
 
 KRAV: ${claimText}

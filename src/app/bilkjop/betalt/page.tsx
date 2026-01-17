@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
 import { CheckCircle2, FileDown, Loader2, FileText, ArrowRight } from "lucide-react";
@@ -56,6 +56,124 @@ function BetaltContent() {
     return text.length > maxLen ? text.substring(0, maxLen - 2) + ".." : text;
   };
 
+  // Hjelpefunksjon: Omskriv brukerens fritekst til nøytral saksfremstilling
+  const reformulateUserText = (rawText: string): string => {
+    if (!rawText) return "";
+    let text = rawText
+      .replace(/!!+/g, ".")
+      .replace(/\?\?+/g, "?")
+      .replace(/\.\.\.+/g, ".")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (text.length > 0) {
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    if (text.length > 0 && !text.match(/[.!?]$/)) {
+      text += ".";
+    }
+    return text;
+  };
+
+  // Hjelpefunksjon: Utvidet juridisk analyse basert på kjøpstype og problemtype
+  const getBilkjopLegalAnalysis = (isDealer: boolean, issues: string[], hadAsIsClause: boolean): string[] => {
+    const analyses: string[] = [];
+    const lawShort = isDealer ? "fkjl." : "kjl.";
+
+    if (isDealer) {
+      analyses.push(`Ved kjøp av motorvogn fra forhandler reguleres forholdet av forbrukerkjøpsloven av 21. juni 2002 nr. 34. Loven er ufravikelig, og selger kan ikke avtale vilkår som er dårligere for forbrukeren enn det som følger av loven, jf. fkjl. § 3.`);
+      analyses.push(`Fra 1. januar 2024 er det ikke lenger adgang til å selge bruktbiler "som den er" til forbrukere. Tidligere inntatt forbehold etter § 17 er ikke lenger gyldige. Dette styrker kjøperens posisjon betydelig ved reklamasjon.`);
+    } else {
+      analyses.push(`Ved kjøp av motorvogn fra privatperson reguleres forholdet av kjøpsloven av 13. mai 1988 nr. 27. Loven gjelder når begge parter er privatpersoner. Selger kan ta forbehold om at tingen selges "som den er", men dette beskytter ikke mot skjulte feil.`);
+      if (hadAsIsClause) {
+        analyses.push(`Selv om kjøretøyet er solgt "som den er" (${lawShort} § 19), foreligger det likevel mangel dersom selger har gitt uriktige opplysninger, har unnlatt å opplyse om vesentlige forhold, eller tingen er i vesentlig dårligere stand enn kjøper hadde grunn til å forvente.`);
+      }
+    }
+
+    if (issues.some(i => i.toLowerCase().includes("motor") || i.toLowerCase().includes("gir") || i.toLowerCase().includes("mekanikk"))) {
+      analyses.push(`Mekaniske feil som oppstår kort tid etter kjøpet vil ofte utgjøre en mangel etter ${lawShort} § 17. ${isDealer ? "Etter fkjl. § 18 annet ledd presumeres feil som viser seg innen ett år etter levering å ha eksistert ved risikoens overgang, med mindre selger kan bevise det motsatte." : "Ved privatkjøp må kjøper sannsynliggjøre at feilen eksisterte ved kjøpet."}`);
+    }
+
+    if (issues.some(i => i.toLowerCase().includes("rust") || i.toLowerCase().includes("karosseri"))) {
+      analyses.push(`Rust som ikke var synlig ved besiktigelse, eller som er mer omfattende enn forventet ut fra kjøretøyets alder og pris, kan utgjøre en mangel. Omfattende rustskader som truer kjøretøyets strukturelle integritet vil normalt være en vesentlig mangel.`);
+    }
+
+    if (issues.some(i => i.toLowerCase().includes("elektr") || i.toLowerCase().includes("lys") || i.toLowerCase().includes("sensor"))) {
+      analyses.push(`Elektriske feil og feil på sikkerhetssystemer vil normalt utgjøre mangler, særlig dersom de påvirker kjøretøyets sikkerhet eller brukbarhet. Slike feil kan gi grunnlag for både retting og erstatning for følgeskader.`);
+    }
+
+    analyses.push(`Etter ${lawShort} ${isDealer ? "§ 26" : "§ 32"} kan kjøperen kreve retting, omlevering, prisavslag eller heving ved mangel. ${isDealer ? "Selger dekker kostnadene ved retting." : "Retting skal skje uten vesentlig ulempe for kjøper."} Ved vesentlig mangel kan kjøper heve kjøpet.`);
+
+    analyses.push(`Erstatning kan kreves for tap som følge av mangelen, jf. ${lawShort} ${isDealer ? "§ 33" : "§ 40"}. Dette omfatter både direkte tap (utgifter til reparasjon, leiebil mv.) og indirekte tap (tapt arbeidsfortjeneste mv.) dersom selger er å bebreide.`);
+
+    return analyses;
+  };
+
+  // Hjelpefunksjon: Kjøperens rettigheter
+  const getBilkjopRights = (isDealer: boolean): Array<{ title: string; desc: string }> => {
+    const lawShort = isDealer ? "fkjl." : "kjl.";
+    return [
+      {
+        title: `Tilbakeholdsrett (${lawShort} ${isDealer ? "§ 20" : "§ 42"})`,
+        desc: "Kjøperen kan holde tilbake så mye av kjøpesummen som er nødvendig for å sikre at kravet blir dekket. Dette gjelder også etter levering dersom det oppdages mangler."
+      },
+      {
+        title: `Rett til retting (${lawShort} ${isDealer ? "§ 29" : "§ 34"})`,
+        desc: `Kjøperen kan kreve at selger retter mangelen uten kostnad for kjøper. ${isDealer ? "Forhandler har rett til å foreta to rettingsforsøk for samme mangel." : "Retting skal skje innen rimelig tid og uten vesentlig ulempe."}`
+      },
+      {
+        title: `Prisavslag (${lawShort} ${isDealer ? "§ 31" : "§ 38"})`,
+        desc: "Dersom mangelen ikke rettes, kan kjøperen kreve prisavslag tilsvarende mangelens betydning. Prisavslaget skal normalt tilsvare reparasjonskostnadene."
+      },
+      {
+        title: `Heving (${lawShort} ${isDealer ? "§ 32" : "§ 39"})`,
+        desc: "Ved vesentlig mangel kan kjøperen heve kjøpet og få kjøpesummen tilbake. Terskelen for heving er høy, men sikkerhetskritiske feil eller svært kostbare reparasjoner kan gi grunnlag for heving."
+      },
+      {
+        title: `Erstatning (${lawShort} ${isDealer ? "§ 33" : "§ 40"})`,
+        desc: "Kjøperen kan kreve erstatning for tap som følge av mangelen. Dette omfatter utgifter til verksted, leiebil, berging og andre direkte tap."
+      }
+    ];
+  };
+
+  // Hjelpefunksjon: Handlingspunkter
+  const getActionPoints = (outcomeLevel: string, isDealer: boolean): string[] => {
+    const points: string[] = [];
+
+    points.push("Send skriftlig reklamasjon til selger uten ugrunnet opphold. Reklamasjonen bør sendes rekommandert eller per e-post med lesebekreftelse for å sikre dokumentasjon på at den er mottatt.");
+    points.push("Reklamasjonen skal inneholde: (1) en klar beskrivelse av feilen/mangelen, (2) hvilke krav du fremmer (retting, prisavslag, heving eller erstatning), og (3) en rimelig frist for tilbakemelding (normalt 14 dager).");
+    points.push("Dokumenter feilen grundig med bilder, video og skriftlig beskrivelse. Få gjerne en verkstedsrapport som bekrefter feilens art og omfang, samt anslått reparasjonskostnad.");
+    points.push("Ikke reparer kjøretøyet før selger har fått anledning til å vurdere mangelen og eventuelt tilby retting. Unntak gjelder ved akutte sikkerhetsfeil eller dersom selger ikke responderer innen rimelig tid.");
+
+    if (outcomeLevel === "GREEN") {
+      if (isDealer) {
+        points.push("Gi selger anledning til å rette mangelen. Forhandler har rett til inntil to rettingsforsøk for samme mangel. Dersom retting ikke lykkes, kan du kreve prisavslag eller heving.");
+      } else {
+        points.push("Gi selger rimelig anledning til å rette mangelen før du eventuelt reparerer hos verksted. Ta vare på alle kvitteringer for utlegg du har hatt som følge av mangelen.");
+      }
+    } else if (outcomeLevel === "YELLOW") {
+      points.push("Vurder å kontakte Forbrukertilsynet eller en forbrukerorganisasjon for veiledning dersom selger avviser reklamasjonen. Ved kjøp fra forhandler kan Forbrukerrådet bistå med mekling.");
+    } else {
+      points.push("Selv om saken fremstår som utfordrende, bør du likevel fremme en skriftlig reklamasjon. Selgers respons kan gi grunnlag for å vurdere saken på nytt.");
+    }
+
+    return points;
+  };
+
+  // Hjelpefunksjon: Konsekvenstekst
+  const getConsequenceText = (outcomeLevel: string, isDealer: boolean): string => {
+    if (outcomeLevel === "GREEN") {
+      if (isDealer) {
+        return "Dersom forhandleren ikke besvarer reklamasjonen innen fristen, eller avviser kravet uten saklig grunn, kan saken bringes inn for Forbrukerrådet for mekling. Fører ikke mekling frem, kan saken bringes inn for Forbrukerklageutvalget. Forhandleren risikerer i så fall å måtte dekke dine sakskostnader i tillegg til kravet.";
+      } else {
+        return "Dersom selger ikke besvarer reklamasjonen innen fristen, eller avviser kravet uten saklig grunn, kan saken bringes inn for forliksrådet. Ved privatkjøp er det viktig å handle raskt, da foreldelsesfristen er kortere enn ved forbrukerkjøp.";
+      }
+    } else if (outcomeLevel === "YELLOW") {
+      return "Selgers respons på reklamasjonen vil være avgjørende for hvordan saken bør håndteres videre. Dersom selger erkjenner forholdet helt eller delvis, kan partene ofte finne en minnelig løsning. Ved uenighet kan det være aktuelt å innhente en uavhengig verkstedvurdering.";
+    } else {
+      return "Selv om saken fremstår som krevende, er det viktig å fremme reklamasjonen skriftlig. Selgers respons kan belyse forhold som endrer vurderingen. En verkstedsrapport kan også avdekke feil som styrker saken.";
+    }
+  };
+
   const generatePDF = async () => {
     if (!data) return;
     setIsGenerating(true);
@@ -68,6 +186,7 @@ function BetaltContent() {
       const contentWidth = pageWidth - margin * 2;
       const safeWidth = contentWidth - 4;
       let y = 0;
+      let currentPage = 1;
 
       if (fontData) {
         doc.addFileToVFS("Roboto-Regular.ttf", fontData.regular);
@@ -78,29 +197,35 @@ function BetaltContent() {
 
       const useFont = fontData ? "Roboto" : "helvetica";
       const isDealer = data.sellerType === "DEALER";
-      const applicableLaw = isDealer ? "Forbrukerkjøpsloven" : "Kjøpsloven";
       const warrantyText = isDealer ? "5 år (2 år for slitedeler)" : "2 år";
       const vehicle = data.vehicle as Record<string, string> | undefined;
       const outcome = data.outcome as Record<string, unknown> | undefined;
       const daysSince = calculateDaysSince(vehicle?.purchaseDate || "");
+      const issues = data.issues as string[] || [];
+      const hadAsIsClause = data.hadAsIsClause as boolean || false;
+
+      // Forbedret header med sidetall
+      const addPageHeader = (pageNum: number) => {
+        doc.setFillColor(30, 41, 59);
+        doc.rect(0, 0, pageWidth, 22, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(11);
+        doc.setFont(useFont, "bold");
+        doc.text("JURIDISK VURDERING – KJØRETØYKJØP", margin, 14);
+        doc.setFontSize(8);
+        doc.setFont(useFont, "normal");
+        doc.text(`Side ${pageNum}`, pageWidth - margin, 14, { align: "right" });
+        y = 30;
+      };
 
       const addPage = () => {
         doc.addPage();
-        y = margin;
-        doc.setFillColor(30, 41, 59);
-        doc.rect(0, 0, pageWidth, 25, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(14);
-        doc.setFont(useFont, "bold");
-        doc.text("BILKJØP-RAPPORT", margin, 16);
-        doc.setFontSize(9);
-        doc.setFont(useFont, "normal");
-        doc.text(`${isDealer ? "Forhandler" : "Privat"} - ${new Date().toLocaleDateString("nb-NO")}`, pageWidth - margin, 16, { align: "right" });
-        y = 35;
+        currentPage++;
+        addPageHeader(currentPage);
       };
 
       const checkPageBreak = (needed: number) => {
-        if (y + needed > pageHeight - 25) addPage();
+        if (y + needed > pageHeight - 20) addPage();
       };
 
       const drawBox = (x: number, yPos: number, width: number, height: number, fillColor: number[]) => {
@@ -108,572 +233,584 @@ function BetaltContent() {
         doc.roundedRect(x, yPos, width, height, 2, 2, "F");
       };
 
-      // PAGE 1
-      doc.setFillColor(30, 41, 59);
-      doc.rect(0, 0, pageWidth, 30, "F");
-      doc.setFillColor(16, 185, 129);
-      doc.roundedRect(margin, 8, 14, 14, 2, 2, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(12);
-      doc.setFont(useFont, "bold");
-      doc.text("H", margin + 5, 17);
-      doc.setFontSize(18);
-      doc.text("BILKJØP-RAPPORT", margin + 20, 17);
-      doc.setFontSize(9);
-      doc.setFont(useFont, "normal");
-      doc.text(`${isDealer ? "Forhandler" : "Privat"} - ${new Date().toLocaleDateString("nb-NO")}`, margin + 20, 24);
-
-      y = 40;
-
-      // === SEKSJON A: VURDERING AV KRAV ===
-      const levelColors: Record<string, number[]> = { GREEN: [34, 197, 94], YELLOW: [234, 179, 8], RED: [239, 68, 68] };
-      const levelLabels: Record<string, string> = { GREEN: "Sterkt krav", YELLOW: "Usikkert krav", RED: "Svakt krav" };
-      const levelExplanations: Record<string, string> = {
-        GREEN: "Basert på opplysningene i saken er det høy sannsynlighet for at du har et gyldig krav mot selger.",
-        YELLOW: "Basert på opplysningene i saken er det usikkert om du har et gyldig krav mot selger.",
-        RED: "Basert på opplysningene i saken er det lav sannsynlighet for at du har et gyldig krav mot selger."
+      const addSectionTitle = (title: string) => {
+        checkPageBreak(15);
+        doc.setFontSize(12);
+        doc.setFont(useFont, "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text(title, margin, y);
+        y += 2;
+        doc.setDrawColor(16, 185, 129);
+        doc.setLineWidth(0.8);
+        doc.line(margin, y, margin + doc.getTextWidth(title) + 5, y);
+        y += 6;
       };
-      const outcomeLevel = outcome?.level as string || "YELLOW";
+
+      const addParagraph = (text: string, fontSize: number = 9) => {
+        doc.setFontSize(fontSize);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        const lines = doc.splitTextToSize(text, safeWidth);
+        lines.forEach((line: string) => {
+          checkPageBreak(5);
+          doc.text(line, margin, y);
+          y += 4.5;
+        });
+        y += 2;
+      };
+
+      const outcomeLevel = (outcome?.level as string) || "YELLOW";
+      const buyerName = (data.buyerName as string) || "Kjøper";
+      const sellerName = (data.sellerName as string) || "Selger";
+
+      // ===== SIDE 1: FORSIDE OG SAMMENDRAG =====
+      doc.setFillColor(30, 41, 59);
+      doc.rect(0, 0, pageWidth, 70, "F");
+
+      // Logo-område
+      doc.setFillColor(16, 185, 129);
+      doc.roundedRect(margin, 20, 12, 12, 2, 2, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont(useFont, "bold");
+      doc.text("H", margin + 4, 28);
+
+      doc.setFontSize(22);
+      doc.setFont(useFont, "bold");
+      doc.text("JURIDISK VURDERING", margin + 18, 28);
+
+      doc.setFontSize(12);
+      doc.setFont(useFont, "normal");
+      doc.text(`Kjøretøykjøp – ${isDealer ? "Forhandler" : "Privat"}salg`, margin + 18, 36);
+
+      doc.setFontSize(9);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Utarbeidet: ${new Date().toLocaleDateString("nb-NO", { day: "numeric", month: "long", year: "numeric" })}`, margin + 18, 45);
+      doc.text(`Referanse: BIL-${Date.now().toString().slice(-8)}`, margin + 18, 51);
+
+      y = 80;
+
+      // Konklusjonsboks
+      const levelColors: Record<string, number[]> = {
+        GREEN: [22, 163, 74],
+        YELLOW: [202, 138, 4],
+        RED: [220, 38, 38]
+      };
+      const levelLabels: Record<string, string> = {
+        GREEN: "KRAVET HAR GODT GRUNNLAG",
+        YELLOW: "KRAVET KREVER NÆRMERE VURDERING",
+        RED: "KRAVET HAR BEGRENSET GRUNNLAG"
+      };
       const levelColor = levelColors[outcomeLevel] || levelColors.YELLOW;
 
-      // Tittel: Vurdering av krav
-      doc.setFontSize(14);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Vurdering av krav", margin, y);
-      y += 8;
+      drawBox(margin, y, contentWidth, 45, [248, 250, 252]);
+      doc.setDrawColor(levelColor[0], levelColor[1], levelColor[2]);
+      doc.setLineWidth(1);
+      doc.line(margin, y, margin, y + 45);
 
-      // Status med farge
-      doc.setFillColor(levelColor[0], levelColor[1], levelColor[2]);
-      doc.circle(margin + 3, y, 3, "F");
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont(useFont, "bold");
+      doc.setTextColor(100, 116, 139);
+      doc.text("KONKLUSJON", margin + 5, y + 8);
+
+      doc.setFontSize(13);
       doc.setTextColor(levelColor[0], levelColor[1], levelColor[2]);
-      doc.text(levelLabels[outcomeLevel] || "Usikkert krav", margin + 10, y + 1);
-      y += 8;
-
-      // Forklaring
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      const explanationLines = doc.splitTextToSize(levelExplanations[outcomeLevel] || levelExplanations.YELLOW, safeWidth);
-      doc.text(explanationLines, margin, y);
-      y += explanationLines.length * 5 + 8;
-
-      // === SEKSJON A (del 2): ANBEFALT NESTE STEG ===
-      doc.setFontSize(12);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Anbefalt neste steg", margin, y);
-      y += 7;
-
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      const nextStepText = "Send et formelt kravbrev til selger.\n\nBasert på vurderingen anbefales det å fremme kravet skriftlig, med tydelig henvisning til relevant lovverk og frister.";
-      const nextStepLines = doc.splitTextToSize(nextStepText, safeWidth);
-      doc.text(nextStepLines, margin, y);
-      y += nextStepLines.length * 5 + 10;
-
-      // === SEKSJON C: HANDLING / CTA ===
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text("Ønsker du hjelp med dette steget?", margin, y);
-      y += 8;
-
-      // CTA-blokk
-      const ctaBoxHeight = 42;
-      doc.setDrawColor(16, 185, 129);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(margin, y, contentWidth, ctaBoxHeight, 2, 2, "S");
-
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Last ned ferdig kravbrev til selger", margin + 4, y + 7);
-
-      doc.setFontSize(10);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text("Pris: 99 kr", margin + 4, y + 14);
+      doc.text(levelLabels[outcomeLevel], margin + 5, y + 18);
 
       doc.setFontSize(9);
-      doc.setTextColor(71, 85, 105);
-      const ctaPoints = [
-        "– Juridisk korrekt formulert",
-        "– Henviser til relevante lovparagrafer",
-        "– Setter tydelige svarfrister",
-        "– Klar til å sendes direkte"
-      ];
-      let ctaY = y + 21;
-      ctaPoints.forEach((point) => {
-        doc.text(point, margin + 4, ctaY);
-        ctaY += 5;
-      });
-      y += ctaBoxHeight + 10;
+      doc.setFont(useFont, "normal");
+      doc.setTextColor(51, 65, 85);
+      const summaryText = outcomeLevel === "GREEN"
+        ? `Basert på de fremlagte opplysningene fremstår ${buyerName}s krav mot ${sellerName} som velbegrunnet. Saken gjelder ${vehicle?.make || "kjøretøy"} ${vehicle?.model || ""} der det er påberopt feil ved ${issues.join(", ").toLowerCase() || "kjøretøyet"}. Det anbefales å fremme skriftlig reklamasjon med konkrete krav.`
+        : outcomeLevel === "YELLOW"
+        ? `Saken reiser flere spørsmål som krever nærmere vurdering. Det er påberopt feil ved ${issues.join(", ").toLowerCase() || "kjøretøyet"}. Styrken av kravet vil avhenge av dokumentasjonen og selgers tilsvar.`
+        : `Saken fremstår som utfordrende å vinne frem med basert på de opplysningene som er gitt. Det anbefales likevel å fremme skriftlig reklamasjon for å avklare selgers standpunkt.`;
 
-      // === RESTEN AV SIDE 1 ===
-      const boxW = (contentWidth - 4) / 3;
+      const summaryLines = doc.splitTextToSize(summaryText, safeWidth - 10);
+      doc.text(summaryLines.slice(0, 4), margin + 5, y + 28);
 
-      // Parties
-      doc.setTextColor(30, 41, 59);
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.text("Parter", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.setLineWidth(0.5);
-      doc.line(margin, y, margin + 18, y);
-      y += 5;
+      y += 55;
 
-      drawBox(margin, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + boxW + 2, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + (boxW + 2) * 2, y, boxW, 18, [248, 250, 252]);
+      // Seksjon 1: Saksopplysninger
+      addSectionTitle("1. Saksopplysninger");
+
+      const boxW = (contentWidth - 4) / 2;
+      drawBox(margin, y, boxW, 22, [248, 250, 252]);
+      drawBox(margin + boxW + 4, y, boxW, 22, [248, 250, 252]);
 
       doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
       doc.setFont(useFont, "normal");
-      doc.text("Kjøper", margin + 2, y + 4);
-      doc.text("Selger", margin + boxW + 4, y + 4);
-      doc.text("Type kjøp", margin + (boxW + 2) * 2 + 2, y + 4);
+      doc.text("KJØPER", margin + 3, y + 5);
+      doc.text("SELGER", margin + boxW + 7, y + 5);
+
+      doc.setFontSize(10);
+      doc.setFont(useFont, "bold");
+      doc.setTextColor(30, 41, 59);
+      doc.text(buyerName, margin + 3, y + 14);
+      doc.text(sellerName, margin + boxW + 7, y + 14);
+
+      y += 28;
+
+      // Kjøretøyinformasjon
+      const thirdW = (contentWidth - 6) / 3;
+      drawBox(margin, y, thirdW, 18, [248, 250, 252]);
+      drawBox(margin + thirdW + 3, y, thirdW, 18, [248, 250, 252]);
+      drawBox(margin + (thirdW + 3) * 2, y, thirdW, 18, [248, 250, 252]);
+
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.setFont(useFont, "normal");
+      doc.text("MERKE/MODELL", margin + 3, y + 5);
+      doc.text("REG.NR", margin + thirdW + 6, y + 5);
+      doc.text("ÅRSMODELL", margin + (thirdW + 3) * 2 + 3, y + 5);
 
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate((data.buyerName as string) || "Ikke oppgitt", 18), margin + 2, y + 12);
-      doc.text(truncate((data.sellerName as string) || "Ikke oppgitt", 18), margin + boxW + 4, y + 12);
-      doc.text(isDealer ? "Forhandler" : "Privat", margin + (boxW + 2) * 2 + 2, y + 12);
+      doc.text(truncate(`${vehicle?.make || ""} ${vehicle?.model || ""}`, 20), margin + 3, y + 13);
+      doc.text(vehicle?.regNum || "-", margin + thirdW + 6, y + 13);
+      doc.text(vehicle?.year || "-", margin + (thirdW + 3) * 2 + 3, y + 13);
+
       y += 22;
 
-      // Vehicle
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.text("Kjøretøy", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 22, y);
-      y += 5;
-
-      drawBox(margin, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + boxW + 2, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + (boxW + 2) * 2, y, boxW, 18, [248, 250, 252]);
+      drawBox(margin, y, thirdW, 18, [248, 250, 252]);
+      drawBox(margin + thirdW + 3, y, thirdW, 18, [248, 250, 252]);
+      drawBox(margin + (thirdW + 3) * 2, y, thirdW, 18, [248, 250, 252]);
 
       doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
       doc.setFont(useFont, "normal");
-      doc.text("Merke", margin + 2, y + 4);
-      doc.text("Modell", margin + boxW + 4, y + 4);
-      doc.text("Reg.nr", margin + (boxW + 2) * 2 + 2, y + 4);
+      doc.text("KJØPESUM", margin + 3, y + 5);
+      doc.text("KM-STAND", margin + thirdW + 6, y + 5);
+      doc.text("KJØPSDATO", margin + (thirdW + 3) * 2 + 3, y + 5);
 
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(truncate(vehicle?.make || "", 16), margin + 2, y + 12);
-      doc.text(truncate(vehicle?.model || "", 16), margin + boxW + 4, y + 12);
-      doc.text(truncate(vehicle?.regNum || "", 12), margin + (boxW + 2) * 2 + 2, y + 12);
-      y += 20;
+      doc.text(vehicle?.price ? `${vehicle.price} kr` : "-", margin + 3, y + 13);
+      doc.text(vehicle?.km ? `${vehicle.km} km` : "-", margin + thirdW + 6, y + 13);
+      doc.text(formatDate(vehicle?.purchaseDate || ""), margin + (thirdW + 3) * 2 + 3, y + 13);
 
+      y += 24;
+
+      // Salgsform
       drawBox(margin, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + boxW + 2, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + (boxW + 2) * 2, y, boxW, 18, [248, 250, 252]);
+      drawBox(margin + boxW + 4, y, boxW, 18, [248, 250, 252]);
 
       doc.setFontSize(7);
       doc.setTextColor(100, 116, 139);
       doc.setFont(useFont, "normal");
-      doc.text("Årsmodell", margin + 2, y + 4);
-      doc.text("Km.stand", margin + boxW + 4, y + 4);
-      doc.text("Kjøpesum", margin + (boxW + 2) * 2 + 2, y + 4);
+      doc.text("TYPE SALG", margin + 3, y + 5);
+      doc.text("TID SIDEN KJØP", margin + boxW + 7, y + 5);
 
       doc.setFontSize(9);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text(vehicle?.year || "-", margin + 2, y + 12);
-      doc.text(vehicle?.km ? `${vehicle.km} km` : "-", margin + boxW + 4, y + 12);
-      doc.text(vehicle?.price ? `${vehicle.price} kr` : "-", margin + (boxW + 2) * 2 + 2, y + 12);
+      doc.text(isDealer ? "Forhandlerkjøp" : "Privatkjøp", margin + 3, y + 13);
+      doc.text(daysSince ? `${daysSince} dager` : "-", margin + boxW + 7, y + 13);
 
+      // Footer side 1
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
-      doc.text("harjegkravpå.no", margin, pageHeight - 8);
-      doc.text("Side 1/3", pageWidth - margin, pageHeight - 8, { align: "right" });
+      doc.text("harjegkravpå.no – Juridisk veiledning for forbrukere", margin, pageHeight - 8);
+      doc.text("Konfidensielt", pageWidth - margin, pageHeight - 8, { align: "right" });
 
-      // PAGE 2
+      // ===== SIDE 2: SAKSFREMSTILLING =====
       addPage();
 
-      const halfW = (contentWidth - 2) / 2;
+      addSectionTitle("2. Saksfremstilling");
 
-      // Kjøpsdato og tid siden kjøp
-      drawBox(margin, y, halfW, 18, [248, 250, 252]);
-      drawBox(margin + halfW + 2, y, halfW, 18, [248, 250, 252]);
+      addParagraph("Nedenfor følger en gjennomgang av saksforholdet slik det er beskrevet av kjøperen. Fremstillingen er bearbeidet til en nøytral saksfremstilling egnet som grunnlag for reklamasjon.");
+      y += 3;
 
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      doc.setFont(useFont, "normal");
-      doc.text("Kjøpsdato", margin + 2, y + 4);
-      doc.text("Tid siden kjøp", margin + halfW + 4, y + 4);
+      if (data.userDescription) {
+        const reformulatedText = reformulateUserText(data.userDescription as string);
 
-      doc.setFontSize(9);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text(formatDate(vehicle?.purchaseDate || ""), margin + 2, y + 12);
-      doc.text(daysSince ? `${daysSince} dager` : "-", margin + halfW + 4, y + 12);
-      y += 22;
-
-      // Problem
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.text("Problemet", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 26, y);
-      y += 5;
-
-      drawBox(margin, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + boxW + 2, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + (boxW + 2) * 2, y, boxW, 18, [248, 250, 252]);
-
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      doc.setFont(useFont, "normal");
-      doc.text("Feilområder", margin + 2, y + 4);
-      doc.text("Sikkerhetskritisk", margin + boxW + 4, y + 4);
-      doc.text("Kjørbar", margin + (boxW + 2) * 2 + 2, y + 4);
-
-      doc.setFontSize(8);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      const issues = data.issues as string[] || [];
-      doc.text(truncate(issues.join(", "), 22), margin + 2, y + 12);
-      doc.text(data.safetyCritical ? "Ja" : "Nei", margin + boxW + 4, y + 12);
-      doc.text(data.notDriveable ? "Nei" : "Ja", margin + (boxW + 2) * 2 + 2, y + 12);
-      y += 20;
-
-      drawBox(margin, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + boxW + 2, y, boxW, 18, [248, 250, 252]);
-      drawBox(margin + (boxW + 2) * 2, y, boxW, 18, [248, 250, 252]);
-
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      doc.setFont(useFont, "normal");
-      doc.text("Kostnadsanslag", margin + 2, y + 4);
-      doc.text("Reklamert", margin + boxW + 4, y + 4);
-      doc.text("Feil oppstod", margin + (boxW + 2) * 2 + 2, y + 4);
-
-      doc.setFontSize(9);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text(truncate((data.costBracket as string) || "Ukjent", 14), margin + 2, y + 12);
-      doc.text(data.complainedQuickly ? "Raskt" : "Sent", margin + boxW + 4, y + 12);
-      doc.text(data.defectSoonAfter ? "Tidlig" : "Sent", margin + (boxW + 2) * 2 + 2, y + 12);
-      y += 22;
-
-      // Contact
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.text("Kontakt med selger", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 42, y);
-      y += 5;
-
-      drawBox(margin, y, halfW, 18, [248, 250, 252]);
-      drawBox(margin + halfW + 2, y, halfW, 18, [248, 250, 252]);
-
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      doc.setFont(useFont, "normal");
-      doc.text("Kontaktet selger", margin + 2, y + 4);
-      doc.text("Status", margin + halfW + 4, y + 4);
-
-      doc.setFontSize(9);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text(data.contactedSeller ? "Ja" : "Nei", margin + 2, y + 12);
-      doc.text(data.contactedSeller ? (data.sellerResponse ? "Fått svar" : "Venter") : "Ikke kontaktet", margin + halfW + 4, y + 12);
-      y += 20;
-
-      if (data.contactedSeller && data.sellerResponse) {
-        const responseLines = doc.splitTextToSize(data.sellerResponse as string, safeWidth - 6);
-        const responseHeight = Math.min(20, 8 + responseLines.length * 4);
-        drawBox(margin, y, contentWidth, responseHeight, [254, 243, 199]);
-        doc.setFontSize(7);
-        doc.setTextColor(133, 77, 14);
+        doc.setFontSize(10);
         doc.setFont(useFont, "bold");
-        doc.text("Selgers respons:", margin + 2, y + 4);
+        doc.setTextColor(30, 41, 59);
+        doc.text("Kjøpers beskrivelse av forholdet:", margin, y);
+        y += 6;
+
+        const historyLines = doc.splitTextToSize(reformulatedText, safeWidth - 8);
+        const boxHeight = Math.max(40, 10 + historyLines.length * 4.5);
+
+        checkPageBreak(boxHeight + 10);
+        drawBox(margin, y, contentWidth, boxHeight, [248, 250, 252]);
+        doc.setDrawColor(100, 116, 139);
+        doc.setLineWidth(0.3);
+        doc.line(margin + 3, y + 3, margin + 3, y + boxHeight - 3);
+
+        doc.setFontSize(9);
         doc.setFont(useFont, "normal");
-        doc.setFontSize(8);
-        doc.setTextColor(113, 63, 18);
-        doc.text(responseLines.slice(0, 3), margin + 2, y + 9);
-        y += responseHeight + 4;
+        doc.setTextColor(51, 65, 85);
+        let textY = y + 8;
+        historyLines.forEach((line: string) => {
+          if (textY < y + boxHeight - 5) {
+            doc.text(line, margin + 8, textY);
+            textY += 4.5;
+          }
+        });
+
+        y += boxHeight + 8;
       }
 
-      drawBox(margin, y, contentWidth, 14, [241, 245, 249]);
-      doc.setFontSize(9);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text(`Gjeldende lov: ${applicableLaw}`, margin + 3, y + 5);
-      doc.setFont(useFont, "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(100, 116, 139);
-      doc.text(`Reklamasjonsfrist: ${warrantyText}`, margin + 3, y + 10);
-      y += 18;
+      // Seksjon 3: Påberopte feil
+      addSectionTitle("3. Påberopte feil og mangler");
 
-      // Vurderingsgrunnlag
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Vurderingsgrunnlag", margin, y);
+      addParagraph("Basert på den fremlagte beskrivelsen kan følgende forhold identifiseres som grunnlag for reklamasjon:");
       y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 42, y);
-      y += 5;
 
-      doc.setFontSize(8);
-      doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text("Basert på informasjonen du har oppgitt:", margin, y);
-      y += 6;
+      if (issues.length > 0) {
+        issues.forEach((issue, index) => {
+          checkPageBreak(20);
 
-      const keyPoints = (outcome?.keyPoints as string[]) || [];
-      keyPoints.forEach((point: string) => {
-        checkPageBreak(10);
-        doc.setFillColor(16, 185, 129);
-        doc.circle(margin + 2, y - 1, 1.2, "F");
-        doc.setTextColor(30, 41, 59);
+          doc.setFontSize(10);
+          doc.setFont(useFont, "bold");
+          doc.setTextColor(30, 41, 59);
+          doc.text(`${index + 1}. ${issue}`, margin, y);
+          y += 5;
+
+          // Forklaring per problemtype
+          let explanation = "";
+          if (issue.toLowerCase().includes("motor") || issue.toLowerCase().includes("mekanikk")) {
+            explanation = `Motorproblemer som oppstår kort tid etter kjøp vil ofte utgjøre en mangel etter ${isDealer ? "fkjl." : "kjl."} § 17. ${isDealer ? "Ved forhandlerkjøp presumeres feil innen ett år å ha eksistert ved kjøpet." : "Kjøper må sannsynliggjøre at feilen eksisterte ved kjøpet."}`;
+          } else if (issue.toLowerCase().includes("gir") || issue.toLowerCase().includes("kløtsj")) {
+            explanation = "Feil på girkasse eller clutch er kostbare å reparere og vil normalt utgjøre en mangel dersom feilen eksisterte ved kjøpet.";
+          } else if (issue.toLowerCase().includes("rust") || issue.toLowerCase().includes("karosseri")) {
+            explanation = "Rust som ikke var synlig ved besiktigelse, eller som er mer omfattende enn forventet, kan utgjøre en mangel.";
+          } else if (issue.toLowerCase().includes("elektr") || issue.toLowerCase().includes("sensor")) {
+            explanation = "Elektriske feil og sensorfeil kan gi grunnlag for reklamasjon, særlig dersom de påvirker sikkerhet eller brukbarhet.";
+          } else {
+            explanation = `Dette kan utgjøre en mangel etter ${isDealer ? "forbrukerkjøpsloven" : "kjøpsloven"} dersom feilen eksisterte ved kjøpet.`;
+          }
+
+          addParagraph(explanation);
+          y += 2;
+        });
+      }
+
+      // Tilleggsinformasjon om sikkerhet og kjørbarhet
+      if (data.safetyCritical || data.notDriveable) {
+        checkPageBreak(25);
+        drawBox(margin, y, contentWidth, 20, [254, 226, 226]);
+        doc.setDrawColor(220, 38, 38);
+        doc.setLineWidth(0.5);
+        doc.line(margin, y, margin, y + 20);
+
+        doc.setFontSize(9);
+        doc.setFont(useFont, "bold");
+        doc.setTextColor(153, 27, 27);
+        doc.text("Alvorlig forhold", margin + 5, y + 7);
+
         doc.setFontSize(8);
-        const pointLines = doc.splitTextToSize(point, safeWidth - 8);
-        doc.text(pointLines, margin + 6, y);
-        y += pointLines.length * 4 + 3;
-      });
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(127, 29, 29);
+        const severityText = data.safetyCritical && data.notDriveable
+          ? "Feilen er sikkerhetskritisk og kjøretøyet er ikke kjørbart. Dette styrker saken betydelig."
+          : data.safetyCritical
+          ? "Feilen er sikkerhetskritisk. Dette styrker saken betydelig."
+          : "Kjøretøyet er ikke kjørbart. Dette styrker saken betydelig.";
+        doc.text(severityText, margin + 5, y + 14);
+        y += 26;
+      }
 
-      doc.setFontSize(7);
-      doc.setTextColor(150, 150, 150);
-      doc.text("harjegkravpå.no", margin, pageHeight - 8);
-      doc.text("Side 2/3", pageWidth - margin, pageHeight - 8, { align: "right" });
-
-      // PAGE 3
+      // ===== SIDE 3: JURIDISK VURDERING =====
       addPage();
 
-      // Juridisk grunnlag
-      doc.setFontSize(11);
-      doc.setFont(useFont, "bold");
-      doc.setTextColor(30, 41, 59);
-      doc.text("Juridisk grunnlag", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 38, y);
-      y += 6;
+      addSectionTitle("4. Juridisk grunnlag");
 
-      const legalRefs = (outcome?.legalRefs as Array<{ heading: string; refs: string[] }>) || [];
-      legalRefs.forEach((section) => {
-        checkPageBreak(16);
+      addParagraph(`Avtaleforholdet reguleres av ${isDealer ? "forbrukerkjøpsloven av 21. juni 2002 nr. 34" : "kjøpsloven av 13. mai 1988 nr. 27"}. Nedenfor følger en gjennomgang av de relevante bestemmelsene og hvordan disse kommer til anvendelse i saken.`);
+      y += 4;
+
+      const legalAnalyses = getBilkjopLegalAnalysis(isDealer, issues, hadAsIsClause);
+
+      legalAnalyses.forEach((analysis) => {
+        checkPageBreak(20);
+        const analysisLines = doc.splitTextToSize(analysis, safeWidth - 5);
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        analysisLines.forEach((line: string) => {
+          checkPageBreak(5);
+          doc.text(line, margin, y);
+          y += 4.5;
+        });
+        y += 4;
+      });
+
+      // Seksjon 5: Kjøperens rettigheter
+      checkPageBreak(40);
+      addSectionTitle("5. Kjøperens rettigheter");
+
+      addParagraph(`Ved mangel har kjøperen følgende beføyelser etter ${isDealer ? "forbrukerkjøpsloven" : "kjøpsloven"}:`);
+      y += 2;
+
+      const rights = getBilkjopRights(isDealer);
+
+      rights.forEach((right) => {
+        checkPageBreak(18);
         doc.setFontSize(9);
         doc.setFont(useFont, "bold");
         doc.setTextColor(30, 41, 59);
-        doc.text(section.heading, margin, y);
-        y += 5;
-        (section.refs || []).forEach((ref: string) => {
-          checkPageBreak(8);
-          doc.setFillColor(30, 41, 59);
-          doc.circle(margin + 2, y - 1, 0.8, "F");
-          doc.setFontSize(8);
-          doc.setFont(useFont, "normal");
-          doc.setTextColor(71, 85, 105);
-          const refLines = doc.splitTextToSize(ref, safeWidth - 8);
-          doc.text(refLines, margin + 6, y);
-          y += refLines.length * 4 + 2;
+        doc.text(right.title, margin, y);
+        y += 4;
+
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        const rightLines = doc.splitTextToSize(right.desc, safeWidth);
+        rightLines.forEach((line: string) => {
+          doc.text(line, margin, y);
+          y += 4;
         });
         y += 3;
       });
+
+      // ===== SIDE 4: ANBEFALT HANDLING =====
+      addPage();
+
+      addSectionTitle("6. Anbefalt fremgangsmåte");
+
+      addParagraph("For å ivareta dine rettigheter anbefales følgende fremgangsmåte. Punktene bør følges i den angitte rekkefølgen:");
       y += 4;
 
-      checkPageBreak(22);
-      const tipLines = doc.splitTextToSize((outcome?.proTip as string) || "", safeWidth - 6);
-      const tipHeight = Math.max(18, 10 + tipLines.length * 4);
-      drawBox(margin, y, contentWidth, tipHeight, [254, 249, 195]);
-      doc.setFontSize(9);
+      const actionPoints = getActionPoints(outcomeLevel, isDealer);
+
+      actionPoints.forEach((point, index) => {
+        checkPageBreak(20);
+
+        doc.setFillColor(16, 185, 129);
+        doc.circle(margin + 3, y + 1, 3, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.setFont(useFont, "bold");
+        doc.text(`${index + 1}`, margin + 1.5, y + 2.5);
+
+        doc.setFontSize(9);
+        doc.setFont(useFont, "normal");
+        doc.setTextColor(51, 65, 85);
+        const pointLines = doc.splitTextToSize(point, safeWidth - 12);
+        let pointY = y;
+        pointLines.forEach((line: string) => {
+          checkPageBreak(5);
+          doc.text(line, margin + 10, pointY + 2);
+          pointY += 4.5;
+        });
+        y = pointY + 4;
+      });
+
+      // Seksjon 7: Konsekvenser
+      y += 4;
+      addSectionTitle("7. Konsekvenser ved manglende oppfølging");
+
+      const consequenceText = getConsequenceText(outcomeLevel, isDealer);
+      addParagraph(consequenceText);
+
+      // Tidsfrister
+      y += 4;
+      checkPageBreak(35);
+      drawBox(margin, y, contentWidth, 30, [254, 249, 195]);
+      doc.setDrawColor(202, 138, 4);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, margin, y + 30);
+
+      doc.setFontSize(10);
       doc.setFont(useFont, "bold");
       doc.setTextColor(133, 77, 14);
-      doc.text("Pro-tip", margin + 3, y + 5);
+      doc.text("Viktige frister", margin + 5, y + 8);
+
       doc.setFontSize(8);
       doc.setFont(useFont, "normal");
       doc.setTextColor(113, 63, 18);
-      doc.text(tipLines.slice(0, 3), margin + 3, y + 11);
-      y += tipHeight + 6;
+      const deadlineText = isDealer
+        ? `Reklamasjon må fremsettes innen rimelig tid etter at mangelen ble oppdaget. Den absolutte reklamasjonsfristen er ${warrantyText} fra levering. For skjulte mangler som viser seg etter 2 år, gjelder 5 års frist.`
+        : `Ved privatkjøp er reklamasjonsfristen normalt 2 år fra kjøpet. Reklamasjon må fremsettes innen rimelig tid etter at mangelen ble oppdaget. Det anbefales å reklamere skriftlig så snart som mulig.`;
+      const deadlineLines = doc.splitTextToSize(deadlineText, safeWidth - 10);
+      doc.text(deadlineLines, margin + 5, y + 15);
 
-      if (data.userDescription) {
-        checkPageBreak(40);
-        doc.setFontSize(11);
-        doc.setFont(useFont, "bold");
-        doc.setTextColor(30, 41, 59);
-        doc.text("Din beskrivelse", margin, y);
-        y += 2;
-        doc.setDrawColor(16, 185, 129);
-        doc.line(margin, y, margin + 36, y);
-        y += 5;
+      y += 38;
 
-        const descLines = doc.splitTextToSize(`"${data.userDescription}"`, safeWidth - 4);
-        const descHeight = Math.min(38, 6 + descLines.length * 4);
-        drawBox(margin, y, contentWidth, descHeight, [248, 250, 252]);
-        doc.setFontSize(8);
+      // ===== SIDE 5: DOKUMENTASJON OG AVSLUTNING =====
+      addPage();
+
+      addSectionTitle("8. Dokumentasjon og bevisføring");
+
+      addParagraph("For å styrke saken anbefales det å samle og sikre følgende dokumentasjon:");
+      y += 2;
+
+      const docPoints = [
+        "Kjøpekontrakt eller kvittering som dokumenterer kjøpet",
+        "Bilder og video av feilen fra flere vinkler med god belysning",
+        "Verkstedrapport som bekrefter feilens art, omfang og estimert reparasjonskostnad",
+        "Skjermbilde av annonsen dersom kjøretøyet ble kjøpt via nettannonse",
+        "All korrespondanse med selger (e-post, SMS, brev)",
+        "Feilkoder fra OBD-avlesning dersom relevant",
+        "Kvitteringer for eventuelle utlegg (berging, leiebil, midlertidig reparasjon)"
+      ];
+
+      docPoints.forEach((point) => {
+        checkPageBreak(8);
+        doc.setFillColor(30, 41, 59);
+        doc.circle(margin + 2, y, 1, "F");
+        doc.setFontSize(9);
         doc.setFont(useFont, "normal");
-        doc.setTextColor(71, 85, 105);
-        doc.text(descLines.slice(0, 8), margin + 3, y + 5);
-        y += descHeight + 6;
-      }
+        doc.setTextColor(51, 65, 85);
+        const pointLines = doc.splitTextToSize(point, safeWidth - 8);
+        doc.text(pointLines, margin + 6, y + 1);
+        y += pointLines.length * 4.5 + 2;
+      });
 
-      if (data.sellerPromises || data.hadAsIsClause !== null || data.visibleDefect !== null || data.hasWorkshopReport !== null) {
-        checkPageBreak(40);
-        doc.setFontSize(11);
-        doc.setFont(useFont, "bold");
-        doc.setTextColor(30, 41, 59);
-        doc.text("Kritiske juridiske momenter", margin, y);
+      // Seksjon 9: Annonsegrunnlag (kun hvis data finnes)
+      const finnUrl = data.finnUrl as string | null;
+      const adEvidenceFiles = data.adEvidenceFiles as Array<{ name: string }> | null;
+      const adClaims = data.adClaims as string | null;
+
+      if (finnUrl || (adEvidenceFiles && adEvidenceFiles.length > 0) || adClaims) {
+        y += 6;
+        addSectionTitle("9. Annonsegrunnlag");
+
+        addParagraph("Følgende informasjon om annonsen er oppgitt av kjøperen. Dette kan være relevant dersom annonsen inneholdt opplysninger som viste seg å være uriktige.");
         y += 2;
-        doc.setDrawColor(239, 68, 68);
-        doc.line(margin, y, margin + 58, y);
-        y += 5;
 
-        if (data.sellerPromises) {
-          checkPageBreak(15);
-          doc.setFontSize(8);
+        if (finnUrl) {
+          checkPageBreak(12);
+          doc.setFontSize(9);
           doc.setFont(useFont, "bold");
-          doc.setTextColor(217, 119, 6);
-          doc.text("Selgers løfter/påstander:", margin, y);
-          y += 5;
-          const promiseLines = doc.splitTextToSize(String(data.sellerPromises), safeWidth - 4);
-          drawBox(margin, y, contentWidth, 6 + promiseLines.slice(0, 5).length * 4, [254, 243, 199]);
-          doc.setFontSize(7);
+          doc.setTextColor(30, 41, 59);
+          doc.text("Referanse til original annonse:", margin, y);
+          y += 4;
           doc.setFont(useFont, "normal");
-          doc.setTextColor(120, 53, 15);
-          doc.text(promiseLines.slice(0, 5), margin + 3, y + 4);
-          y += 6 + promiseLines.slice(0, 5).length * 4 + 4;
+          doc.setTextColor(51, 65, 85);
+          const urlLines = doc.splitTextToSize(finnUrl, safeWidth);
+          urlLines.forEach((line: string) => {
+            doc.text(line, margin, y);
+            y += 4;
+          });
+          y += 3;
         }
 
-        if (data.hadAsIsClause !== null && data.hadAsIsClause !== undefined) {
-          checkPageBreak(10);
-          doc.setFontSize(8);
+        if (adClaims) {
+          checkPageBreak(20);
+          doc.setFontSize(9);
           doc.setFont(useFont, "bold");
-          const isDealer = data.sellerType === "DEALER";
-          if (data.hadAsIsClause && isDealer) {
-            doc.setTextColor(220, 38, 38);
-            doc.text('"Som den er"-klausul: JA (UGYLDIG hos forhandler etter 01.01.2024)', margin, y);
-          } else if (data.hadAsIsClause) {
-            doc.setTextColor(217, 119, 6);
-            doc.text('"Som den er"-klausul: JA (kan ha betydning, men beskytter ikke mot skjulte feil)', margin, y);
-          } else {
-            doc.setTextColor(22, 163, 74);
-            doc.text('"Som den er"-klausul: Nei, normalt salg', margin, y);
-          }
-          y += 6;
-        }
+          doc.setTextColor(30, 41, 59);
+          doc.text("Kjøpers beskrivelse av hva annonsen lovet:", margin, y);
+          y += 5;
 
-        if (data.visibleDefect !== null && data.visibleDefect !== undefined) {
-          checkPageBreak(10);
-          doc.setFontSize(8);
-          doc.setFont(useFont, "bold");
-          if (data.visibleDefect) {
-            doc.setTextColor(217, 119, 6);
-            doc.text("Synlig feil ved kjøp: JA (kan svekke saken, men ikke umuliggjør krav)", margin, y);
-          } else {
-            doc.setTextColor(22, 163, 74);
-            doc.text("Synlig feil ved kjøp: NEI - Feilen var skjult (styrker saken)", margin, y);
-          }
-          y += 6;
-        }
+          const claimsLines = doc.splitTextToSize(reformulateUserText(adClaims), safeWidth - 8);
+          const claimsBoxHeight = Math.max(20, 8 + claimsLines.length * 4.5);
 
-        if (data.hasWorkshopReport !== null && data.hasWorkshopReport !== undefined) {
-          checkPageBreak(10);
-          doc.setFontSize(8);
-          doc.setFont(useFont, "bold");
-          if (data.hasWorkshopReport) {
-            doc.setTextColor(22, 163, 74);
-            doc.text("Verkstedsrapport: JA (styrker saken betydelig)", margin, y);
-            y += 5;
-            if (data.workshopReportText) {
-              const workshopLines = doc.splitTextToSize(String(data.workshopReportText), safeWidth - 4);
-              const wsHeight = 6 + Math.min(workshopLines.length, 8) * 4;
-              drawBox(margin, y, contentWidth, wsHeight, [219, 234, 254]);
-              doc.setFontSize(7);
-              doc.setFont(useFont, "normal");
-              doc.setTextColor(30, 58, 138);
-              doc.text(workshopLines.slice(0, 8), margin + 3, y + 4);
-              y += wsHeight + 4;
-            } else {
-              y += 2;
+          drawBox(margin, y, contentWidth, claimsBoxHeight, [248, 250, 252]);
+          doc.setDrawColor(100, 116, 139);
+          doc.setLineWidth(0.3);
+          doc.line(margin + 3, y + 3, margin + 3, y + claimsBoxHeight - 3);
+
+          doc.setFontSize(9);
+          doc.setFont(useFont, "normal");
+          doc.setTextColor(51, 65, 85);
+          let claimsY = y + 6;
+          claimsLines.forEach((line: string) => {
+            if (claimsY < y + claimsBoxHeight - 3) {
+              doc.text(line, margin + 8, claimsY);
+              claimsY += 4.5;
             }
-          } else {
-            doc.setTextColor(217, 119, 6);
-            doc.text("Verkstedsrapport: Ikke undersøkt ennå (anbefales å få dette)", margin, y);
-            y += 6;
-          }
+          });
+          y += claimsBoxHeight + 5;
         }
-        y += 4;
+
+        if (adEvidenceFiles && adEvidenceFiles.length > 0) {
+          checkPageBreak(15);
+          doc.setFontSize(9);
+          doc.setFont(useFont, "bold");
+          doc.setTextColor(30, 41, 59);
+          doc.text(`Vedlagt dokumentasjon (${adEvidenceFiles.length} fil${adEvidenceFiles.length > 1 ? "er" : ""}):`, margin, y);
+          y += 5;
+
+          adEvidenceFiles.forEach((file) => {
+            checkPageBreak(6);
+            doc.setFillColor(30, 41, 59);
+            doc.circle(margin + 2, y, 1, "F");
+            doc.setFontSize(9);
+            doc.setFont(useFont, "normal");
+            doc.setTextColor(51, 65, 85);
+            doc.text(file.name, margin + 6, y + 1);
+            y += 5;
+          });
+        }
       }
 
-      if (data.additionalInfo) {
-        checkPageBreak(40);
-        doc.setFontSize(11);
+      y += 6;
+      addSectionTitle("10. Tvisteløsning");
+
+      addParagraph("Dersom reklamasjonen ikke fører frem, finnes følgende muligheter for tvisteløsning:");
+      y += 2;
+
+      const disputeOptions = isDealer
+        ? [
+            { title: "Forbrukerrådet", desc: "Tilbyr gratis mekling mellom forbruker og forhandler. Meklingen er frivillig, men mange saker løses på dette stadiet." },
+            { title: "Forbrukerklageutvalget", desc: "Behandler klager på kjøretøykjøp fra forhandler dersom mekling ikke fører frem. Utvalgets avgjørelser er bindende dersom de ikke bringes inn for domstolene innen fire uker." },
+            { title: "Domstolene", desc: "Saken kan bringes inn for forliksrådet eller tingretten. Ved forbrukertvister er det særlige regler om sakskostnader som beskytter forbrukeren." }
+          ]
+        : [
+            { title: "Forliksrådet", desc: "Ved privatkjøp kan saken bringes direkte inn for forliksrådet. Forliksrådet forsøker først mekling, deretter kan det avsi dom i saker med tvistesum under 200 000 kr." },
+            { title: "Domstolene", desc: "Dersom saken ikke løses i forliksrådet, kan den ankes til tingretten. Ved tvister mellom privatpersoner gjelder ordinære regler om sakskostnader." }
+          ];
+
+      disputeOptions.forEach((option) => {
+        checkPageBreak(18);
+        doc.setFontSize(9);
         doc.setFont(useFont, "bold");
         doc.setTextColor(30, 41, 59);
-        doc.text("Tilleggsinformasjon", margin, y);
-        y += 2;
-        doc.setDrawColor(16, 185, 129);
-        doc.line(margin, y, margin + 46, y);
-        y += 5;
+        doc.text(option.title, margin, y);
+        y += 4;
 
-        const addInfoLines = doc.splitTextToSize(`${data.additionalInfo}`, safeWidth - 4);
-        const maxLines = 25;
-        const linesToShow = addInfoLines.slice(0, maxLines);
-        const addInfoHeight = Math.min(60, 6 + linesToShow.length * 4);
-        drawBox(margin, y, contentWidth, addInfoHeight, [240, 253, 244]);
-        doc.setFontSize(7);
         doc.setFont(useFont, "normal");
-        doc.setTextColor(22, 101, 52);
-        doc.text(linesToShow, margin + 3, y + 5);
-        y += addInfoHeight + 6;
-      }
+        doc.setTextColor(51, 65, 85);
+        const optionLines = doc.splitTextToSize(option.desc, safeWidth);
+        optionLines.forEach((line: string) => {
+          doc.text(line, margin, y);
+          y += 4;
+        });
+        y += 3;
+      });
 
-      checkPageBreak(50);
-      doc.setFontSize(11);
+      // Avsluttende merknad
+      y += 6;
+      addSectionTitle("11. Avsluttende merknad");
+
+      addParagraph("Denne vurderingen er utarbeidet på grunnlag av opplysningene som er gitt, og gir en foreløpig vurdering av saken. Den konkrete rettsstillingen vil avhenge av den fullstendige dokumentasjonen og eventuelle innsigelser fra motparten.");
+
+      addParagraph("Rapporten er ment som veiledning og utgjør ikke juridisk rådgivning i lovens forstand. Ved kompliserte saker eller store verdier anbefales det å konsultere advokat for en bindende vurdering.");
+
+      // CTA-boks for kravbrev
+      y += 6;
+      checkPageBreak(35);
+      doc.setDrawColor(16, 185, 129);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(margin, y, contentWidth, 30, 2, 2, "S");
+
+      doc.setFontSize(10);
       doc.setFont(useFont, "bold");
       doc.setTextColor(30, 41, 59);
-      doc.text("Dokumentasjon du trenger", margin, y);
-      y += 2;
-      doc.setDrawColor(16, 185, 129);
-      doc.line(margin, y, margin + 58, y);
-      y += 5;
+      doc.text("Neste steg: Skriftlig reklamasjon", margin + 5, y + 8);
 
-      doc.setFontSize(8);
+      doc.setFontSize(9);
       doc.setFont(useFont, "normal");
-      doc.setTextColor(71, 85, 105);
-      doc.text("Samle følgende for å styrke saken:", margin, y);
-      y += 6;
+      doc.setTextColor(51, 65, 85);
+      const ctaText = "For å fremme kravet formelt kan du bestille et ferdig utformet kravbrev basert på denne vurderingen. Brevet er tilpasset din sak, juridisk korrekt formulert, og klart til å sendes til selger.";
+      const ctaLines = doc.splitTextToSize(ctaText, safeWidth - 10);
+      doc.text(ctaLines, margin + 5, y + 15);
 
-      ["Kjøpekontrakt eller kvittering", "Bilder/video av feilen", "Verkstedrapport", "Kommunikasjon med selger", "Annonse (skjermbilde)", "Feilkoder fra OBD", "Kostnadsoverslag"].forEach((item) => {
-        checkPageBreak(6);
-        doc.setFillColor(34, 197, 94);
-        doc.rect(margin, y - 2.5, 3, 3, "F");
-        doc.setTextColor(30, 41, 59);
-        doc.setFontSize(8);
-        doc.text(item, margin + 6, y);
-        y += 6;
-      });
-      y += 8;
-
-      checkPageBreak(14);
-      drawBox(margin, y, contentWidth, 12, [241, 245, 249]);
       doc.setFontSize(8);
-      doc.setFont(useFont, "bold");
       doc.setTextColor(100, 116, 139);
-      doc.text("Viktig:", margin + 3, y + 5);
-      doc.setFont(useFont, "normal");
-      doc.setFontSize(7);
-      doc.text(truncate((outcome?.disclaimer as string) || "Veiledningen er basert på opplysningene du har gitt.", 80), margin + 16, y + 5);
+      doc.text("Kravbrev kan bestilles på harjegkravpå.no", margin + 5, y + 26);
 
+      // Footer siste side
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
-      doc.text("harjegkravpå.no", margin, pageHeight - 8);
-      doc.text("Side 3/3", pageWidth - margin, pageHeight - 8, { align: "right" });
+      doc.text("harjegkravpå.no – Juridisk veiledning for forbrukere", margin, pageHeight - 8);
+      doc.text("Konfidensielt", pageWidth - margin, pageHeight - 8, { align: "right" });
 
       doc.save(`bilkjop-rapport-${isDealer ? "forhandler" : "privat"}-${new Date().toISOString().split("T")[0]}.pdf`);
       setDownloaded(true);

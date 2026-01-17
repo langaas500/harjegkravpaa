@@ -42,6 +42,9 @@ export default function HomePage() {
         <p className="mt-2 text-xs text-slate-500">
           Gratis å starte · Ingen konto · Du kan stoppe når som helst
         </p>
+        <p className="mt-1 text-xs text-slate-500">
+          Veiledende vurdering. Ingen binding. Du bestemmer neste steg.
+        </p>
 
         {/* Kategorier - kompakte kort */}
         <div className="w-full max-w-2xl mt-3 md:mt-2">
@@ -82,9 +85,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        <p className="mt-2 text-xs text-slate-600">
-          Full rapport: 39 kr · Kravbrev: 99 kr
-        </p>
+        <div className="mt-4 text-left max-w-md">
+          <p className="text-sm text-slate-400 font-medium mb-2">Hva får du?</p>
+          <ul className="text-xs text-slate-500 space-y-1">
+            <li>• Rapport (39 kr): Få en klar vurdering av om du har krav, hvor mye det gjelder, og hva du bør gjøre videre.</li>
+            <li>• Kravbrev (99 kr): Et ferdig formulert, juridisk korrekt kravbrev klart til å sendes.</li>
+          </ul>
+        </div>
       </section>
 
       {/* Footer - minimal */}

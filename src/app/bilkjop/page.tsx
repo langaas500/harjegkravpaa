@@ -20,7 +20,7 @@ import { createCase, updateCase } from "@/lib/supabase";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
 type VehicleType = "CAR" | "MOTORCYCLE" | null;
-type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "PROMISES" | "AS_IS_CLAUSE" | "VISIBLE_DEFECT" | "WORKSHOP_REPORT" | "ADDITIONAL" | "RESULT";
+type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "PROMISES" | "AS_IS_CLAUSE" | "VISIBLE_DEFECT" | "WORKSHOP_REPORT" | "AD_EVIDENCE" | "ADDITIONAL" | "RESULT";
 
 interface VehicleInfo {
   make: string;
@@ -96,6 +96,11 @@ export default function BilkjopPage() {
   const [workshopReportText, setWorkshopReportText] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<{ key: string; name: string; type: string; publicUrl: string }[]>([]);
 
+  // Annonse/bevis-steg
+  const [finnUrl, setFinnUrl] = useState("");
+  const [adEvidenceFiles, setAdEvidenceFiles] = useState<{ key: string; name: string; type: string; publicUrl: string }[]>([]);
+  const [adClaims, setAdClaims] = useState("");
+
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
@@ -151,6 +156,9 @@ export default function BilkjopPage() {
         hasWorkshopReport,
         workshopReportText: hasWorkshopReport ? workshopReportText : null,
         uploadedFiles,
+        finnUrl: finnUrl || null,
+        adEvidenceFiles,
+        adClaims: adClaims || null,
       };
 
       // Opprett case i Supabase
@@ -240,6 +248,9 @@ export default function BilkjopPage() {
       hasWorkshopReport,
       workshopReportText: hasWorkshopReport ? workshopReportText : null,
       uploadedFiles,
+      finnUrl: finnUrl || null,
+      adEvidenceFiles,
+      adClaims: adClaims || null,
       outcome,
       caseId,
       access_token: caseAccessToken || crypto.randomUUID(),
@@ -1062,9 +1073,85 @@ export default function BilkjopPage() {
                 Tilbake
               </button>
               <button
-                onClick={() => setStep("ADDITIONAL")}
+                onClick={() => setStep("AD_EVIDENCE")}
                 disabled={hasWorkshopReport === null}
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+              >
+                Neste
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === "AD_EVIDENCE" && (
+          <section className="space-y-5">
+            <div className="flex items-center gap-3">
+              <FileText className="h-6 w-6 text-purple-400" />
+              <h2 className="text-2xl font-bold">Tillegg (valgfritt): Annonse og bevis</h2>
+            </div>
+            <p className="text-sm text-slate-400">
+              Hadde annonsen bilder, beskrivelser eller løfter som viste seg å være feil? Her kan du legge ved dokumentasjon. Ikke påkrevd, men styrker saken.
+            </p>
+
+            <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4 text-sm">
+              <p className="font-semibold text-purple-400 mb-2">Hvorfor er dette nyttig?</p>
+              <p className="text-slate-300">
+                Hvis annonsen lovte noe som viste seg å være feil (f.eks. &ldquo;EU-godkjent uten anmerkninger&rdquo; eller &ldquo;nylig service&rdquo;), kan dette styrke saken din betydelig.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-slate-300 mb-2">Lenke til annonsen (valgfritt)</label>
+              <input
+                type="url"
+                value={finnUrl}
+                onChange={(e) => setFinnUrl(e.target.value)}
+                placeholder="https://finn.no/..."
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+              />
+              <p className="text-xs text-slate-600 mt-1">
+                Vi henter ikke data fra Finn.no automatisk. Lenken brukes kun som referanse i dokumentene.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-slate-300 mb-2">Last opp skjermbilde eller PDF av annonsen</label>
+              <FileUpload
+                category="bilkjop-annonse"
+                maxFiles={5}
+                files={adEvidenceFiles}
+                onFilesChange={setAdEvidenceFiles}
+              />
+              <p className="text-xs text-slate-600 mt-2">
+                Skjermbilder av annonsen, inkludert tekst, bilder og spesifikasjoner, brukes som bevis i saken.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-slate-300 mb-2">Hva ble lovet i annonsen som ikke stemmer? (valgfritt)</label>
+              <textarea
+                value={adClaims}
+                onChange={(e) => setAdClaims(e.target.value)}
+                placeholder="For eksempel: 'I annonsen stod det at bilen var EU-godkjent uten anmerkninger, men det viste seg at den hadde rustskader i bærende konstruksjon.'"
+                maxLength={600}
+                rows={4}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+              />
+              <p className="text-xs text-slate-600 mt-1">{adClaims.length} / 600 tegn</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep("WORKSHOP_REPORT")}
+                className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake
+              </button>
+              <button
+                onClick={() => setStep("ADDITIONAL")}
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1127,7 +1214,7 @@ export default function BilkjopPage() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setStep("DESCRIPTION")}
+                onClick={() => setStep("AD_EVIDENCE")}
                 className="flex items-center gap-2 rounded-full border border-white/10 px-5 py-3 text-slate-400 hover:bg-white/5"
               >
                 <ArrowLeft className="h-4 w-4" />
