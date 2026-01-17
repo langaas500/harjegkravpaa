@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Car, ChevronDown } from "lucide-react";
 import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
@@ -99,7 +100,7 @@ export default function BruktbilFeilPage() {
             <p>
               Mange tror at «som den er» betyr ingen rettigheter. Det stemmer ikke.
               Ved skjulte feil eller feil opplysninger kan du kreve prisavslag,
-              heving eller erstatning.
+              heving eller erstatning – <Link href="/bilkjop" className="underline hover:text-white">sjekk om du har krav</Link>.
             </p>
           </div>
         </section>

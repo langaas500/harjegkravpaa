@@ -158,7 +158,7 @@ export default function PrivatKjopPage() {
               </div>
             </div>
             <p className="text-slate-300 mt-4">
-              At selger avviser kravet, betyr ikke at du ikke har rett. Det betyr bare at saken må vurderes nærmere.
+              At selger avviser kravet, betyr ikke at du ikke har rett. Det betyr bare at saken må vurderes nærmere – <Link href="/bilkjop" className="underline hover:text-white">sjekk saken din</Link>.
             </p>
           </div>
         </section>

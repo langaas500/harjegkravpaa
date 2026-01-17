@@ -120,7 +120,7 @@ export default function ReklamasjonPage() {
               <li>• Enkel, åpenbar feil gir kortere frist</li>
             </ul>
             <p className="text-slate-300">
-              Hovedregelen er enkel: Jo raskere du reklamerer, jo tryggere er du. Vent ikke unødvendig.
+              Hovedregelen er enkel: Jo raskere du reklamerer, jo tryggere er du. Vent ikke unødvendig – <Link href="/bilkjop" className="underline hover:text-white">start gratis vurdering</Link>.
             </p>
           </div>
         </section>

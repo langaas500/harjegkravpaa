@@ -90,7 +90,7 @@ export default function HevingPage() {
               Ved privatkjøp gjelder kjøpsloven, men også her kan heving være mulig ved skjulte eller uriktige opplysninger.
             </p>
             <p className="text-slate-300">
-              Uansett hvem du kjøpte bilen fra, vurderes heving alltid konkret.
+              Uansett hvem du kjøpte bilen fra, vurderes heving alltid konkret. Du kan <Link href="/bilkjop" className="underline hover:text-white">få en vurdering av hevingskravet</Link> her.
             </p>
           </div>
         </section>

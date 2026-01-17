@@ -8,7 +8,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Static SEO pages
   const seoPages = [
     // Bilkjop SEO pages
-    "/bilkjop/bruktbil-feil",
     "/bilkjop/reklamasjon",
     "/bilkjop/garanti",
     "/bilkjop/heving",
@@ -47,6 +46,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/bilkjop/bruktbil-feil`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
     },
   ];
 

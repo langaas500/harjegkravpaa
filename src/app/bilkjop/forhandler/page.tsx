@@ -153,7 +153,7 @@ export default function ForhandlerPage() {
               </div>
             </div>
             <p className="text-slate-300 mt-4">
-              Et avslag fra forhandler er ikke en endelig avgjørelse. Det er deres syn på saken, ikke en juridisk konklusjon.
+              Et avslag fra forhandler er ikke en endelig avgjørelse. Det er deres syn på saken, ikke en juridisk konklusjon – <Link href="/bilkjop" className="underline hover:text-white">få en vurdering av saken</Link>.
             </p>
           </div>
         </section>

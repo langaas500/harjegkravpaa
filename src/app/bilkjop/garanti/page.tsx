@@ -204,7 +204,7 @@ export default function GarantiPage() {
               <li>• Har du reklamert innen rimelig tid?</li>
             </ul>
             <p className="text-slate-300">
-              Svarene på disse spørsmålene kan være viktigere enn hva garantien sier. Det er helheten som avgjør om du har et krav.
+              Svarene på disse spørsmålene kan være viktigere enn hva garantien sier. Det er helheten som avgjør om du har et krav – <Link href="/bilkjop" className="underline hover:text-white">sjekk reklamasjonssaken</Link>.
             </p>
           </div>
         </section>
