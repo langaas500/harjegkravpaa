@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, FileText, ChevronDown } from "lucide-react";
 import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
@@ -51,7 +52,7 @@ export default function ReklamasjonPage() {
 
         {/* Intro */}
         <p className="text-lg text-slate-300 mb-10">
-          Har du oppdaget feil på bilen etter kjøpet? Da må du reklamere til selger. Reklamasjon er den formelle måten å melde fra om at noe er galt, og det er en forutsetning for å kunne kreve retting, prisavslag eller heving. Her forklarer vi hvordan du går frem.
+          Har du <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">oppdaget feil på bilen etter kjøpet</Link>? Da må du reklamere til selger. Reklamasjon er den formelle måten å melde fra om at noe er galt, og det er en forutsetning for å kunne kreve retting, prisavslag eller heving. Her forklarer vi hvordan du går frem.
         </p>
 
         {/* Section: Hva er reklamasjon */}
@@ -312,7 +313,7 @@ export default function ReklamasjonPage() {
             </div>
 
             <p className="text-slate-300 mt-4">
-              Før du tar saken videre, kan det være avgjørende å få vurdert om reklamasjonen er riktig formulert og om neste steg er riktig for din situasjon. Sjekk saken din for en konkret vurdering basert på opplysningene du har gitt.
+              Før du tar saken videre, kan det være avgjørende å få vurdert om reklamasjonen er riktig formulert og om neste steg er riktig for din situasjon. Hvis du har <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">kjøpt bil med feil</Link>, kan du sjekke saken din for en konkret vurdering.
             </p>
           </div>
         </section>

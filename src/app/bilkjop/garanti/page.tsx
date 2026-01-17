@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Shield, ChevronDown } from "lucide-react";
 import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
@@ -119,7 +120,7 @@ export default function GarantiPage() {
               </div>
             </div>
             <p className="text-slate-300 mt-4">
-              Dersom garantien avslår kravet ditt, betyr det ikke nødvendigvis at du står uten rettigheter. Det kan fortsatt foreligge en mangel som gir grunnlag for reklamasjon.
+              Dersom garantien avslår kravet ditt, betyr det ikke nødvendigvis at du står uten rettigheter. Har du <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">kjøpt bil med feil</Link>, kan det fortsatt foreligge en mangel som gir grunnlag for reklamasjon.
             </p>
             <p className="text-slate-300 mt-4">
               I praksis er det ofte helhetsvurderingen av kjøpet som avgjør om du har et krav – ikke garantien alene.
@@ -182,7 +183,7 @@ export default function GarantiPage() {
               </div>
             </div>
             <p className="text-slate-300 mt-4">
-              Poenget er at garantiavslag ikke er det samme som at du ikke har en sak. Det er to forskjellige vurderinger.
+              Poenget er at garantiavslag ikke er det samme som at du ikke har en sak. Det er to forskjellige vurderinger. Les mer om <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">feil på bilen etter kjøp</Link>.
             </p>
           </div>
         </section>

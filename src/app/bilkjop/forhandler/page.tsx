@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Store, ChevronDown } from "lucide-react";
 import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
@@ -100,7 +101,7 @@ export default function ForhandlerPage() {
               Ved forbrukerkjøp gjelder en viktig bevisregel: Hvis en feil viser seg innen seks måneder etter kjøpet, antas det at feilen fantes ved levering. Da er det forhandler som må bevise at den ikke gjorde det.
             </p>
             <p className="text-slate-300">
-              Forhandler har også plikt til å gi riktige opplysninger om bilen. Uriktige eller manglende opplysninger kan i seg selv utgjøre en mangel.
+              Forhandler har også plikt til å gi riktige opplysninger om bilen. Uriktige eller manglende opplysninger kan i seg selv utgjøre en mangel. Hvis du har <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">oppdaget feil etter kjøpet</Link>, kan dette være relevant.
             </p>
           </div>
         </section>
@@ -129,7 +130,7 @@ export default function ForhandlerPage() {
           </h2>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
             <p className="text-slate-300">
-              Mange opplever at forhandler avviser kravet. Det kan ha flere årsaker, og avslag betyr ikke nødvendigvis at du står uten rettigheter.
+              Mange opplever at forhandler avviser kravet. Det kan ha flere årsaker, og avslag betyr ikke nødvendigvis at du står uten rettigheter. Har du <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">kjøpt bil med feil</Link>, bør du alltid vurdere saken nærmere.
             </p>
             <div className="space-y-3 mt-4">
               <div className="border-l-2 border-white/20 pl-4">

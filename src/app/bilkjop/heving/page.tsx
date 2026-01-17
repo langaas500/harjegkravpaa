@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, XOctagon, ChevronDown } from "lucide-react";
 import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
@@ -96,7 +97,7 @@ export default function HevingPage() {
           </h2>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
             <p className="text-slate-300">
-              For å kunne heve må mangelen være vesentlig. Det holder ikke at bilen har en feil – feilen må være så alvorlig at det gir deg god grunn til å si deg løs fra avtalen.
+              For å kunne heve må mangelen være vesentlig. Det holder ikke at bilen har en feil – har du <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">kjøpt bil med feil</Link>, må feilen være så alvorlig at det gir deg god grunn til å si deg løs fra avtalen.
             </p>
             <p className="text-slate-300">
               Hva som er «vesentlig» er en helhetsvurdering. Det finnes ingen fast grense, men noen momenter går igjen:
@@ -158,7 +159,7 @@ export default function HevingPage() {
               Selv om terskelen er høy, finnes det situasjoner der heving kan være riktig løsning:
             </p>
             <ul className="text-slate-300 space-y-2 ml-4">
-              <li>• Bilen har gjentatte feil som ikke lar seg reparere</li>
+              <li>• Bilen har gjentatte feil som ikke lar seg reparere – se <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">feil på bilen etter kjøp</Link></li>
               <li>• Feilen er så omfattende at bilen ikke kan brukes som forutsatt</li>
               <li>• Selger har gitt uriktige opplysninger om vesentlige forhold</li>
               <li>• Reparasjonsforsøk har mislyktes flere ganger</li>

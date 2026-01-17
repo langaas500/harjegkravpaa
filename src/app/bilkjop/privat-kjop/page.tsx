@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Users, ChevronDown } from "lucide-react";
 import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
@@ -50,7 +51,7 @@ export default function PrivatKjopPage() {
         </div>
 
         <p className="text-lg text-slate-300 mb-10">
-          Mange tror at kjøp fra privatperson betyr null rettigheter. Det stemmer ikke. Kjøpsloven gjelder også mellom private, og den gir deg rettigheter selv om bilen er solgt «som den er».
+          Mange tror at kjøp fra privatperson betyr null rettigheter. Det stemmer ikke. Har du <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">kjøpt bruktbil med skjult feil</Link>, kan du fortsatt ha krav. Kjøpsloven gjelder også mellom private, og den gir deg rettigheter selv om bilen er solgt «som den er».
         </p>
 
         {/* Sone 2: Tidlig beslutningsanker */}
@@ -102,7 +103,7 @@ export default function PrivatKjopPage() {
             <ul className="text-slate-300 space-y-2 ml-4">
               <li>• Selger har holdt tilbake opplysninger som du burde fått</li>
               <li>• Selger har gitt uriktige opplysninger</li>
-              <li>• Bilen er i vesentlig dårligere stand enn du hadde grunn til å forvente</li>
+              <li>• Bilen er i vesentlig dårligere stand enn du hadde grunn til å forvente – les mer om <Link href="/bilkjop/bruktbil-feil" className="underline hover:text-white">feil på bil etter kjøp</Link></li>
             </ul>
             <p className="text-slate-300">
               Med andre ord: «som den er» beskytter ikke selger mot egne feil eller tilbakeholdt informasjon.
