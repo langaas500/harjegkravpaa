@@ -242,7 +242,7 @@ export default function BilkjopPage() {
       uploadedFiles,
       outcome,
       caseId,
-      access_token: caseAccessToken,
+      access_token: caseAccessToken || crypto.randomUUID(),
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
     router.push("/bilkjop/rapport");

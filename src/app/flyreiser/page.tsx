@@ -383,7 +383,8 @@ export default function FlyreiserPage() {
       outcome,
       // Supabase tracking
       caseId,
-      access_token: caseAccessToken,
+      // Fallback: generer lokal token hvis Supabase feilet
+      access_token: caseAccessToken || crypto.randomUUID(),
     };
     localStorage.setItem("flyreiser-data", JSON.stringify(data));
     router.push("/flyreiser/rapport");

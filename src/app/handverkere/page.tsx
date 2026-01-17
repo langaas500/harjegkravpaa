@@ -451,7 +451,7 @@ export default function HandverkerePage() {
       uploadedFiles,
       outcome,
       caseId,
-      access_token: caseAccessToken,
+      access_token: caseAccessToken || crypto.randomUUID(),
     };
     localStorage.setItem("handverk-data", JSON.stringify(data));
     router.push("/handverkere/rapport");
