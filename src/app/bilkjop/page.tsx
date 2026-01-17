@@ -280,11 +280,12 @@ function BilkjopPageContent() {
               <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
                 <Car className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-3xl font-bold">Kjøp av bil eller motorsykkel</h1>
+              <h1 className="text-3xl font-bold">Har du kjøpt bil eller motorsykkel med feil?</h1>
             </div>
 
             <p className="text-lg text-slate-400">
-              Har du kjøpt en defekt bil eller motorsykkel? Svar på noen spørsmål, så vurderer vi om du sannsynligvis har en sak.
+              Svar på noen enkle spørsmål.<br />
+              Du får en veiledende vurdering av om du har et krav – og hva du bør gjøre videre.
             </p>
 
             <div className="space-y-3">
@@ -332,13 +333,13 @@ function BilkjopPageContent() {
             </div>
 
             <div className="text-sm text-slate-500 space-y-1">
-              <p>• Tar ca. 2 minutter</p>
-              <p>• Gratis vurdering</p>
+              <p>• Starter enkelt – blir mer detaljert bare hvis det trengs</p>
+              <p>• Gratis veiledende vurdering</p>
               <p>• Valgfri PDF-rapport (39 kr)</p>
             </div>
 
             <p className="text-xs text-slate-600 text-center">
-              Veiledende vurdering, ikke juridisk rådgivning
+              Veiledende vurdering basert på norsk forbrukerlovgivning. Ikke juridisk rådgivning.
             </p>
           </section>
         )}
