@@ -280,16 +280,21 @@ function BilkjopPageContent() {
               <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
                 <Car className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-3xl font-bold">Har du kjøpt bil eller motorsykkel med feil?</h1>
+              <h1 className="text-3xl font-bold">Kjøpt bil med feil? Sjekk om du kan ha krav</h1>
             </div>
 
             <p className="text-lg text-slate-400">
-              Svar på noen enkle spørsmål.<br />
-              Du får en veiledende vurdering av om du har et krav – og hva du bør gjøre videre.
+              Oppdaget feil etter kjøpet?<br />
+              Du kan ha krav på prisavslag, heving eller erstatning.
+            </p>
+
+            <p className="text-lg text-slate-400">
+              Svar på noen spørsmål og få en veiledende vurdering basert på norsk forbrukerlovgivning.
             </p>
 
             <div className="space-y-3">
               <p className="text-sm font-semibold text-slate-400">Hva gjelder saken?</p>
+              <p className="text-xs text-slate-500">Valget avgjør hvilke regler som brukes i vurderingen.</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => {
