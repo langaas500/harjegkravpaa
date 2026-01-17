@@ -37,19 +37,34 @@ export default function RapportPage() {
   const handlePayment = async () => {
     setIsLoading(true);
     try {
+      // Hent access_token fra localStorage
+      const stored = localStorage.getItem("bilkjop-data");
+      const token = stored ? JSON.parse(stored).access_token : null;
+
+      if (!token) {
+        alert("Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt.");
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productType: "rapport" }),
+        body: JSON.stringify({
+          token,
+          productType: "REPORT",
+          category: "bilkjop",
+          returnPath: "/bilkjop/betalt",
+        }),
       });
 
       const { url, error } = await response.json();
-      
+
       if (error) {
         alert("Feil: " + error);
         return;
       }
-      
+
       if (url) {
         window.location.href = url;
       }

@@ -138,10 +138,25 @@ export default function FlyreiserKravbrevPage() {
     }
 
     try {
+      // Hent access_token fra localStorage
+      const stored = localStorage.getItem("flyreiser-data");
+      const token = stored ? JSON.parse(stored).access_token : null;
+
+      if (!token) {
+        alert("Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt.");
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productType: "flyreiser-kravbrev" }),
+        body: JSON.stringify({
+          token,
+          productType: "KRAVBREV",
+          category: "flyreiser",
+          returnPath: "/flyreiser/kravbrev/betalt",
+        }),
       });
 
       const { url, error } = await response.json();
