@@ -14,7 +14,11 @@
       "Bash(curl:*)",
       "Bash(ping:*)",
       "Bash(npx tsc:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm install:*)",
+      "Bash(cd:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm run lint:*)"
     ]
   }
 }
