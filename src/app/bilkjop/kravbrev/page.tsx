@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, FileText, Loader2, Wrench, BadgePercent, Undo2 } from "lucide-react";
+import {
+  ArrowLeft,
+  FileText,
+  Loader2,
+  Wrench,
+  BadgePercent,
+  Undo2,
+} from "lucide-react";
 
 type ClaimType = "repair" | "discount" | "cancel";
 
@@ -10,37 +17,53 @@ export default function KravbrevPage() {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const [buyerAddress, setBuyerAddress] = useState("");
-  const [sellerAddress, setSellerAddress] = useState("");
+
   const [claimType, setClaimType] = useState<ClaimType | null>(null);
   const [discountAmount, setDiscountAmount] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("bilkjop-data");
     if (stored) {
-      setData(JSON.parse(stored));
+      try {
+        const parsed = JSON.parse(stored);
+        setData(parsed);
+
+        // Hvis bruker har vært her før, hent valg tilbake
+        if (parsed?.claimType) setClaimType(parsed.claimType as ClaimType);
+        if (parsed?.discountAmount) setDiscountAmount(String(parsed.discountAmount));
+      } catch {
+        setData(null);
+      }
     }
   }, []);
 
-  const canProceed = buyerAddress.trim() && sellerAddress.trim() && claimType;
+  const discountAmountNumber = useMemo(() => {
+    const n = Number(discountAmount);
+    return Number.isFinite(n) ? n : NaN;
+  }, [discountAmount]);
+
+  const canProceed = useMemo(() => {
+    if (!claimType) return false;
+    if (claimType === "discount") {
+      return Number.isFinite(discountAmountNumber) && discountAmountNumber > 0;
+    }
+    return true;
+  }, [claimType, discountAmountNumber]);
 
   const handlePayment = async () => {
     if (!canProceed) return;
     setIsLoading(true);
 
+    // IKKE be om adresse/regnr her. Alt slikt skal komme fra wizard (bilkjop-data).
     const updatedData = {
       ...data,
-      buyerAddress,
-      sellerAddress,
       claimType,
-      discountAmount: claimType === "discount" ? discountAmount : null,
+      discountAmount: claimType === "discount" ? String(discountAmountNumber) : null,
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(updatedData));
 
     try {
-      // Hent access_token fra localStorage
-      const token = data?.access_token as string | undefined;
+      const token = updatedData?.access_token as string | undefined;
 
       if (!token) {
         alert("Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt.");
@@ -79,7 +102,7 @@ export default function KravbrevPage() {
 
   if (!data) {
     return (
-      <main className="bg-nordic text-white flex items-center justify-center">
+      <main className="bg-nordic text-white flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-white" />
       </main>
     );
@@ -103,7 +126,9 @@ export default function KravbrevPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Kravbrev</h1>
-              <p className="text-slate-500 text-sm">Ferdig formulert brev du kan sende til selger</p>
+              <p className="text-slate-500 text-sm">
+                Ferdig formulert brev du kan sende til selger
+              </p>
             </div>
           </div>
 
@@ -111,7 +136,9 @@ export default function KravbrevPage() {
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm space-y-2">
             <div className="flex justify-between">
               <span className="text-slate-500">Sak</span>
-              <span>{data.vehicle?.make} {data.vehicle?.model}</span>
+              <span>
+                {data.vehicle?.make} {data.vehicle?.model}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Kjøper</span>
@@ -121,28 +148,11 @@ export default function KravbrevPage() {
               <span className="text-slate-500">Selger</span>
               <span>{data.sellerName || "Ikke oppgitt"}</span>
             </div>
-          </div>
 
-          {/* Din adresse */}
-          <div className="space-y-2">
-            <label className="block text-sm text-slate-500">Din adresse</label>
-            <textarea
-              value={buyerAddress}
-              onChange={(e) => setBuyerAddress(e.target.value)}
-              placeholder="Ola Nordmann&#10;Gateveien 123&#10;0123 Oslo"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30 min-h-[100px] resize-none"
-            />
-          </div>
-
-          {/* Selgers adresse */}
-          <div className="space-y-2">
-            <label className="block text-sm text-slate-500">Selgers adresse</label>
-            <textarea
-              value={sellerAddress}
-              onChange={(e) => setSellerAddress(e.target.value)}
-              placeholder="Bilforhandler AS&#10;Bilveien 456&#10;0456 Oslo"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30 min-h-[100px] resize-none"
-            />
+            {/* Viktig: Vi spør IKKE om adresse/reg.nr her */}
+            <div className="pt-2 text-xs text-slate-600">
+              Adresse og registreringsnummer hentes automatisk fra saken du fylte ut i wizard.
+            </div>
           </div>
 
           {/* Hva krever du? */}
@@ -157,7 +167,11 @@ export default function KravbrevPage() {
                     : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <Wrench className={`h-6 w-6 ${claimType === "repair" ? "text-white" : "text-slate-500"}`} />
+                <Wrench
+                  className={`h-6 w-6 ${
+                    claimType === "repair" ? "text-white" : "text-slate-500"
+                  }`}
+                />
                 <span className="text-sm font-medium">Reparasjon</span>
               </button>
 
@@ -169,7 +183,11 @@ export default function KravbrevPage() {
                     : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <BadgePercent className={`h-6 w-6 ${claimType === "discount" ? "text-white" : "text-slate-500"}`} />
+                <BadgePercent
+                  className={`h-6 w-6 ${
+                    claimType === "discount" ? "text-white" : "text-slate-500"
+                  }`}
+                />
                 <span className="text-sm font-medium">Prisavslag</span>
               </button>
 
@@ -181,7 +199,11 @@ export default function KravbrevPage() {
                     : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <Undo2 className={`h-6 w-6 ${claimType === "cancel" ? "text-white" : "text-slate-500"}`} />
+                <Undo2
+                  className={`h-6 w-6 ${
+                    claimType === "cancel" ? "text-white" : "text-slate-500"
+                  }`}
+                />
                 <span className="text-sm font-medium">Heve kjøpet</span>
               </button>
             </div>
@@ -190,7 +212,9 @@ export default function KravbrevPage() {
           {/* Beløp hvis prisavslag */}
           {claimType === "discount" && (
             <div className="space-y-2">
-              <label className="block text-sm text-slate-500">Hvor mye krever du i prisavslag?</label>
+              <label className="block text-sm text-slate-500">
+                Hvor mye krever du i prisavslag?
+              </label>
               <div className="relative">
                 <input
                   type="number"
@@ -199,8 +223,17 @@ export default function KravbrevPage() {
                   placeholder="F.eks. 15000"
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">kr</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+                  kr
+                </span>
               </div>
+
+              {discountAmount.trim().length > 0 &&
+                (!Number.isFinite(discountAmountNumber) || discountAmountNumber <= 0) && (
+                  <p className="text-xs text-rose-300">
+                    Skriv inn et beløp større enn 0.
+                  </p>
+                )}
             </div>
           )}
 
@@ -236,6 +269,10 @@ export default function KravbrevPage() {
 
             <p className="text-xs text-slate-600 text-center mt-3">
               Brevet utformes basert på opplysningene i saken din og norsk forbrukerlovgivning.
+            </p>
+
+            <p className="text-[11px] text-slate-600 text-center mt-2">
+              Neste steg etter betaling: kun telefon og e-post (resten hentes fra wizard).
             </p>
           </div>
         </div>
