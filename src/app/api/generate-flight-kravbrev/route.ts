@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { runWithTimeout } from "@/lib/runWithTimeout";
+import { logEvent, generateRequestId } from "@/lib/logger";
 
 const client = new Anthropic();
 
@@ -71,6 +73,9 @@ function getEU261Amount(distanceCategory: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  const requestId = generateRequestId();
+  const start = Date.now();
+
   try {
     const data = await req.json();
 
@@ -437,12 +442,15 @@ SPRÅKKRAV:
 ═══════════════════════════════════════════════════════════════`;
     }
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      messages: [{ role: "user", content: userPrompt }],
-      system: systemPrompt,
-    });
+    const message = await runWithTimeout(
+      client.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        messages: [{ role: "user", content: userPrompt }],
+        system: systemPrompt,
+      }),
+      60000
+    );
 
     const content = message.content[0];
     if (content.type !== "text") throw new Error("Unexpected response type");
@@ -627,11 +635,40 @@ ${passengerSignatur}`;
       }
     }
 
+    logEvent({
+      route: "generate-flight-kravbrev",
+      category: "fly",
+      requestId,
+      status: "ok",
+      latencyMs: Date.now() - start,
+      model: "claude-sonnet-4-20250514",
+    });
+
     return NextResponse.json({ kravbrev: brev });
   } catch (error) {
+    const latencyMs = Date.now() - start;
+    const isTimeout = error instanceof Error && error.message === "TIMEOUT";
+
     console.error("Flight kravbrev generation error:", error);
+
+    logEvent({
+      route: "generate-flight-kravbrev",
+      category: "fly",
+      requestId,
+      status: isTimeout ? "timeout" : "error",
+      latencyMs,
+      model: "claude-sonnet-4-20250514",
+    });
+
+    if (isTimeout) {
+      return NextResponse.json(
+        { error: "Genereringen tok for lang tid. Prøv igjen.", requestId },
+        { status: 504 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Kunne ikke generere kravbrev" },
+      { error: "Kunne ikke generere kravbrev. Prøv igjen.", requestId },
       { status: 500 }
     );
   }

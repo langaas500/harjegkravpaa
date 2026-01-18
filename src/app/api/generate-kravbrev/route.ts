@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { runWithTimeout } from "@/lib/runWithTimeout";
+import { logEvent, generateRequestId } from "@/lib/logger";
 
 const client = new Anthropic();
 
 export async function POST(request: NextRequest) {
+  const requestId = generateRequestId();
+  const start = Date.now();
+
   try {
     const data = await request.json();
 
@@ -332,26 +337,58 @@ KRAV: ${claimText}
 
 Skriv brevet nå.`;
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
-      messages: [
-        {
-          role: "user",
-          content: userPrompt,
-        },
-      ],
-      system: systemPrompt,
-    });
+    const message = await runWithTimeout(
+      client.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        messages: [
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
+        system: systemPrompt,
+      }),
+      60000
+    );
 
     const textContent = message.content.find((block) => block.type === "text");
     const letter = textContent ? textContent.text : "Kunne ikke generere kravbrev.";
 
+    logEvent({
+      route: "generate-kravbrev",
+      category: "bilkjop",
+      requestId,
+      status: "ok",
+      latencyMs: Date.now() - start,
+      model: "claude-sonnet-4-20250514",
+    });
+
     return NextResponse.json({ letter });
   } catch (error) {
+    const latencyMs = Date.now() - start;
+    const isTimeout = error instanceof Error && error.message === "TIMEOUT";
+
     console.error("Kravbrev generation error:", error);
+
+    logEvent({
+      route: "generate-kravbrev",
+      category: "bilkjop",
+      requestId,
+      status: isTimeout ? "timeout" : "error",
+      latencyMs,
+      model: "claude-sonnet-4-20250514",
+    });
+
+    if (isTimeout) {
+      return NextResponse.json(
+        { error: "Genereringen tok for lang tid. Prøv igjen.", requestId },
+        { status: 504 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Kunne ikke generere kravbrev. Prøv igjen senere." },
+      { error: "Kunne ikke generere kravbrev. Prøv igjen.", requestId },
       { status: 500 }
     );
   }

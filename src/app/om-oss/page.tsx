@@ -43,7 +43,7 @@ export default function OmOssPage() {
         </h2>
 
         <p className="text-slate-300">
-          Harjegkravpå.no drives av Langaas Solutions (org.nr 936 977 774), registrert i Norge.
+          Harjegkravpå.no drives av SOLUTIONS BY LANGAAS (org.nr 936 977 774), registrert i Norge.
         </p>
 
         <p className="text-slate-300">
