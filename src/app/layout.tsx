@@ -7,7 +7,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Har jeg krav på?",
-  description: "Enkle svar på hva du har krav på – basert på norsk regelverk.",
+  description:
+    "Finn ut om du har krav etter norsk forbrukerlov. Svar på noen korte spørsmål og se om du har krav – og hva du bør gjøre videre. Gratis og uforpliktende.",
   alternates: {
     canonical: "https://harjegkravpå.no",
   },
