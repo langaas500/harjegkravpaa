@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Har jeg krav på?",
   description: "Enkle svar på hva du har krav på – basert på norsk regelverk.",
+  alternates: {
+    canonical: "https://harjegkravpå.no",
+  },
 };
 
 export default function RootLayout({
