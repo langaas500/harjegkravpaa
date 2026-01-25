@@ -1,26 +1,27 @@
 // src/app/page.tsx
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  Car,
-  Plane,
-  Wrench,
-  Package,
-  CheckCircle2,
-  X,
-} from "lucide-react";
+import { Car, Plane, Wrench, Package, ArrowRight, ShieldCheck } from "lucide-react";
+
+type Cat = {
+  key: string;
+  title: string;
+  desc: string;
+  href: string;
+  icon: React.ElementType;
+  disabled?: boolean;
+};
 
 export default function HomePage() {
   const router = useRouter();
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const [showCategoryFocus, setShowCategoryFocus] = useState(false);
 
-  const liveCats = [
+  const cats: Cat[] = [
     {
-      key: "bilkjop",
+      key: "kjoretoy",
       icon: Car,
       title: "Kjøretøy",
       desc: "Feil på bil eller MC? Finn ut om du har krav etter kjøpet.",
@@ -40,274 +41,171 @@ export default function HomePage() {
       desc: "Dårlig arbeid eller uenighet? Få en vurdering av saken din.",
       href: "/handverkere",
     },
-  ] as const;
-
-  const soonCats = [
     {
       key: "reklamasjon",
       icon: Package,
       title: "Reklamasjon",
-      desc: "Kjøpt noe som ikke holder mål? Kommer snart.",
+      desc: "Opplevd feil med varen? Finn ut om du har rett til omlevering.",
       href: "/snart?cat=reklamasjon",
+      disabled: true,
     },
-  ] as const;
+  ];
 
-  // ESC to close
-  useEffect(() => {
-    if (!pickerOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setPickerOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [pickerOpen]);
-
-  // click outside to close
-  useEffect(() => {
-    if (!pickerOpen) return;
-    const onDown = (e: MouseEvent) => {
-      const el = dialogRef.current;
-      if (!el) return;
-      if (e.target instanceof Node && !el.contains(e.target)) {
-        setPickerOpen(false);
-      }
-    };
-    window.addEventListener("mousedown", onDown);
-    return () => window.removeEventListener("mousedown", onDown);
-  }, [pickerOpen]);
-
-  const openPicker = () => setPickerOpen(true);
-
-  const go = (href: string) => {
-    setPickerOpen(false);
+  const go = (href: string, disabled?: boolean) => {
+    if (disabled) return;
     router.push(href);
   };
 
   return (
-    <main className="bg-nordic text-white min-h-screen">
-      <div className="mx-auto w-full max-w-6xl px-4 pt-16 pb-10 md:pt-20">
-        {/* HERO */}
-        <section className="text-center">
-          <h1 className="mx-auto max-w-4xl text-4xl md:text-6xl font-bold leading-[1.08] tracking-tight">
-            Har du krav på prisavslag,
-            <br className="hidden md:block" />
-            heving eller erstatning?
-          </h1>
+    <main className="relative min-h-screen text-white">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 -z-20 bg-cover bg-center"
+        style={{ backgroundImage: "url(/bg.png)" }}
+      />
+      {/* Overlay for readability (matches “calm + deep” look) */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/70" />
+      {/* Subtle vignette */}
+      <div className="absolute inset-0 -z-10 [background:radial-gradient(1000px_600px_at_20%_10%,rgba(255,255,255,0.10),transparent_60%),radial-gradient(900px_500px_at_80%_20%,rgba(255,255,255,0.08),transparent_55%)]" />
 
-          <p className="mx-auto mt-5 max-w-2xl text-base md:text-lg text-slate-300/90">
-            Finn raskt ut om du kan ha krav etter å ha oppdaget feil ved kjøpet.
-          </p>
+      {/* Content */}
+      <div className="mx-auto w-full max-w-6xl px-6">
+        {/* Top nav */}
+        <header className="pt-6">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <ShieldCheck className="h-6 w-6 text-emerald-300/90" />
+              <span className="text-sm font-semibold tracking-tight text-white/90">
+                Harjegkravpå.no
+              </span>
+            </Link>
 
-          {/* Trust points */}
-          <div className="mx-auto mt-6 w-full max-w-xl text-left">
-            <div className="flex items-start gap-3 text-sm md:text-[15px] text-slate-200">
-              <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-400 shrink-0" />
-              <span>Gratis veiledende vurdering basert på norsk forbrukerlov</span>
-            </div>
-            <div className="mt-2 flex items-start gap-3 text-sm md:text-[15px] text-slate-200">
-              <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-400 shrink-0" />
-              <span>Svar på noen spørsmål – få et klarere svar</span>
-            </div>
-          </div>
+            <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
+              <Link href="/om-oss" className="hover:text-white/90 transition-colors">
+                Om oss <span className="text-white/40">⌄</span>
+              </Link>
+              <Link href="/tjenester" className="hover:text-white/90 transition-colors">
+                Tjenester <span className="text-white/40">⌄</span>
+              </Link>
+              <Link href="/kontakt" className="hover:text-white/90 transition-colors">
+                Kontakt oss
+              </Link>
+            </nav>
 
-          {/* CTA */}
-          <div className="mt-7">
             <button
-              onClick={openPicker}
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#1F4F45] px-8 py-4 text-base md:text-lg font-semibold text-[#ECFDF5] hover:bg-[#246457] transition-all"
+              onClick={() => router.push("/bilkjop")}
+              className="rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-2 text-sm font-semibold text-white/85 backdrop-blur-md transition-colors"
             >
-              Sjekk om du har krav
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              Start vurdering
             </button>
+          </div>
+        </header>
 
-            <p className="mt-3 text-xs md:text-sm text-slate-400">
-              Velg hva saken gjelder, og få en rask vurdering.
+        {/* Hero */}
+        <section className="pt-16 md:pt-20">
+          <div className="max-w-2xl">
+            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.03]">
+              Finn ut om du har
+              <br />
+              krav etter kjøpet
+            </h1>
+
+            <p className="mt-6 text-lg text-white/70 leading-relaxed">
+              Gratis, veiledende vurdering basert på norsk forbrukerlov.
+              <br />
+              Tar ca. 5–10 minutter, ingen konto. Ingen binding.
             </p>
-            <p className="mt-1 text-xs text-slate-500">
-              Ingen konto · Ingen binding · Du bestemmer neste steg
-            </p>
-          </div>
-        </section>
 
-        {/* INFOKORT */}
-        <section className="mt-10">
-          <div className="mx-auto w-full max-w-5xl rounded-2xl bg-white/95 text-neutral-900 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
-            <div className="px-6 py-5 md:px-8 md:py-6 text-center">
-              <h2 className="text-xl md:text-2xl font-bold">Når oppstår krav?</h2>
-              <p className="mt-2 text-sm text-neutral-600">
-                Ingen konto · Ingen binding · Du bestemmer selv neste steg
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-6 pb-6 md:px-8 md:pb-8">
-              <div className="rounded-xl bg-neutral-100 p-5 text-left">
-                <p className="font-semibold mb-1">Skjulte feil</p>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  Du har rettigheter hvis bil eller MC har feil som først ble oppdaget
-                  etter kjøpet.
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-neutral-100 p-5 text-left">
-                <p className="font-semibold mb-1">Ikke som avtalt</p>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  Dersom kjøpet ikke lever opp til det som ble lovet eller avtalt.
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-neutral-100 p-5 text-left">
-                <p className="font-semibold mb-1">Kjøpt av privatperson</p>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  Forbrukerkjøpsloven kan også gjelde ved kjøp mellom privatpersoner.
-                </p>
-              </div>
+            <div className="mt-8">
+              <button
+                onClick={() => setShowCategoryFocus(true)}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#1F4F45] px-6 py-3 text-base font-semibold text-[#ECFDF5] hover:bg-[#246457] transition-colors"
+              >
+                Start gratis vurdering
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </section>
 
-        {/* KATEGORIKORT */}
-        <section className="mt-10">
-          <div className="mx-auto w-full max-w-5xl">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {liveCats.map((c) => (
-                <button
-                  key={c.key}
-                  onClick={() => go(c.href)}
-                  className="text-left rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.07] transition-all p-4"
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <c.icon className="h-4 w-4 text-slate-200" />
-                    <span className="font-semibold text-sm text-white">{c.title}</span>
+        {/* Categories */}
+        <section className="mt-14">
+          <h2 className="text-2xl font-semibold text-white/75">Velg kategori</h2>
+
+          <div
+            className={[
+              "mt-6 transition-all duration-300",
+              showCategoryFocus
+                ? "relative rounded-3xl ring-2 ring-emerald-500/30 shadow-[0_0_0_6px_rgba(16,185,129,0.08)] p-3"
+                : "",
+            ].join(" ")}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {cats.map((c) => (
+              <button
+                key={c.key}
+                onClick={() => go(c.href, c.disabled)}
+                className={[
+                  "text-left rounded-2xl border border-white/12 bg-white/[0.06] backdrop-blur-md",
+                  "shadow-[0_18px_70px_rgba(0,0,0,0.35)]",
+                  "px-6 py-5 transition-colors",
+                  c.disabled
+                    ? "opacity-60 cursor-not-allowed hover:bg-white/[0.06]"
+                    : "hover:bg-white/[0.09]",
+                ].join(" ")}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.05]">
+                    <c.icon className="h-5 w-5 text-white/75" />
                   </div>
-                  <p className="text-xs text-slate-400 leading-snug">{c.desc}</p>
-                </button>
-              ))}
 
-              {soonCats.map((c) => (
-                <button
-                  key={c.key}
-                  onClick={() => go(c.href)}
-                  className="text-left rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all p-4"
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <c.icon className="h-4 w-4 text-slate-400" />
-                    <span className="font-semibold text-sm text-white/90">
-                      {c.title}
-                    </span>
+                  <div className="min-w-0">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xl font-semibold text-white/85">{c.title}</p>
+                      {c.disabled ? (
+                        <span className="text-xs text-white/45">Kommer snart</span>
+                      ) : null}
+                    </div>
+                    <p className="mt-2 text-sm text-white/60 leading-relaxed">
+                      {c.desc}
+                    </p>
                   </div>
-                  <p className="text-xs text-slate-500 leading-snug">{c.desc}</p>
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              Trygghet for norsk forbrukerlov
+                </div>
+              </button>
+            ))}
             </div>
           </div>
         </section>
 
-        {/* FOOTER */}
-        <footer className="mt-10 border-t border-white/5 pt-4">
-          <div className="text-center text-xs text-slate-600 space-y-1">
-            <div>
-              <a href="/bruksvilkar" className="hover:text-slate-400">Bruksvilkår</a>{" "}
-              • <a href="/personvern" className="hover:text-slate-400">Personvern</a>{" "}
-              • <a href="/kontakt" className="hover:text-slate-400">Kontakt oss</a>{" "}
-              • <a href="/om-oss" className="hover:text-slate-400">Om oss</a>
-            </div>
-            <div>
-              Solutions by Langaas • Org.nr 936 977 774 •{" "}
-              <a href="mailto:kontakt@harjegkravpå.no" className="hover:text-slate-400">
-                kontakt@harjegkravpå.no
-              </a>
-            </div>
+        {/* Footer */}
+        <footer className="mt-14 pb-6">
+          <div className="flex items-center justify-center gap-2 text-white/70">
+            <ShieldCheck className="h-5 w-5 text-white/60" />
+            <span className="text-lg font-medium">Basert på Forbrukerkjøpsloven</span>
+          </div>
+
+          <div className="mt-3 text-center text-xs text-white/45">
+            <Link href="/bruksvilkar" className="hover:text-white/65 transition-colors">
+              Bruksvilkår
+            </Link>{" "}
+            ·{" "}
+            <Link href="/personvern" className="hover:text-white/65 transition-colors">
+              Personvern
+            </Link>{" "}
+            ·{" "}
+            <Link href="/kontakt" className="hover:text-white/65 transition-colors">
+              Kontakt oss
+            </Link>{" "}
+            · utviklet av Langaas ·{" "}
+            <a
+              href="mailto:kontakt@harjegkravpå.no"
+              className="hover:text-white/65 transition-colors"
+            >
+              kontakt@harjegkravpå.no
+            </a>
           </div>
         </footer>
       </div>
-
-      {/* MODAL: kategori-velger (ingen ny side, SEO-trygt) */}
-      {pickerOpen && (
-        <div className="fixed inset-0 z-50">
-          {/* backdrop */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-          {/* dialog */}
-          <div className="absolute inset-0 flex items-center justify-center p-4">
-            <div
-              ref={dialogRef}
-              className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#0b1216]/95 text-white shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Velg kategori"
-            >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-                <div>
-                  <p className="text-sm text-slate-400">Start vurdering</p>
-                  <h3 className="text-lg font-semibold">Velg hva saken gjelder</h3>
-                </div>
-                <button
-                  onClick={() => setPickerOpen(false)}
-                  className="rounded-lg p-2 hover:bg-white/5 transition"
-                  aria-label="Lukk"
-                >
-                  <X className="h-5 w-5 text-slate-300" />
-                </button>
-              </div>
-
-              <div className="p-5">
-                <div className="grid grid-cols-1 gap-3">
-                  {liveCats.map((c) => (
-                    <button
-                      key={c.key}
-                      onClick={() => go(c.href)}
-                      className="w-full text-left rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20 transition p-4"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-lg border border-white/10 bg-white/5 p-2">
-                          <c.icon className="h-5 w-5 text-slate-200" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="font-semibold">{c.title}</p>
-                            <span className="text-xs text-slate-400">Start</span>
-                          </div>
-                          <p className="mt-1 text-sm text-slate-400">{c.desc}</p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-
-                  {soonCats.map((c) => (
-                    <button
-                      key={c.key}
-                      onClick={() => go(c.href)}
-                      className="w-full text-left rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition p-4"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-lg border border-white/10 bg-white/5 p-2">
-                          <c.icon className="h-5 w-5 text-slate-400" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="font-semibold text-white/90">{c.title}</p>
-                            <span className="text-xs text-slate-500">Kommer snart</span>
-                          </div>
-                          <p className="mt-1 text-sm text-slate-500">{c.desc}</p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                <p className="mt-4 text-xs text-slate-500">
-                  Gratis å starte · Ingen konto · Du kan stoppe når som helst
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
