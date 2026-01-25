@@ -190,7 +190,7 @@ export default function FlyreiserKravbrevPage() {
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition"
         >
           <ArrowLeft className="h-4 w-4" />
           Tilbake
@@ -203,7 +203,7 @@ export default function FlyreiserKravbrevPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Kravbrev</h1>
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Ferdig formulert brev du kan sende til flyselskapet
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function FlyreiserKravbrevPage() {
             </div>
 
             <div className="flex justify-between">
-              <span className="text-slate-500">Problemtype</span>
+              <span className="text-slate-400">Problemtype</span>
               <span className="flex items-center gap-2">
                 {getProblemIcon(data.problemType)}
                 {getProblemTypeLabel(data.problemType)}
@@ -225,29 +225,29 @@ export default function FlyreiserKravbrevPage() {
             </div>
 
             <div className="flex justify-between">
-              <span className="text-slate-500">Flyselskap</span>
+              <span className="text-slate-400">Flyselskap</span>
               <span>{data.flight?.airline || "Ikke oppgitt"}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-slate-500">Flynummer</span>
+              <span className="text-slate-400">Flynummer</span>
               <span className="font-mono">{data.flight?.flightNumber || "Ikke oppgitt"}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-slate-500">Rute</span>
+              <span className="text-slate-400">Rute</span>
               <span>
                 {data.flight?.departureAirport} → {data.flight?.arrivalAirport}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-slate-500">Flydato</span>
+              <span className="text-slate-400">Flydato</span>
               <span>{formatDate(data.flight?.flightDate)}</span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-slate-500">Regelverk</span>
+              <span className="text-slate-400">Regelverk</span>
               <span>
                 {data.problemType === "BAGGAGE"
                   ? "Montrealkonvensjonen"
@@ -257,7 +257,7 @@ export default function FlyreiserKravbrevPage() {
 
             {data.outcome?.compensationAmount && (
               <div className="flex justify-between pt-2 border-t border-white/10">
-                <span className="text-slate-500">Mulig kompensasjon</span>
+                <span className="text-slate-400">Mulig kompensasjon</span>
                 <span className="text-emerald-400 font-semibold">
                   {data.outcome.compensationAmount}
                 </span>
@@ -352,7 +352,7 @@ export default function FlyreiserKravbrevPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">Juridisk kravbrev</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-400">
                     Basert på {data.problemType === "BAGGAGE" ? "Montreal" : "EU261"}, klart til å
                     sende
                   </p>
@@ -379,7 +379,7 @@ export default function FlyreiserKravbrevPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-600 text-center mt-3">
+            <p className="text-xs text-slate-500 text-center mt-3">
               Brevet utformes basert på saken din og{" "}
               {data.problemType === "BAGGAGE"
                 ? "Montrealkonvensjonen"

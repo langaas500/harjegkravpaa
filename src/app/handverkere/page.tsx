@@ -474,7 +474,7 @@ export default function HandverkerePage() {
               Problemer med en håndverker? Svar på noen spørsmål, så vurderer vi om du kan ha grunnlag for å reklamere.
             </p>
 
-            <div className="text-sm text-slate-500 space-y-1">
+            <div className="text-sm text-slate-400 space-y-1">
               <p>• Tar ca. 3–4 minutter</p>
               <p>• Gratis vurdering</p>
               <p>• Valgfri PDF-rapport (39 kr)</p>
@@ -488,7 +488,7 @@ export default function HandverkerePage() {
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </button>
 
-            <p className="text-xs text-slate-600 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering, ikke juridisk rådgivning
             </p>
           </section>
@@ -497,7 +497,7 @@ export default function HandverkerePage() {
         {step === "FAG" && (
           <section className="space-y-5">
             <h2 className="text-2xl font-bold">Hva slags håndverker gjelder det?</h2>
-            <p className="text-sm text-slate-500">Velg alle som gjelder</p>
+            <p className="text-sm text-slate-400">Velg alle som gjelder</p>
 
             <div className="grid grid-cols-2 gap-3">
               {FAG_OPTIONS.map((opt) => (
@@ -518,7 +518,7 @@ export default function HandverkerePage() {
 
             {fagValg.includes("annet") && (
               <div>
-                <label className="block text-sm text-slate-500 mb-2">Hvilket fag gjelder det?</label>
+                <label className="block text-sm text-slate-400 mb-2">Hvilket fag gjelder det?</label>
                 <input
                   type="text"
                   value={fagAnnetTekst}
@@ -552,7 +552,7 @@ export default function HandverkerePage() {
         {step === "PROBLEM" && (
           <section className="space-y-5">
             <h2 className="text-2xl font-bold">Hva er problemet?</h2>
-            <p className="text-sm text-slate-500">Velg alle som gjelder</p>
+            <p className="text-sm text-slate-400">Velg alle som gjelder</p>
 
             <div className="space-y-2">
               {PROBLEM_OPTIONS.map((opt) => (
@@ -572,7 +572,7 @@ export default function HandverkerePage() {
 
             {problemValg.includes("annet") && (
               <div>
-                <label className="block text-sm text-slate-500 mb-2">Hva gjelder det?</label>
+                <label className="block text-sm text-slate-400 mb-2">Hva gjelder det?</label>
                 <input
                   type="text"
                   value={problemAnnetTekst}
@@ -722,7 +722,7 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-2">Kort tilleggsbeskrivelse (valgfritt)</label>
+                <label className="block text-sm text-slate-400 mb-2">Kort tilleggsbeskrivelse (valgfritt)</label>
                 <input
                   type="text"
                   value={beskrivelsetilleggKort}
@@ -862,7 +862,7 @@ export default function HandverkerePage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-slate-500 mb-2">Når startet jobben? (valgfritt)</label>
+                <label className="block text-sm text-slate-400 mb-2">Når startet jobben? (valgfritt)</label>
                 <input
                   type="date"
                   value={jobbStartDato}
@@ -899,7 +899,7 @@ export default function HandverkerePage() {
 
               {hadFerdigDato && (
                 <div>
-                  <label className="block text-sm text-slate-500 mb-2">Hvilken dato?</label>
+                  <label className="block text-sm text-slate-400 mb-2">Hvilken dato?</label>
                   <input
                     type="date"
                     value={ferdigDato}
@@ -910,7 +910,7 @@ export default function HandverkerePage() {
               )}
 
               <div>
-                <label className="block text-sm text-slate-500 mb-2">Når oppdaget du problemet? (valgfritt)</label>
+                <label className="block text-sm text-slate-400 mb-2">Når oppdaget du problemet? (valgfritt)</label>
                 <input
                   type="date"
                   value={oppdagetDato}
@@ -947,7 +947,7 @@ export default function HandverkerePage() {
 
               {harReklamert && (
                 <div>
-                  <label className="block text-sm text-slate-500 mb-2">Når reklamerte du? (valgfritt)</label>
+                  <label className="block text-sm text-slate-400 mb-2">Når reklamerte du? (valgfritt)</label>
                   <input
                     type="date"
                     value={reklamertDato}
@@ -991,7 +991,7 @@ export default function HandverkerePage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-slate-500 mb-2">Avtalt kontraktssum (kr)</label>
+                  <label className="block text-sm text-slate-400 mb-2">Avtalt kontraktssum (kr)</label>
                   <input
                     type="number"
                     value={kontraktssum}
@@ -1001,7 +1001,7 @@ export default function HandverkerePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-500 mb-2">Fakturert beløp (kr)</label>
+                  <label className="block text-sm text-slate-400 mb-2">Fakturert beløp (kr)</label>
                   <input
                     type="number"
                     value={fakturaSum}
@@ -1013,7 +1013,7 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-2">Estimert utbedringskostnad (kr)</label>
+                <label className="block text-sm text-slate-400 mb-2">Estimert utbedringskostnad (kr)</label>
                 <input
                   type="number"
                   value={utbedringEstimert}
@@ -1051,7 +1051,7 @@ export default function HandverkerePage() {
 
               {innhentetTilbud && (
                 <div>
-                  <label className="block text-sm text-slate-500 mb-2">Tilbudssum fra annen håndverker (kr)</label>
+                  <label className="block text-sm text-slate-400 mb-2">Tilbudssum fra annen håndverker (kr)</label>
                   <input
                     type="number"
                     value={tilbudSum}
@@ -1090,7 +1090,7 @@ export default function HandverkerePage() {
 
               <div>
                 <p className="text-sm text-slate-300 mb-3">Har du dokumentasjon eller vurdering fra annen fagperson?</p>
-                <p className="text-xs text-slate-500 mb-3">Dette kan være en kort vurdering fra rørlegger, elektriker, takstmann eller annen fagperson. Det trenger ikke være en full rapport.</p>
+                <p className="text-xs text-slate-400 mb-3">Dette kan være en kort vurdering fra rørlegger, elektriker, takstmann eller annen fagperson. Det trenger ikke være en full rapport.</p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setHarTredjepartDokumentasjon(true)}
@@ -1190,7 +1190,7 @@ export default function HandverkerePage() {
 
             <div className="space-y-4 pt-2">
               <div>
-                <label className="block text-sm text-slate-500 mb-2">Ønsket frist for løsning (valgfritt)</label>
+                <label className="block text-sm text-slate-400 mb-2">Ønsket frist for løsning (valgfritt)</label>
                 <input
                   type="date"
                   value={frist}
@@ -1354,7 +1354,7 @@ export default function HandverkerePage() {
               Fortell oss hva som har skjedd. Jo mer detaljer, desto bedre vurdering får du.
             </p>
 
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400">
               <p className="font-medium text-slate-400 mb-1">Tips – inkluder gjerne:</p>
               <ul className="space-y-0.5">
                 <li>• Hva avtalen gikk ut på</li>
@@ -1372,7 +1372,7 @@ export default function HandverkerePage() {
               rows={8}
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
             />
-            <p className="text-xs text-slate-600">{dinHistorie.length} / 5000 tegn (minimum 50)</p>
+            <p className="text-xs text-slate-500">{dinHistorie.length} / 5000 tegn (minimum 50)</p>
 
             <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4">
               <p className="text-sm text-teal-400">
@@ -1418,7 +1418,7 @@ export default function HandverkerePage() {
               Hva har håndverkeren sagt? (valgfritt, men nyttig for vurderingen)
             </p>
 
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400">
               <p className="font-medium text-slate-400 mb-1">Eksempler:</p>
               <ul className="space-y-0.5">
                 <li>• Avviser ansvar</li>
@@ -1436,7 +1436,7 @@ export default function HandverkerePage() {
               rows={5}
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
             />
-            <p className="text-xs text-slate-600">{handverkerSvar.length} / 2000 tegn</p>
+            <p className="text-xs text-slate-500">{handverkerSvar.length} / 2000 tegn</p>
 
             <div className="flex gap-3">
               <button
@@ -1469,7 +1469,7 @@ export default function HandverkerePage() {
 
             <div className="space-y-3">
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Ditt navn (anbefalt)</label>
+                <label className="block text-sm text-slate-400 mb-1">Ditt navn (anbefalt)</label>
                 <input
                   type="text"
                   value={navn}
@@ -1480,7 +1480,7 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-1">E-post</label>
+                <label className="block text-sm text-slate-400 mb-1">E-post</label>
                 <input
                   type="email"
                   value={epost}
@@ -1491,7 +1491,7 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Telefon (valgfritt)</label>
+                <label className="block text-sm text-slate-400 mb-1">Telefon (valgfritt)</label>
                 <input
                   type="tel"
                   value={telefon}
@@ -1502,7 +1502,7 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Din gateadresse <span className="text-red-400">*</span></label>
+                <label className="block text-sm text-slate-400 mb-1">Din gateadresse <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   value={gateadresse}
@@ -1515,7 +1515,7 @@ export default function HandverkerePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-slate-500 mb-1">Postnummer <span className="text-red-400">*</span></label>
+                  <label className="block text-sm text-slate-400 mb-1">Postnummer <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     value={postnummer}
@@ -1527,7 +1527,7 @@ export default function HandverkerePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-500 mb-1">Poststed <span className="text-red-400">*</span></label>
+                  <label className="block text-sm text-slate-400 mb-1">Poststed <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     value={poststed}
@@ -1540,7 +1540,7 @@ export default function HandverkerePage() {
               </div>
 
               <div className="border-t border-white/10 pt-4">
-                <label className="block text-sm text-slate-500 mb-1">Håndverkerens navn/firma <span className="text-red-400">*</span></label>
+                <label className="block text-sm text-slate-400 mb-1">Håndverkerens navn/firma <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   value={handverkerNavn}
@@ -1552,7 +1552,7 @@ export default function HandverkerePage() {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Håndverkerens gateadresse <span className="text-red-400">*</span></label>
+                <label className="block text-sm text-slate-400 mb-1">Håndverkerens gateadresse <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   value={handverkerGateadresse}
@@ -1565,7 +1565,7 @@ export default function HandverkerePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-slate-500 mb-1">Postnummer <span className="text-red-400">*</span></label>
+                  <label className="block text-sm text-slate-400 mb-1">Postnummer <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     value={handverkerPostnummer}
@@ -1577,7 +1577,7 @@ export default function HandverkerePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-500 mb-1">Poststed <span className="text-red-400">*</span></label>
+                  <label className="block text-sm text-slate-400 mb-1">Poststed <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     value={handverkerPoststed}
@@ -1696,7 +1696,7 @@ export default function HandverkerePage() {
 
             {outcome.recommendedClaim && (
               <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-sm text-slate-500 uppercase tracking-wide mb-1">Anbefalt kravtype</p>
+                <p className="text-sm text-slate-400 uppercase tracking-wide mb-1">Anbefalt kravtype</p>
                 <p className="text-white font-medium">
                   {outcome.recommendedClaim === "retting" && "Retting av arbeidet"}
                   {outcome.recommendedClaim === "prisavslag" && "Prisavslag"}
@@ -1735,7 +1735,7 @@ export default function HandverkerePage() {
             )}
 
             <div className="space-y-2">
-              <p className="text-sm text-slate-500 uppercase tracking-wide">Nøkkelpunkter</p>
+              <p className="text-sm text-slate-400 uppercase tracking-wide">Nøkkelpunkter</p>
               <ul className="text-slate-300 space-y-1">
                 {outcome.keyPoints.map((point, i) => (
                   <li key={i}>• {point}</li>
@@ -1752,7 +1752,7 @@ export default function HandverkerePage() {
 
             {outcome.deadlineSuggestion && (
               <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-sm text-slate-500 mb-1">Anbefalt frist</p>
+                <p className="text-sm text-slate-400 mb-1">Anbefalt frist</p>
                 <p className="text-white">{outcome.deadlineSuggestion}</p>
               </div>
             )}
@@ -1775,7 +1775,7 @@ export default function HandverkerePage() {
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering, ikke juridisk rådgivning
             </p>
           </section>

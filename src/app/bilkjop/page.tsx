@@ -294,7 +294,7 @@ function BilkjopPageContent() {
 
             <div className="space-y-3">
               <p className="text-sm font-semibold text-slate-400">Hva gjelder saken?</p>
-              <p className="text-xs text-slate-500">Valget avgjør hvilke regler som brukes i vurderingen.</p>
+              <p className="text-xs text-slate-400">Valget avgjør hvilke regler som brukes i vurderingen.</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => {
@@ -311,7 +311,7 @@ function BilkjopPageContent() {
                     <Car className="h-5 w-5" />
                     <div>
                       <p className="font-semibold">Bil</p>
-                      <p className="text-xs text-slate-500 mt-0.5">Personbil, varebil, SUV</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Personbil, varebil, SUV</p>
                     </div>
                   </div>
                 </button>
@@ -330,20 +330,20 @@ function BilkjopPageContent() {
                     <Car className="h-5 w-5" />
                     <div>
                       <p className="font-semibold">Motorsykkel</p>
-                      <p className="text-xs text-slate-500 mt-0.5">MC, scooter, moped</p>
+                      <p className="text-xs text-slate-400 mt-0.5">MC, scooter, moped</p>
                     </div>
                   </div>
                 </button>
               </div>
             </div>
 
-            <div className="text-sm text-slate-500 space-y-1">
+            <div className="text-sm text-slate-400 space-y-1">
               <p>• Starter enkelt – blir mer detaljert bare hvis det trengs</p>
               <p>• Gratis veiledende vurdering</p>
               <p>• Valgfri PDF-rapport (39 kr)</p>
             </div>
 
-            <p className="text-xs text-slate-600 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering basert på norsk forbrukerlovgivning. Ikke juridisk rådgivning.
             </p>
           </section>
@@ -355,7 +355,7 @@ function BilkjopPageContent() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Ditt navn (valgfritt)</label>
+                <label className="block text-sm text-slate-400 mb-1">Ditt navn (valgfritt)</label>
                 <input
                   type="text"
                   placeholder="Ola Nordmann"
@@ -365,7 +365,7 @@ function BilkjopPageContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Selger (valgfritt)</label>
+                <label className="block text-sm text-slate-400 mb-1">Selger (valgfritt)</label>
                 <input
                   type="text"
                   placeholder="Firma AS / Navn"
@@ -422,7 +422,7 @@ function BilkjopPageContent() {
             </div>
 
             <div>
-              <label className="block text-sm text-slate-500 mb-1">Kjøpsdato *</label>
+              <label className="block text-sm text-slate-400 mb-1">Kjøpsdato *</label>
               <input
                 type="date"
                 value={vehicle.purchaseDate}
@@ -431,7 +431,7 @@ function BilkjopPageContent() {
               />
             </div>
 
-            <p className="text-xs text-slate-600">* Obligatoriske felter</p>
+            <p className="text-xs text-slate-500">* Obligatoriske felter</p>
 
             <div className="flex gap-3">
               <button
@@ -505,7 +505,7 @@ function BilkjopPageContent() {
         {step === "ISSUES" && (
           <section className="space-y-5">
             <h2 className="text-2xl font-bold">Hva er problemet?</h2>
-            <p className="text-sm text-slate-500">Velg alle som gjelder</p>
+            <p className="text-sm text-slate-400">Velg alle som gjelder</p>
             <div className="grid grid-cols-2 gap-3">
               {ISSUE_OPTIONS.map((opt) => (
                 <button
@@ -625,7 +625,7 @@ function BilkjopPageContent() {
                   }`}
                 >
                   <p className="font-medium">{opt.label}</p>
-                  <p className="text-xs text-slate-500">{opt.desc}</p>
+                  <p className="text-xs text-slate-400">{opt.desc}</p>
                 </button>
               ))}
             </div>
@@ -742,7 +742,7 @@ function BilkjopPageContent() {
             </div>
             {contactedSeller === true && (
               <div>
-                <label className="block text-sm text-slate-500 mb-2">
+                <label className="block text-sm text-slate-400 mb-2">
                   Hva svarte selger? (valgfritt)
                 </label>
                 <textarea
@@ -753,7 +753,7 @@ function BilkjopPageContent() {
                   rows={3}
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
                 />
-                <p className="text-xs text-slate-600 mt-1">{sellerResponse.length} / 500 tegn</p>
+                <p className="text-xs text-slate-500 mt-1">{sellerResponse.length} / 500 tegn</p>
               </div>
             )}
             <div className="flex gap-3">
@@ -785,7 +785,7 @@ function BilkjopPageContent() {
             <p className="text-sm text-slate-400">
               Gi oss mer detaljer så blir analysen bedre. <span className="text-slate-600">(Valgfritt)</span>
             </p>
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400">
               <p className="font-medium text-slate-400 mb-1">Tips – inkluder gjerne:</p>
               <ul className="space-y-0.5">
                 <li>• Symptomer og når de oppstod</li>
@@ -801,7 +801,7 @@ function BilkjopPageContent() {
               rows={5}
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
             />
-            <p className="text-xs text-slate-600">{userDescription.length} / 1000 tegn</p>
+            <p className="text-xs text-slate-500">{userDescription.length} / 1000 tegn</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("CONTACT")}
@@ -838,7 +838,7 @@ function BilkjopPageContent() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400">
               <p className="font-medium text-slate-400 mb-2">Eksempler på relevante løfter:</p>
               <ul className="space-y-1">
                 <li>• &ldquo;{vehicleText("Bilen", "Motorsykkelen")} er nylig EU-godkjent uten anmerkninger&rdquo;</li>
@@ -856,7 +856,7 @@ function BilkjopPageContent() {
               rows={4}
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
             />
-            <p className="text-xs text-slate-600">{sellerPromises.length} / 1000 tegn</p>
+            <p className="text-xs text-slate-500">{sellerPromises.length} / 1000 tegn</p>
 
             <div className="flex gap-3">
               <button
@@ -907,7 +907,7 @@ function BilkjopPageContent() {
                 }`}
               >
                 <p className="font-semibold">Nei, ingen slik klausul</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Normalt salg uten spesielle forbehold
                 </p>
               </button>
@@ -920,7 +920,7 @@ function BilkjopPageContent() {
                 }`}
               >
                 <p className="font-semibold">Ja, {vehicleText("bilen", "motorsykkelen")} ble solgt &ldquo;som den er&rdquo;</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Det stod i annonse/kontrakt at {vehicleText("bilen", "motorsykkelen")} selges uten garanti
                 </p>
               </button>
@@ -973,7 +973,7 @@ function BilkjopPageContent() {
                 }`}
               >
                 <p className="font-semibold">Nei, feilen var skjult</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Jeg oppdaget problemet først etter kjøpet
                 </p>
               </button>
@@ -986,7 +986,7 @@ function BilkjopPageContent() {
                 }`}
               >
                 <p className="font-semibold">Ja, feilen kunne sees ved kjøpet</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Problemet var synlig, men jeg trodde det var mindre alvorlig
                 </p>
               </button>
@@ -1039,7 +1039,7 @@ function BilkjopPageContent() {
                 }`}
               >
                 <p className="font-semibold">Ja, jeg har verkstedsrapport</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   {vehicleText("Bilen", "Motorsykkelen")} er undersøkt og jeg har dokumentasjon
                 </p>
               </button>
@@ -1052,7 +1052,7 @@ function BilkjopPageContent() {
                 }`}
               >
                 <p className="font-semibold">Nei, ikke undersøkt ennå</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Jeg har ikke tatt {vehicleText("bilen", "motorsykkelen")} til verksted
                 </p>
               </button>
@@ -1060,7 +1060,7 @@ function BilkjopPageContent() {
 
             {hasWorkshopReport === true && (
               <>
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400">
                   <p className="font-medium text-slate-400 mb-2">Lim inn eller oppsummer rapporten:</p>
                   <ul className="space-y-1">
                     <li>• Hva verkstedet fant (feilkoder, diagnosefunn)</li>
@@ -1077,7 +1077,7 @@ function BilkjopPageContent() {
                   rows={6}
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none font-mono text-sm"
                 />
-                <p className="text-xs text-slate-600">{workshopReportText.length} / 2000 tegn</p>
+                <p className="text-xs text-slate-500">{workshopReportText.length} / 2000 tegn</p>
               </>
             )}
 
@@ -1127,7 +1127,7 @@ function BilkjopPageContent() {
                 placeholder="https://finn.no/..."
                 className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
               />
-              <p className="text-xs text-slate-600 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Vi henter ikke data fra Finn.no automatisk. Lenken brukes kun som referanse i dokumentene.
               </p>
             </div>
@@ -1140,7 +1140,7 @@ function BilkjopPageContent() {
                 files={adEvidenceFiles}
                 onFilesChange={setAdEvidenceFiles}
               />
-              <p className="text-xs text-slate-600 mt-2">
+              <p className="text-xs text-slate-500 mt-2">
                 Skjermbilder av annonsen, inkludert tekst, bilder og spesifikasjoner, brukes som bevis i saken.
               </p>
             </div>
@@ -1155,7 +1155,7 @@ function BilkjopPageContent() {
                 rows={4}
                 className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
               />
-              <p className="text-xs text-slate-600 mt-1">{adClaims.length} / 600 tegn</p>
+              <p className="text-xs text-slate-500 mt-1">{adClaims.length} / 600 tegn</p>
             </div>
 
             <div className="flex gap-3">
@@ -1194,7 +1194,7 @@ function BilkjopPageContent() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-500">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400">
               <p className="font-medium text-slate-400 mb-2">Forslag til hva du kan inkludere:</p>
               <ul className="space-y-1">
                 <li>• Detaljert historikk om når og hvordan problemet oppstod</li>
@@ -1214,7 +1214,7 @@ function BilkjopPageContent() {
               rows={10}
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none font-mono text-sm"
             />
-            <p className="text-xs text-slate-600">{additionalInfo.length} / 5000 tegn</p>
+            <p className="text-xs text-slate-500">{additionalInfo.length} / 5000 tegn</p>
 
             <div>
               <p className="text-sm text-slate-300 mb-3">Last opp dokumentasjon (valgfritt)</p>
@@ -1224,7 +1224,7 @@ function BilkjopPageContent() {
                 files={uploadedFiles}
                 onFilesChange={setUploadedFiles}
               />
-              <p className="text-xs text-slate-600 mt-2">
+              <p className="text-xs text-slate-500 mt-2">
                 Verkstedsrapporter, bilder av feil, kjøpekontrakt, annonse, eller annen dokumentasjon
               </p>
             </div>
@@ -1298,7 +1298,7 @@ function BilkjopPageContent() {
             </div>
             
             <div className="space-y-2">
-              <p className="text-sm text-slate-500 uppercase tracking-wide">Nøkkelpunkter</p>
+              <p className="text-sm text-slate-400 uppercase tracking-wide">Nøkkelpunkter</p>
               <ul className="text-slate-300 space-y-1">
                 {outcome.keyPoints.map((point, i) => (
                   <li key={i}>• {point}</li>
@@ -1324,7 +1324,7 @@ function BilkjopPageContent() {
               </button>
             </div>
             
-            <p className="text-xs text-slate-600 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering, ikke juridisk rådgivning
             </p>
           </section>

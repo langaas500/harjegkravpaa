@@ -65,7 +65,7 @@ export default function BruktbilFeilPage() {
             Sjekk om du har krav
             <ArrowRight className="h-5 w-5" />
           </button>
-          <p className="text-sm text-gray-500 mt-3">
+          <p className="text-sm text-slate-400 mt-3">
             Gratis vurdering • Tar vanligvis noen få minutter • Ingen forpliktelser
           </p>
         </div>
@@ -176,7 +176,7 @@ export default function BruktbilFeilPage() {
           </button>
         </section>
 
-        <p className="text-xs text-slate-600 text-center mt-8">
+        <p className="text-xs text-slate-500 text-center mt-8">
           Innholdet er generell informasjon og ikke juridisk rådgivning.
         </p>
       </article>

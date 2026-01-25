@@ -89,7 +89,7 @@ export default function RapportPage() {
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition"
         >
           <ArrowLeft className="h-4 w-4" />
           Tilbake
@@ -113,23 +113,23 @@ export default function RapportPage() {
 
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Kjøper</span>
+              <span className="text-slate-400">Kjøper</span>
               <span>{data.buyerName || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Selger</span>
+              <span className="text-slate-400">Selger</span>
               <span>{data.sellerName || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Bil</span>
+              <span className="text-slate-400">Bil</span>
               <span>{data.vehicle?.make} {data.vehicle?.model}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Kjøpsdato</span>
+              <span className="text-slate-400">Kjøpsdato</span>
               <span>{formatDate(data.vehicle?.purchaseDate)}</span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-slate-500">Lov</span>
+              <span className="text-slate-400">Lov</span>
               <span>{data.sellerType === "DEALER" ? "Forbrukerkjøpsloven" : "Kjøpsloven"}</span>
             </div>
           </div>
@@ -143,7 +143,7 @@ export default function RapportPage() {
                   </div>
                   <div>
                     <p className="font-semibold">Komplett PDF-rapport</p>
-                    <p className="text-xs text-slate-500">3 sider med vurdering og lovhenvisninger</p>
+                    <p className="text-xs text-slate-400">3 sider med vurdering og lovhenvisninger</p>
                   </div>
                 </div>
                 <p className="text-2xl font-bold">39 kr</p>
@@ -168,7 +168,7 @@ export default function RapportPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-600 text-center mt-3">
+            <p className="text-xs text-slate-500 text-center mt-3">
               Sikker betaling via Stripe. Rapporten lastes ned etter betaling.
             </p>
           </div>

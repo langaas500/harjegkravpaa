@@ -430,7 +430,7 @@ export default function FlyreiserPage() {
                     <Clock className="h-5 w-5 text-amber-400" />
                     <div>
                       <p className="font-semibold">Forsinkelse</p>
-                      <p className="text-xs text-slate-500 mt-0.5">Flyet kom frem, men forsinket</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Flyet kom frem, men forsinket</p>
                     </div>
                   </div>
                 </button>
@@ -446,7 +446,7 @@ export default function FlyreiserPage() {
                     <XCircle className="h-5 w-5 text-red-400" />
                     <div>
                       <p className="font-semibold">Kansellering</p>
-                      <p className="text-xs text-slate-500 mt-0.5">Flyet ble kansellert</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Flyet ble kansellert</p>
                     </div>
                   </div>
                 </button>
@@ -462,7 +462,7 @@ export default function FlyreiserPage() {
                     <UserX className="h-5 w-5 text-orange-400" />
                     <div>
                       <p className="font-semibold">Nektet ombordstigning</p>
-                      <p className="text-xs text-slate-500 mt-0.5">Overbooking eller annen grunn</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Overbooking eller annen grunn</p>
                     </div>
                   </div>
                 </button>
@@ -478,14 +478,14 @@ export default function FlyreiserPage() {
                     <Briefcase className="h-5 w-5 text-purple-400" />
                     <div>
                       <p className="font-semibold">Bagasjeproblemer</p>
-                      <p className="text-xs text-slate-500 mt-0.5">Forsinket, tapt eller skadet bagasje</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Forsinket, tapt eller skadet bagasje</p>
                     </div>
                   </div>
                 </button>
               </div>
             </div>
 
-            <div className="text-sm text-slate-500 space-y-1">
+            <div className="text-sm text-slate-400 space-y-1">
               <p>• Tar ca. 2 minutter</p>
               <p>• Gratis vurdering</p>
               <p>• Kompensasjon opptil 600 EUR</p>
@@ -498,7 +498,7 @@ export default function FlyreiserPage() {
               </p>
             </div>
 
-            <p className="text-xs text-slate-600 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering, ikke juridisk rådgivning
             </p>
           </section>
@@ -509,7 +509,7 @@ export default function FlyreiserPage() {
             <h2 className="text-2xl font-bold">Om flyvningen</h2>
 
             <div>
-              <label className="block text-sm text-slate-500 mb-1">Ditt navn (valgfritt)</label>
+              <label className="block text-sm text-slate-400 mb-1">Ditt navn (valgfritt)</label>
               <input
                 type="text"
                 placeholder="Ola Nordmann"
@@ -521,7 +521,7 @@ export default function FlyreiserPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Flyselskap *</label>
+                <label className="block text-sm text-slate-400 mb-1">Flyselskap *</label>
                 <input
                   type="text"
                   placeholder="Norwegian, SAS, Widerøe..."
@@ -531,7 +531,7 @@ export default function FlyreiserPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Flynummer *</label>
+                <label className="block text-sm text-slate-400 mb-1">Flynummer *</label>
                 <input
                   type="text"
                   placeholder="DY1234, SK456..."
@@ -544,7 +544,7 @@ export default function FlyreiserPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Fra flyplass *</label>
+                <label className="block text-sm text-slate-400 mb-1">Fra flyplass *</label>
                 <input
                   type="text"
                   placeholder="Oslo (OSL), Bergen (BGO)..."
@@ -554,7 +554,7 @@ export default function FlyreiserPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Til flyplass *</label>
+                <label className="block text-sm text-slate-400 mb-1">Til flyplass *</label>
                 <input
                   type="text"
                   placeholder="London (LHR), Paris (CDG)..."
@@ -567,7 +567,7 @@ export default function FlyreiserPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Flydato *</label>
+                <label className="block text-sm text-slate-400 mb-1">Flydato *</label>
                 <input
                   type="date"
                   value={flight.flightDate}
@@ -576,7 +576,7 @@ export default function FlyreiserPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Bookingreferanse (PNR)</label>
+                <label className="block text-sm text-slate-400 mb-1">Bookingreferanse (PNR)</label>
                 <input
                   type="text"
                   placeholder="ABC123"
@@ -589,7 +589,7 @@ export default function FlyreiserPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Planlagt avgang (tid)</label>
+                <label className="block text-sm text-slate-400 mb-1">Planlagt avgang (tid)</label>
                 <input
                   type="time"
                   value={flight.scheduledDeparture}
@@ -598,7 +598,7 @@ export default function FlyreiserPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-500 mb-1">Planlagt ankomst (tid)</label>
+                <label className="block text-sm text-slate-400 mb-1">Planlagt ankomst (tid)</label>
                 <input
                   type="time"
                   value={flight.scheduledArrival}
@@ -608,7 +608,7 @@ export default function FlyreiserPage() {
               </div>
             </div>
 
-            <p className="text-xs text-slate-600">* Obligatoriske felter. Tidspunkter styrker kravbrevet.</p>
+            <p className="text-xs text-slate-500">* Obligatoriske felter. Tidspunkter styrker kravbrevet.</p>
 
             <div className="flex gap-3">
               <button
@@ -667,7 +667,7 @@ export default function FlyreiserPage() {
 
                 {delayDuration && delayDuration !== "under2" && (
                   <div>
-                    <label className="block text-sm text-slate-500 mb-1">
+                    <label className="block text-sm text-slate-400 mb-1">
                       Faktisk ankomsttid (når dør åpnet)
                     </label>
                     <input
@@ -676,7 +676,7 @@ export default function FlyreiserPage() {
                       onChange={(e) => setActualArrival(e.target.value)}
                       className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
                     />
-                    <p className="text-xs text-slate-600 mt-1">Styrker kravbrevet. Sjekk flightstatus eller boardingkort.</p>
+                    <p className="text-xs text-slate-500 mt-1">Styrker kravbrevet. Sjekk flightstatus eller boardingkort.</p>
                   </div>
                 )}
 
@@ -707,7 +707,7 @@ export default function FlyreiserPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium">{opt.label}</p>
-                          <p className="text-xs text-slate-500">{opt.desc}</p>
+                          <p className="text-xs text-slate-400">{opt.desc}</p>
                         </div>
                         {opt.compensation === true && (
                           <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
@@ -723,7 +723,7 @@ export default function FlyreiserPage() {
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm text-slate-500 mb-1">Dato for varsel</label>
+                        <label className="block text-sm text-slate-400 mb-1">Dato for varsel</label>
                         <input
                           type="date"
                           value={cancellationNoticeDate}
@@ -732,7 +732,7 @@ export default function FlyreiserPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-slate-500 mb-1">Hvordan fikk du beskjed?</label>
+                        <label className="block text-sm text-slate-400 mb-1">Hvordan fikk du beskjed?</label>
                         <div className="grid grid-cols-3 gap-2">
                           {NOTICE_CHANNEL_OPTIONS.slice(0, 3).map((opt) => (
                             <button
@@ -778,7 +778,7 @@ export default function FlyreiserPage() {
                 {offeredAlternative === true && (
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm text-slate-500 mb-2">
+                      <label className="block text-sm text-slate-400 mb-2">
                         Beskriv alternativet (dato, tid, rute)
                       </label>
                       <textarea
@@ -850,7 +850,7 @@ export default function FlyreiserPage() {
 
                 {offeredAlternative === true && (
                   <div>
-                    <label className="block text-sm text-slate-500 mb-2">
+                    <label className="block text-sm text-slate-400 mb-2">
                       Beskriv alternativet (valgfritt)
                     </label>
                     <textarea
@@ -881,7 +881,7 @@ export default function FlyreiserPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Forsinket bagasje</p>
-                        <p className="text-xs text-slate-500">Bagasjen kom senere enn deg</p>
+                        <p className="text-xs text-slate-400">Bagasjen kom senere enn deg</p>
                       </div>
                       <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                         Mulig erstatning
@@ -900,7 +900,7 @@ export default function FlyreiserPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Tapt bagasje</p>
-                        <p className="text-xs text-slate-500">Bagasjen er borte (over 21 dager)</p>
+                        <p className="text-xs text-slate-400">Bagasjen er borte (over 21 dager)</p>
                       </div>
                       <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                         Mulig erstatning
@@ -919,7 +919,7 @@ export default function FlyreiserPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Skadet bagasje</p>
-                        <p className="text-xs text-slate-500">Bagasjen kom frem med skader</p>
+                        <p className="text-xs text-slate-400">Bagasjen kom frem med skader</p>
                       </div>
                       <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                         Mulig erstatning
@@ -971,7 +971,7 @@ export default function FlyreiserPage() {
                       Nei
                     </button>
                   </div>
-                  <p className="text-xs text-slate-600 mt-2">
+                  <p className="text-xs text-slate-500 mt-2">
                     PIR (Property Irregularity Report) er et skjema du fyller ut på flyplassen når bagasjen mangler eller er skadet.
                   </p>
                 </div>
@@ -1001,7 +1001,7 @@ export default function FlyreiserPage() {
 
                 {hadWorkMeetings === true && (
                   <div>
-                    <label className="block text-sm text-slate-500 mb-2">
+                    <label className="block text-sm text-slate-400 mb-2">
                       Beskriv kort hva som ble påvirket (valgfritt)
                     </label>
                     <textarea
@@ -1084,7 +1084,7 @@ export default function FlyreiserPage() {
                         Nei
                       </button>
                     </div>
-                    <p className="text-xs text-slate-600 mt-2">
+                    <p className="text-xs text-slate-500 mt-2">
                       Nødvendige medisiner kan typisk dekkes som rimelige erstatningskjøp.
                     </p>
                   </div>
@@ -1102,7 +1102,7 @@ export default function FlyreiserPage() {
                     placeholder="F.eks: 2500"
                     className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
                   />
-                  <p className="text-xs text-slate-600 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     Summen av alle utgifter du hadde på grunn av bagasjeproblemene
                   </p>
                 </div>
@@ -1200,7 +1200,7 @@ export default function FlyreiserPage() {
                     files={uploadedFiles}
                     onFilesChange={setUploadedFiles}
                   />
-                  <p className="text-xs text-slate-600 mt-2">
+                  <p className="text-xs text-slate-500 mt-2">
                     Kvitteringer, PIR-skjema, boardingkort eller annen relevant dokumentasjon
                   </p>
                 </div>
@@ -1286,7 +1286,7 @@ export default function FlyreiserPage() {
 
             {wasExtraordinary === true && (
               <div>
-                <label className="block text-sm text-slate-500 mb-2">
+                <label className="block text-sm text-slate-400 mb-2">
                   Hva sa de? (valgfritt)
                 </label>
                 <textarea
@@ -1347,7 +1347,7 @@ export default function FlyreiserPage() {
 
             {contactedAirline === true && (
               <div>
-                <label className="block text-sm text-slate-500 mb-2">
+                <label className="block text-sm text-slate-400 mb-2">
                   Hva svarte de? (valgfritt)
                 </label>
                 <textarea
@@ -1358,7 +1358,7 @@ export default function FlyreiserPage() {
                   rows={3}
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
                 />
-                <p className="text-xs text-slate-600 mt-1">{airlineResponse.length} / 500 tegn</p>
+                <p className="text-xs text-slate-500 mt-1">{airlineResponse.length} / 500 tegn</p>
               </div>
             )}
 
@@ -1414,7 +1414,7 @@ export default function FlyreiserPage() {
 
                 {hadExpenses === true && (
                   <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                    <p className="text-xs text-slate-500">Disse utgiftene kan kreves i tillegg til kompensasjon (EU261 art. 9)</p>
+                    <p className="text-xs text-slate-400">Disse utgiftene kan kreves i tillegg til kompensasjon (EU261 art. 9)</p>
                     <div className="grid grid-cols-2 gap-2">
                       {EU261_EXPENSE_OPTIONS.map((opt) => (
                         <button
@@ -1438,7 +1438,7 @@ export default function FlyreiserPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs text-slate-500 mb-1">Totalt beløp (NOK)</label>
+                        <label className="block text-xs text-slate-400 mb-1">Totalt beløp (NOK)</label>
                         <input
                           type="number"
                           value={eu261ExpenseAmount}
@@ -1448,7 +1448,7 @@ export default function FlyreiserPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-slate-500 mb-1">Kort beskrivelse</label>
+                        <label className="block text-xs text-slate-400 mb-1">Kort beskrivelse</label>
                         <input
                           type="text"
                           value={eu261ExpenseDescription}
@@ -1475,7 +1475,7 @@ export default function FlyreiserPage() {
                 rows={4}
                 className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
               />
-              <p className="text-xs text-slate-600 mt-1">{userDescription.length} / 2000 tegn</p>
+              <p className="text-xs text-slate-500 mt-1">{userDescription.length} / 2000 tegn</p>
             </div>
 
             <div>
@@ -1504,7 +1504,7 @@ export default function FlyreiserPage() {
                 maxLength={13}
                 className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 font-mono focus:border-white/30 focus:outline-none"
               />
-              <p className="text-xs text-slate-600 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Oppgir du kontonummer nå slipper du å sende det separat til flyselskapet.
               </p>
             </div>
@@ -1585,7 +1585,7 @@ export default function FlyreiserPage() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm text-slate-500 uppercase tracking-wide">Nøkkelpunkter</p>
+              <p className="text-sm text-slate-400 uppercase tracking-wide">Nøkkelpunkter</p>
               <ul className="text-slate-300 space-y-1">
                 {outcome.keyPoints.map((point, i) => (
                   <li key={i}>• {point}</li>
@@ -1594,7 +1594,7 @@ export default function FlyreiserPage() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm text-slate-500 uppercase tracking-wide">Neste steg</p>
+              <p className="text-sm text-slate-400 uppercase tracking-wide">Neste steg</p>
               <ul className="text-slate-300 space-y-1">
                 {outcome.nextSteps.map((step, i) => (
                   <li key={i}>{i + 1}. {step}</li>
@@ -1620,7 +1620,7 @@ export default function FlyreiserPage() {
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 text-center">
+            <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering, ikke juridisk rådgivning
             </p>
           </section>

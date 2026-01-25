@@ -98,7 +98,7 @@ export default function HandverkKravbrevPage() {
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition"
         >
           <ArrowLeft className="h-4 w-4" />
           Tilbake
@@ -111,19 +111,19 @@ export default function HandverkKravbrevPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Kravbrev</h1>
-              <p className="text-slate-500 text-sm">Ferdig formulert brev du kan sende til håndverkeren</p>
+              <p className="text-slate-400 text-sm">Ferdig formulert brev du kan sende til håndverkeren</p>
             </div>
           </div>
 
           {/* Sammendrag med adresser fra wizard */}
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm space-y-3">
             <div className="flex justify-between">
-              <span className="text-slate-500">Sak</span>
+              <span className="text-slate-400">Sak</span>
               <span>{(data.fag as string[])?.join(", ") || "Håndverkertjeneste"}</span>
             </div>
 
             <div className="border-t border-white/10 pt-3">
-              <span className="text-slate-500 text-xs uppercase tracking-wide">Avsender</span>
+              <span className="text-slate-400 text-xs uppercase tracking-wide">Avsender</span>
               <div className="mt-1 text-white">
                 <p>{(data.navn as string) || "Ikke oppgitt"}</p>
                 {kundeAdresse && <p>{kundeAdresse}</p>}
@@ -132,7 +132,7 @@ export default function HandverkKravbrevPage() {
             </div>
 
             <div className="border-t border-white/10 pt-3">
-              <span className="text-slate-500 text-xs uppercase tracking-wide">Mottaker</span>
+              <span className="text-slate-400 text-xs uppercase tracking-wide">Mottaker</span>
               <div className="mt-1 text-white">
                 <p>{(data.handverkerNavn as string) || "Ikke oppgitt"}</p>
                 {handverkerAdresse && <p>{handverkerAdresse}</p>}
@@ -156,7 +156,7 @@ export default function HandverkKravbrevPage() {
 
           {/* Hva krever du? */}
           <div className="space-y-3">
-            <label className="block text-sm text-slate-500">Hva krever du?</label>
+            <label className="block text-sm text-slate-400">Hva krever du?</label>
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setClaimType("retting")}
@@ -166,7 +166,7 @@ export default function HandverkKravbrevPage() {
                     : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <Wrench className={`h-6 w-6 ${claimType === "retting" ? "text-white" : "text-slate-500"}`} />
+                <Wrench className={`h-6 w-6 ${claimType === "retting" ? "text-white" : "text-slate-400"}`} />
                 <span className="text-sm font-medium">Retting</span>
               </button>
 
@@ -178,7 +178,7 @@ export default function HandverkKravbrevPage() {
                     : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <BadgePercent className={`h-6 w-6 ${claimType === "prisavslag" ? "text-white" : "text-slate-500"}`} />
+                <BadgePercent className={`h-6 w-6 ${claimType === "prisavslag" ? "text-white" : "text-slate-400"}`} />
                 <span className="text-sm font-medium">Prisavslag</span>
               </button>
 
@@ -190,7 +190,7 @@ export default function HandverkKravbrevPage() {
                     : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <Undo2 className={`h-6 w-6 ${claimType === "heving" ? "text-white" : "text-slate-500"}`} />
+                <Undo2 className={`h-6 w-6 ${claimType === "heving" ? "text-white" : "text-slate-400"}`} />
                 <span className="text-sm font-medium">Heve avtalen</span>
               </button>
             </div>
@@ -199,16 +199,16 @@ export default function HandverkKravbrevPage() {
           {/* Beløp hvis prisavslag */}
           {claimType === "prisavslag" && (
             <div className="space-y-2">
-              <label className="block text-sm text-slate-500">Hvor mye krever du i prisavslag?</label>
+              <label className="block text-sm text-slate-400">Hvor mye krever du i prisavslag?</label>
               <div className="relative">
                 <input
                   type="number"
                   value={prisavslagBelop}
                   onChange={(e) => setPrisavslagBelop(e.target.value)}
                   placeholder="F.eks. 15000"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">kr</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">kr</span>
               </div>
             </div>
           )}
@@ -219,7 +219,7 @@ export default function HandverkKravbrevPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">Juridisk kravbrev</p>
-                  <p className="text-xs text-slate-500">Ferdig formulert, klart til å sende</p>
+                  <p className="text-xs text-slate-400">Ferdig formulert, klart til å sende</p>
                 </div>
                 <p className="text-2xl font-bold">99 kr</p>
               </div>
@@ -243,7 +243,7 @@ export default function HandverkKravbrevPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-600 text-center mt-3">
+            <p className="text-xs text-slate-500 text-center mt-3">
               Brevet utformes basert på opplysningene i saken din og håndverkertjenesteloven.
             </p>
           </div>

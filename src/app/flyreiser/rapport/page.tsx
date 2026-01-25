@@ -122,7 +122,7 @@ export default function FlyreiserRapportPage() {
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition"
         >
           <ArrowLeft className="h-4 w-4" />
           Tilbake
@@ -151,34 +151,34 @@ export default function FlyreiserRapportPage() {
 
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Passasjer</span>
+              <span className="text-slate-400">Passasjer</span>
               <span>{data.passengerName || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Problemtype</span>
+              <span className="text-slate-400">Problemtype</span>
               <span className="flex items-center gap-2">
                 {getProblemIcon(data.problemType)}
                 {getProblemTypeLabel(data.problemType)}
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Flyselskap</span>
+              <span className="text-slate-400">Flyselskap</span>
               <span>{data.flight?.airline || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Flynummer</span>
+              <span className="text-slate-400">Flynummer</span>
               <span>{data.flight?.flightNumber || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Rute</span>
+              <span className="text-slate-400">Rute</span>
               <span>{data.flight?.departureAirport} → {data.flight?.arrivalAirport}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Flydato</span>
+              <span className="text-slate-400">Flydato</span>
               <span>{formatDate(data.flight?.flightDate)}</span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-slate-500">Regelverk</span>
+              <span className="text-slate-400">Regelverk</span>
               <span>{data.problemType === "BAGGAGE" ? "Montrealkonvensjonen" : "EU-forordning 261/2004"}</span>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function FlyreiserRapportPage() {
                   </div>
                   <div>
                     <p className="font-semibold">Komplett PDF-rapport</p>
-                    <p className="text-xs text-slate-500">Vurdering med lovhenvisninger og neste steg</p>
+                    <p className="text-xs text-slate-400">Vurdering med lovhenvisninger og neste steg</p>
                   </div>
                 </div>
                 <p className="text-2xl font-bold">39 kr</p>
@@ -217,7 +217,7 @@ export default function FlyreiserRapportPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-600 text-center mt-3">
+            <p className="text-xs text-slate-500 text-center mt-3">
               Sikker betaling via Stripe. Rapporten lastes ned etter betaling.
             </p>
           </div>

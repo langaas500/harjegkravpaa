@@ -17,7 +17,13 @@ export async function POST(request: NextRequest) {
     const vehicleNameDef = vehicleType === "MOTORCYCLE" ? "motorsykkelen" : "bilen";
 
     const sellerType = data.sellerType || "forhandler";
-    const vehicle = data.vehicle || {};
+    const rawVehicle = data.vehicle || {};
+    // Normalize vehicle fields - accept both wizard field names and expected names
+    const vehicle = {
+      ...rawVehicle,
+      mileage: rawVehicle.mileage || rawVehicle.km || "",
+      regNumber: rawVehicle.regNumber || rawVehicle.regNum || "",
+    };
     const issues = data.issues || {};
     const sellerContact = data.sellerContact || {};
     const userDescription = data.userDescription || "";
@@ -36,14 +42,14 @@ export async function POST(request: NextRequest) {
     const adEvidenceFiles = data.adEvidenceFiles || [];
     const adClaims = data.adClaims || "";
 
-    // Kontaktinfo fra skjema
+    // Kontaktinfo fra skjema - accept both top-level and nested fields from wizard
     const contactInfo = data.contactInfo || {};
-    const buyerName = contactInfo.buyerName || "[Ditt navn]";
-    const buyerAddress = contactInfo.buyerAddress || "[Din adresse]";
-    const buyerPostcode = contactInfo.buyerPostcode || "[Postnr]";
-    const buyerCity = contactInfo.buyerCity || "[Poststed]";
-    const buyerPhone = contactInfo.buyerPhone || "";
-    const buyerEmail = contactInfo.buyerEmail || "";
+    const buyerName = contactInfo.buyerName || data.buyerName || "[Ditt navn]";
+    const buyerAddress = contactInfo.buyerAddress || data.buyerAddress || "[Din adresse]";
+    const buyerPostcode = contactInfo.buyerPostcode || data.buyerPostcode || "[Postnr]";
+    const buyerCity = contactInfo.buyerCity || data.buyerCity || "[Poststed]";
+    const buyerPhone = contactInfo.buyerPhone || data.buyerPhone || "";
+    const buyerEmail = contactInfo.buyerEmail || data.buyerEmail || "";
 
     const safeSellerNameRaw =
       (typeof vehicle.seller === "string" ? vehicle.seller : "") ||

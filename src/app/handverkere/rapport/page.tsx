@@ -89,7 +89,7 @@ export default function HandverkRapportPage() {
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition"
         >
           <ArrowLeft className="h-4 w-4" />
           Tilbake
@@ -113,23 +113,23 @@ export default function HandverkRapportPage() {
 
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Kunde</span>
+              <span className="text-slate-400">Kunde</span>
               <span>{data.navn || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Håndverker</span>
+              <span className="text-slate-400">Håndverker</span>
               <span>{data.handverkerNavn || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Fag</span>
+              <span className="text-slate-400">Fag</span>
               <span>{data.fag?.join(", ") || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-500">Problem</span>
+              <span className="text-slate-400">Problem</span>
               <span className="text-right max-w-[200px]">{data.problemer?.join(", ") || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between py-2">
-              <span className="text-slate-500">Lov</span>
+              <span className="text-slate-400">Lov</span>
               <span>Håndverkertjenesteloven</span>
             </div>
           </div>
@@ -143,7 +143,7 @@ export default function HandverkRapportPage() {
                   </div>
                   <div>
                     <p className="font-semibold">Komplett PDF-rapport</p>
-                    <p className="text-xs text-slate-500">Vurdering med lovhenvisninger</p>
+                    <p className="text-xs text-slate-400">Vurdering med lovhenvisninger</p>
                   </div>
                 </div>
                 <p className="text-2xl font-bold">39 kr</p>
@@ -168,7 +168,7 @@ export default function HandverkRapportPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-600 text-center mt-3">
+            <p className="text-xs text-slate-500 text-center mt-3">
               Sikker betaling via Stripe. Rapporten lastes ned etter betaling.
             </p>
           </div>

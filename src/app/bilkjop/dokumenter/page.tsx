@@ -206,12 +206,12 @@ export default function DokumenterPage() {
         <div className="flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+            className="flex items-center gap-2 text-slate-400 hover:text-white transition"
           >
             <ArrowLeft className="h-4 w-4" />
             Tilbake
           </button>
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-slate-400">
             {getTotalCount()} dokument{getTotalCount() !== 1 ? "er" : ""}
           </span>
         </div>
@@ -297,7 +297,7 @@ export default function DokumenterPage() {
                 <p className="font-medium">
                   Dra filer hit eller <span className="text-emerald-400">klikk for å velge</span>
                 </p>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-slate-400 mt-1">
                   PDF, bilder, Word, Excel, tekst (maks 10MB per fil)
                 </p>
               </div>
@@ -316,7 +316,7 @@ export default function DokumenterPage() {
                 <div className="flex items-center gap-2 text-slate-400">
                   {CATEGORY_ICONS[category]}
                   <span className="font-medium">{CATEGORY_LABELS[category]}</span>
-                  <span className="text-sm text-slate-600">({docs.length})</span>
+                  <span className="text-sm text-slate-500">({docs.length})</span>
                 </div>
 
                 <div className="grid gap-2">
@@ -355,7 +355,7 @@ export default function DokumenterPage() {
                       {/* File info */}
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{doc.fileName}</p>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-400">
                           {formatFileSize(doc.fileData.byteLength)} • {formatDate(doc.uploadedAt)}
                         </p>
                       </div>
@@ -363,7 +363,7 @@ export default function DokumenterPage() {
                       {/* Delete button */}
                       <button
                         onClick={() => handleDelete(doc.id)}
-                        className="p-2 rounded-lg hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition"
+                        className="p-2 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition"
                       >
                         <Trash2 className="h-5 w-5" />
                       </button>
@@ -377,7 +377,7 @@ export default function DokumenterPage() {
 
         {/* Empty state */}
         {documents.length === 0 && (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-slate-400">
             <File className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>Ingen dokumenter lastet opp ennå</p>
             <p className="text-sm mt-1">Last opp filer for å komme i gang</p>
@@ -394,7 +394,7 @@ export default function DokumenterPage() {
               <Download className="h-5 w-5" />
               Generer samlet PDF
             </button>
-            <p className="text-center text-sm text-slate-500 mt-3">
+            <p className="text-center text-sm text-slate-400 mt-3">
               Kravbrev + alle vedlegg i ett dokument
             </p>
           </div>

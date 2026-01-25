@@ -155,11 +155,11 @@ export default function FileUpload({
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
-            <Upload className="h-8 w-8 text-slate-500" />
+            <Upload className="h-8 w-8 text-slate-400" />
             <p className="text-sm text-slate-400">
               Dra filer hit eller klikk for å velge
             </p>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-slate-500">
               JPG, PNG, WebP, HEIC eller PDF (maks 10MB per fil)
             </p>
           </div>
@@ -190,7 +190,7 @@ export default function FileUpload({
                 onClick={() => removeFile(file.key)}
                 className="p-1 hover:bg-white/10 rounded transition"
               >
-                <X className="h-4 w-4 text-slate-500 hover:text-red-400" />
+                <X className="h-4 w-4 text-slate-400 hover:text-red-400" />
               </button>
             </div>
           ))}
@@ -198,7 +198,7 @@ export default function FileUpload({
       )}
 
       {/* File count */}
-      <p className="text-xs text-slate-600">
+      <p className="text-xs text-slate-500">
         {files.length} av {maxFiles} filer lastet opp
       </p>
     </div>

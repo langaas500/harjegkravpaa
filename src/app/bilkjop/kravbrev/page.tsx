@@ -113,7 +113,7 @@ export default function KravbrevPage() {
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition"
         >
           <ArrowLeft className="h-4 w-4" />
           Tilbake
@@ -126,7 +126,7 @@ export default function KravbrevPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">Kravbrev</h1>
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Ferdig formulert brev du kan sende til selger
               </p>
             </div>
@@ -135,29 +135,29 @@ export default function KravbrevPage() {
           {/* Sammendrag */}
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm space-y-2">
             <div className="flex justify-between">
-              <span className="text-slate-500">Sak</span>
+              <span className="text-slate-400">Sak</span>
               <span>
                 {data.vehicle?.make} {data.vehicle?.model}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Kjøper</span>
+              <span className="text-slate-400">Kjøper</span>
               <span>{data.buyerName || "Ikke oppgitt"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Selger</span>
+              <span className="text-slate-400">Selger</span>
               <span>{data.sellerName || "Ikke oppgitt"}</span>
             </div>
 
             {/* Viktig: Vi spør IKKE om adresse/reg.nr her */}
-            <div className="pt-2 text-xs text-slate-600">
+            <div className="pt-2 text-xs text-slate-500">
               Adresse og registreringsnummer hentes automatisk fra saken du fylte ut i wizard.
             </div>
           </div>
 
           {/* Hva krever du? */}
           <div className="space-y-3">
-            <label className="block text-sm text-slate-500">Hva krever du?</label>
+            <label className="block text-sm text-slate-400">Hva krever du?</label>
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setClaimType("repair")}
@@ -169,7 +169,7 @@ export default function KravbrevPage() {
               >
                 <Wrench
                   className={`h-6 w-6 ${
-                    claimType === "repair" ? "text-white" : "text-slate-500"
+                    claimType === "repair" ? "text-white" : "text-slate-400"
                   }`}
                 />
                 <span className="text-sm font-medium">Reparasjon</span>
@@ -185,7 +185,7 @@ export default function KravbrevPage() {
               >
                 <BadgePercent
                   className={`h-6 w-6 ${
-                    claimType === "discount" ? "text-white" : "text-slate-500"
+                    claimType === "discount" ? "text-white" : "text-slate-400"
                   }`}
                 />
                 <span className="text-sm font-medium">Prisavslag</span>
@@ -201,7 +201,7 @@ export default function KravbrevPage() {
               >
                 <Undo2
                   className={`h-6 w-6 ${
-                    claimType === "cancel" ? "text-white" : "text-slate-500"
+                    claimType === "cancel" ? "text-white" : "text-slate-400"
                   }`}
                 />
                 <span className="text-sm font-medium">Heve kjøpet</span>
@@ -212,7 +212,7 @@ export default function KravbrevPage() {
           {/* Beløp hvis prisavslag */}
           {claimType === "discount" && (
             <div className="space-y-2">
-              <label className="block text-sm text-slate-500">
+              <label className="block text-sm text-slate-400">
                 Hvor mye krever du i prisavslag?
               </label>
               <div className="relative">
@@ -221,9 +221,9 @@ export default function KravbrevPage() {
                   value={discountAmount}
                   onChange={(e) => setDiscountAmount(e.target.value)}
                   placeholder="F.eks. 15000"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                   kr
                 </span>
               </div>
@@ -243,7 +243,7 @@ export default function KravbrevPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">Juridisk kravbrev</p>
-                  <p className="text-xs text-slate-500">Ferdig formulert, klart til å sende</p>
+                  <p className="text-xs text-slate-400">Ferdig formulert, klart til å sende</p>
                 </div>
                 <p className="text-2xl font-bold">99 kr</p>
               </div>
@@ -267,11 +267,11 @@ export default function KravbrevPage() {
               )}
             </button>
 
-            <p className="text-xs text-slate-600 text-center mt-3">
+            <p className="text-xs text-slate-500 text-center mt-3">
               Brevet utformes basert på opplysningene i saken din og norsk forbrukerlovgivning.
             </p>
 
-            <p className="text-[11px] text-slate-600 text-center mt-2">
+            <p className="text-[11px] text-slate-500 text-center mt-2">
               Neste steg etter betaling: kun telefon og e-post (resten hentes fra wizard).
             </p>
           </div>

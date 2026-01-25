@@ -846,7 +846,7 @@ function BetaltContent() {
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-left">
-          <p className="text-sm text-slate-500 mb-1">Ordre</p>
+          <p className="text-sm text-slate-400 mb-1">Ordre</p>
           <p className="font-semibold">Bilkjøp-rapport PDF</p>
           <p className="text-slate-400">39 kr</p>
         </div>
@@ -912,7 +912,7 @@ function BetaltContent() {
         <div className="pt-4">
           <button
             onClick={() => router.push("/")}
-            className="text-slate-500 hover:text-slate-300 text-sm"
+            className="text-slate-400 hover:text-slate-300 text-sm"
           >
             Tilbake til forsiden
           </button>
