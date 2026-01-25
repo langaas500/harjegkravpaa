@@ -84,9 +84,6 @@ export default function HomePage() {
               <Link href="/om-oss" className="hover:text-white/90 transition-colors">
                 Om oss <span className="text-white/40">⌄</span>
               </Link>
-              <Link href="/tjenester" className="hover:text-white/90 transition-colors">
-                Tjenester <span className="text-white/40">⌄</span>
-              </Link>
               <Link href="/kontakt" className="hover:text-white/90 transition-colors">
                 Kontakt oss
               </Link>
