@@ -63,7 +63,7 @@ export default function HomePage() {
         className="absolute inset-0 -z-20 bg-cover bg-center"
         style={{ backgroundImage: "url(/bg.png)" }}
       />
-      {/* Overlay for readability (matches “calm + deep” look) */}
+      {/* Overlay for readability */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/70" />
       {/* Subtle vignette */}
       <div className="absolute inset-0 -z-10 [background:radial-gradient(1000px_600px_at_20%_10%,rgba(255,255,255,0.10),transparent_60%),radial-gradient(900px_500px_at_80%_20%,rgba(255,255,255,0.08),transparent_55%)]" />
@@ -121,6 +121,16 @@ export default function HomePage() {
                 Start gratis vurdering
                 <ArrowRight className="h-4 w-4" />
               </button>
+
+              {/* ✅ Dag 1: Intern lenke til /bilkjop */}
+              <div className="mt-3">
+                <Link
+                  href="/bilkjop"
+                  className="text-sm text-emerald-300/80 hover:text-emerald-300 underline underline-offset-4 transition-colors"
+                >
+                  Reklamasjon på bruktbil – sjekk om du har krav
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -138,38 +148,38 @@ export default function HomePage() {
             ].join(" ")}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {cats.map((c) => (
-              <button
-                key={c.key}
-                onClick={() => go(c.href, c.disabled)}
-                className={[
-                  "text-left rounded-2xl border border-white/12 bg-white/[0.06] backdrop-blur-md",
-                  "shadow-[0_18px_70px_rgba(0,0,0,0.35)]",
-                  "px-6 py-5 transition-colors",
-                  c.disabled
-                    ? "opacity-60 cursor-not-allowed hover:bg-white/[0.06]"
-                    : "hover:bg-white/[0.09]",
-                ].join(" ")}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.05]">
-                    <c.icon className="h-5 w-5 text-white/75" />
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-xl font-semibold text-white/85">{c.title}</p>
-                      {c.disabled ? (
-                        <span className="text-xs text-white/45">Kommer snart</span>
-                      ) : null}
+              {cats.map((c) => (
+                <button
+                  key={c.key}
+                  onClick={() => go(c.href, c.disabled)}
+                  className={[
+                    "text-left rounded-2xl border border-white/12 bg-white/[0.06] backdrop-blur-md",
+                    "shadow-[0_18px_70px_rgba(0,0,0,0.35)]",
+                    "px-6 py-5 transition-colors",
+                    c.disabled
+                      ? "opacity-60 cursor-not-allowed hover:bg-white/[0.06]"
+                      : "hover:bg-white/[0.09]",
+                  ].join(" ")}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.05]">
+                      <c.icon className="h-5 w-5 text-white/75" />
                     </div>
-                    <p className="mt-2 text-sm text-white/60 leading-relaxed">
-                      {c.desc}
-                    </p>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xl font-semibold text-white/85">{c.title}</p>
+                        {c.disabled ? (
+                          <span className="text-xs text-white/45">Kommer snart</span>
+                        ) : null}
+                      </div>
+                      <p className="mt-2 text-sm text-white/60 leading-relaxed">
+                        {c.desc}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              ))}
             </div>
           </div>
         </section>
