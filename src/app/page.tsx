@@ -121,16 +121,6 @@ export default function HomePage() {
                 Start gratis vurdering
                 <ArrowRight className="h-4 w-4" />
               </button>
-
-              {/* ✅ Dag 1: Intern lenke til /bilkjop */}
-              <div className="mt-3">
-                <Link
-                  href="/bilkjop"
-                  className="text-sm text-emerald-300/80 hover:text-emerald-300 underline underline-offset-4 transition-colors"
-                >
-                  Reklamasjon på bruktbil – sjekk om du har krav
-                </Link>
-              </div>
             </div>
           </div>
         </section>
@@ -138,6 +128,15 @@ export default function HomePage() {
         {/* Categories */}
         <section className="mt-14">
           <h2 className="text-2xl font-semibold text-white/75">Velg kategori</h2>
+
+          <div className="mt-2">
+            <Link
+              href="/bilkjop"
+              className="text-sm text-white/70 hover:text-emerald-300 underline underline-offset-4 transition-colors"
+            >
+              Reklamasjon på bruktbil – sjekk om du har krav
+            </Link>
+          </div>
 
           <div
             className={[
