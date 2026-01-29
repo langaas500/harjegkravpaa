@@ -207,7 +207,7 @@ export default function HomePage() {
               href="mailto:kontakt@harjegkravpå.no"
               className="hover:text-white/65 transition-colors"
             >
-              kontakt@harjegkravpå.no
+              kontakt@harjegkravpaa.no
             </a>
           </div>
         </footer>
