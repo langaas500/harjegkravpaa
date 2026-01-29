@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AppHeader from "./components/AppHeader";
@@ -21,6 +22,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="no">
+      {/* Google tag (gtag.js) for Google Ads */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=AW-17884170370"
+        strategy="afterInteractive"
+      />
+      <Script id="google-ads-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'AW-17884170370');
+        `}
+      </Script>
+
       <body className={inter.className}>
         {/* Header-lag: isolert, ingen blur, alltid skarp */}
         <div className="sticky top-0 z-50">
