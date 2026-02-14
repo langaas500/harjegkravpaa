@@ -28,7 +28,6 @@ export default function KravbrevPage() {
         const parsed = JSON.parse(stored);
         setData(parsed);
 
-        // Hvis bruker har vært her før, hent valg tilbake
         if (parsed?.claimType) setClaimType(parsed.claimType as ClaimType);
         if (parsed?.discountAmount) setDiscountAmount(String(parsed.discountAmount));
       } catch {
@@ -54,7 +53,6 @@ export default function KravbrevPage() {
     if (!canProceed) return;
     setIsLoading(true);
 
-    // IKKE be om adresse/regnr her. Alt slikt skal komme fra wizard (bilkjop-data).
     const updatedData = {
       ...data,
       claimType,
@@ -102,178 +100,161 @@ export default function KravbrevPage() {
 
   if (!data) {
     return (
-      <main className="bg-nordic text-white flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      <main className="bg-[#0a0f0d] text-white flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
       </main>
     );
   }
 
   return (
-    <main className="bg-nordic text-white">
-      <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-400 hover:text-white transition"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Tilbake
-        </button>
+    <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
+      {/* Ambient background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.04) 0%, transparent 70%)" }} />
+        <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, rgba(16,185,129,0.025) 0%, transparent 70%)" }} />
+      </div>
 
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl border border-white/10 bg-white/[0.03]">
-              <FileText className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">Kravbrev</h1>
-              <p className="text-slate-400 text-sm">
-                Ferdig formulert brev du kan sende til selger
-              </p>
-            </div>
-          </div>
+      <div className="relative z-10">
+        <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Tilbake
+          </button>
 
-          {/* Sammendrag */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm space-y-2">
-            <div className="flex justify-between">
-              <span className="text-slate-400">Sak</span>
-              <span>
-                {data.vehicle?.make} {data.vehicle?.model}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Kjøper</span>
-              <span>{data.buyerName || "Ikke oppgitt"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Selger</span>
-              <span>{data.sellerName || "Ikke oppgitt"}</span>
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.08]">
+                <FileText className="h-6 w-6 text-emerald-400" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight">Kravbrev</h1>
+                <p className="text-slate-400 text-sm">
+                  Ferdig formulert brev du kan sende til selger
+                </p>
+              </div>
             </div>
 
-            {/* Viktig: Vi spør IKKE om adresse/reg.nr her */}
-            <div className="pt-2 text-xs text-slate-500">
-              Adresse og registreringsnummer hentes automatisk fra saken du fylte ut i wizard.
-            </div>
-          </div>
-
-          {/* Hva krever du? */}
-          <div className="space-y-3">
-            <label className="block text-sm text-slate-400">Hva krever du?</label>
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                onClick={() => setClaimType("repair")}
-                className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                  claimType === "repair"
-                    ? "border-white bg-white/10"
-                    : "border-white/10 hover:border-white/20"
-                }`}
-              >
-                <Wrench
-                  className={`h-6 w-6 ${
-                    claimType === "repair" ? "text-white" : "text-slate-400"
-                  }`}
-                />
-                <span className="text-sm font-medium">Reparasjon</span>
-              </button>
-
-              <button
-                onClick={() => setClaimType("discount")}
-                className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                  claimType === "discount"
-                    ? "border-white bg-white/10"
-                    : "border-white/10 hover:border-white/20"
-                }`}
-              >
-                <BadgePercent
-                  className={`h-6 w-6 ${
-                    claimType === "discount" ? "text-white" : "text-slate-400"
-                  }`}
-                />
-                <span className="text-sm font-medium">Prisavslag</span>
-              </button>
-
-              <button
-                onClick={() => setClaimType("cancel")}
-                className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                  claimType === "cancel"
-                    ? "border-white bg-white/10"
-                    : "border-white/10 hover:border-white/20"
-                }`}
-              >
-                <Undo2
-                  className={`h-6 w-6 ${
-                    claimType === "cancel" ? "text-white" : "text-slate-400"
-                  }`}
-                />
-                <span className="text-sm font-medium">Heve kjøpet</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Beløp hvis prisavslag */}
-          {claimType === "discount" && (
-            <div className="space-y-2">
-              <label className="block text-sm text-slate-400">
-                Hvor mye krever du i prisavslag?
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={discountAmount}
-                  onChange={(e) => setDiscountAmount(e.target.value)}
-                  placeholder="F.eks. 15000"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  kr
+            {/* Sammendrag */}
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 text-sm space-y-2">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Sak</span>
+                <span>
+                  {data.vehicle?.make} {data.vehicle?.model}
                 </span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Kjøper</span>
+                <span>{data.buyerName || "Ikke oppgitt"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Selger</span>
+                <span>{data.sellerName || "Ikke oppgitt"}</span>
+              </div>
 
-              {discountAmount.trim().length > 0 &&
-                (!Number.isFinite(discountAmountNumber) || discountAmountNumber <= 0) && (
-                  <p className="text-xs text-rose-300">
-                    Skriv inn et beløp større enn 0.
-                  </p>
-                )}
-            </div>
-          )}
-
-          {/* Pris og betaling */}
-          <div className="border-t border-white/10 pt-6">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold">Juridisk kravbrev</p>
-                  <p className="text-xs text-slate-400">Ferdig formulert, klart til å sende</p>
-                </div>
-                <p className="text-2xl font-bold">99 kr</p>
+              <div className="pt-2 text-xs text-slate-600">
+                Adresse og registreringsnummer hentes automatisk fra saken du fylte ut i wizard.
               </div>
             </div>
 
-            <button
-              onClick={handlePayment}
-              disabled={!canProceed || isLoading}
-              className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition disabled:opacity-40 disabled:hover:bg-teal-500"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Starter betaling...
-                </>
-              ) : (
-                <>
-                  <FileText className="h-5 w-5" />
-                  Betal og få kravbrev
-                </>
-              )}
-            </button>
+            {/* Hva krever du? */}
+            <div className="space-y-3">
+              <label className="block text-sm text-slate-400">Hva krever du?</label>
+              <div className="grid grid-cols-3 gap-3">
+                {([
+                  { type: "repair" as ClaimType, icon: Wrench, label: "Reparasjon" },
+                  { type: "discount" as ClaimType, icon: BadgePercent, label: "Prisavslag" },
+                  { type: "cancel" as ClaimType, icon: Undo2, label: "Heve kjøpet" },
+                ]).map(({ type, icon: Icon, label }) => (
+                  <button
+                    key={type}
+                    onClick={() => setClaimType(type)}
+                    className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+                      claimType === type
+                        ? "border-emerald-500/40 bg-emerald-500/[0.08]"
+                        : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
+                    }`}
+                  >
+                    <Icon
+                      className={`h-6 w-6 ${
+                        claimType === type ? "text-emerald-400" : "text-slate-400"
+                      }`}
+                    />
+                    <span className={`text-sm font-medium ${claimType === type ? "text-white" : ""}`}>{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <p className="text-xs text-slate-500 text-center mt-3">
-              Brevet utformes basert på opplysningene i saken din og norsk forbrukerlovgivning.
-            </p>
+            {/* Beløp hvis prisavslag */}
+            {claimType === "discount" && (
+              <div className="space-y-2">
+                <label className="block text-sm text-slate-400">
+                  Hvor mye krever du i prisavslag?
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={discountAmount}
+                    onChange={(e) => setDiscountAmount(e.target.value)}
+                    placeholder="F.eks. 15000"
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/20 transition"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+                    kr
+                  </span>
+                </div>
 
-            <p className="text-[11px] text-slate-500 text-center mt-2">
-              Neste steg etter betaling: kun telefon og e-post (resten hentes fra wizard).
-            </p>
+                {discountAmount.trim().length > 0 &&
+                  (!Number.isFinite(discountAmountNumber) || discountAmountNumber <= 0) && (
+                    <p className="text-xs text-rose-400">
+                      Skriv inn et beløp større enn 0.
+                    </p>
+                  )}
+              </div>
+            )}
+
+            {/* Pris og betaling */}
+            <div className="border-t border-white/[0.06] pt-6">
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 mb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold">Juridisk kravbrev</p>
+                    <p className="text-xs text-slate-500">Ferdig formulert, klart til å sende</p>
+                  </div>
+                  <p className="text-2xl font-extrabold">99 kr</p>
+                </div>
+              </div>
+
+              <button
+                onClick={handlePayment}
+                disabled={!canProceed || isLoading}
+                className="group w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-4 font-bold text-lg hover:bg-emerald-400 transition disabled:opacity-30 disabled:hover:bg-emerald-500"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Starter betaling...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-5 w-5" />
+                    Betal og få kravbrev
+                  </>
+                )}
+              </button>
+
+              <p className="text-xs text-slate-600 text-center mt-3">
+                Brevet utformes basert på opplysningene i saken din og norsk forbrukerlovgivning.
+              </p>
+
+              <p className="text-[11px] text-slate-600 text-center mt-2">
+                Neste steg etter betaling: kun telefon og e-post (resten hentes fra wizard).
+              </p>
+            </div>
           </div>
         </div>
       </div>

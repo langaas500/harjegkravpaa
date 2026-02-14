@@ -458,8 +458,12 @@ export default function HandverkerePage() {
   };
 
   return (
-    <main className="bg-nordic text-white">
-      <div className="mx-auto w-full max-w-2xl px-4 py-10">
+    <main className="bg-[#0a0f0d] text-white min-h-screen relative">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/[0.03] rounded-full blur-[100px]" />
+      </div>
+      <div className="relative mx-auto w-full max-w-2xl px-4 py-10">
 
         {step === "INTRO" && (
           <section className="space-y-6">
@@ -482,7 +486,7 @@ export default function HandverkerePage() {
 
             <button
               onClick={() => setStep("FAG")}
-              className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition"
+              className="group w-full flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-4 font-bold text-lg hover:bg-emerald-400 transition"
             >
               Start vurdering
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -540,7 +544,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("PROBLEM")}
                 disabled={!canProceedFag}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -594,7 +598,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("ALVORLIGHET")}
                 disabled={!canProceedProblem}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -744,7 +748,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("AVTALE")}
                 disabled={!canProceedAlvorlighet}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -844,7 +848,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("TIDSLINJE")}
                 disabled={!canProceedAvtale}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -969,7 +973,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("OMFANG_KOST")}
                 disabled={!canProceedTidslinje}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1153,7 +1157,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("KRAVMAL")}
                 disabled={!canProceedOmfangKost}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1289,7 +1293,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("DOKUMENTASJON")}
                 disabled={!canProceedKravmal}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1335,7 +1339,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("HISTORIE")}
                 disabled={!canProceedDok}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1374,14 +1378,14 @@ export default function HandverkerePage() {
             />
             <p className="text-xs text-slate-500">{dinHistorie.length} / 5000 tegn (minimum 50)</p>
 
-            <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4">
-              <p className="text-sm text-teal-400">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+              <p className="text-sm text-emerald-400">
                 <Upload className="inline h-4 w-4 mr-2" />
                 Har du bilder eller kontrakt?
                 <Link
                   href="#"
                   onClick={(e) => { e.preventDefault(); setStep("UPLOAD"); }}
-                  className="underline ml-1 hover:text-teal-300"
+                  className="underline ml-1 hover:text-emerald-300"
                 >
                   Hopp til opplasting
                 </Link>
@@ -1399,7 +1403,7 @@ export default function HandverkerePage() {
               <button
                 onClick={() => setStep("SVAR")}
                 disabled={!canProceedHistorie}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1448,7 +1452,7 @@ export default function HandverkerePage() {
               </button>
               <button
                 onClick={() => setStep("PERSONALIA")}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1600,7 +1604,7 @@ export default function HandverkerePage() {
               </button>
               <button
                 onClick={() => setStep("UPLOAD")}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1637,7 +1641,7 @@ export default function HandverkerePage() {
               <button
                 onClick={analyzeCase}
                 disabled={isAnalyzing}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-bold hover:bg-teal-400 transition disabled:opacity-60"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition disabled:opacity-60"
               >
                 {isAnalyzing ? (
                   <>
@@ -1744,8 +1748,8 @@ export default function HandverkerePage() {
             </div>
 
             {outcome.whatToWriteNow && (
-              <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-4">
-                <p className="text-sm text-teal-400 font-medium mb-1">Hva du bør skrive nå</p>
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+                <p className="text-sm text-emerald-400 font-medium mb-1">Hva du bør skrive nå</p>
                 <p className="text-slate-300 text-sm">{outcome.whatToWriteNow}</p>
               </div>
             )}
@@ -1767,7 +1771,7 @@ export default function HandverkerePage() {
               </button>
               <button
                 onClick={goToReport}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-bold hover:bg-teal-400 transition"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"
               >
                 <FileText className="h-5 w-5" />
                 Se full rapport

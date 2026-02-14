@@ -1,187 +1,152 @@
-"use client";
-
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Car, ChevronDown } from "lucide-react";
-import SeoFloatingCTA from "@/components/SeoFloatingCTA";
+import { ArrowRight, ChevronDown } from "lucide-react";
+import BilSeoHero from "@/components/seo/BilSeoHero";
 
 export default function BruktbilFeilPage() {
-  const router = useRouter();
-
   return (
-    <main className="bg-nordic text-white min-h-screen">
-      {/* Sub-header navigation */}
-      <nav className="border-b border-white/10">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex justify-end">
-          <div className="flex items-center gap-8 text-base">
-            <button
-              onClick={() => router.push("/bilkjop")}
-              className="text-white font-medium hover:text-slate-300 transition"
-            >
-              Bilkjøp
-            </button>
-            <button
-              onClick={() => router.push("/flyreiser")}
-              className="text-slate-400 hover:text-white transition"
-            >
-              Flyreiser
-            </button>
-            <button
-              onClick={() => router.push("/bilkjop")}
-              className="text-white hover:text-slate-300 transition"
-            >
-              Sjekk om du har krav →
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Content */}
-      <article className="max-w-3xl mx-auto px-4 py-12">
-        {/* H1 */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <Car className="h-6 w-6 text-white" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold">
-            Kjøpt bil med feil? Sjekk om du har krav
-          </h1>
-        </div>
-
-        {/* Intro */}
-        <p className="text-lg text-slate-300 mb-6">
+    <BilSeoHero
+      eyebrow="Forbrukerrettigheter"
+      h1Top="Kjøpt bil med feil?"
+      h1Accent="Sjekk om du har krav."
+      intro={
+        <p className="text-lg text-slate-300 leading-relaxed">
           Har du kjøpt bil og oppdaget feil etter kjøpet? Enten du har
-          <strong className="text-white"> kjøpt bruktbil privat</strong> eller fra
-          forhandler, kan du ha rettigheter dersom bilen har skjulte eller
+          <strong className="text-white"> kjøpt bruktbil privat</strong> eller
+          fra forhandler, kan du ha rettigheter dersom bilen har skjulte eller
           vesentlige feil.
         </p>
+      }
+      heroImageAlt="Kjøpt bil med feil – sjekk dine rettigheter"
+      primaryCtaTitle="Har du krav etter bilkjøpet?"
+      primaryCtaText="Svar på noen spørsmål og få en veiledende vurdering av om du kan kreve prisavslag, retting eller heving."
+      primaryCtaButton="Sjekk om du har krav"
+      secondaryCtaText="Sjekk saken din nå →"
+    >
+      {/* Hva avgjør om du har krav */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">
+          Hva avgjør om du har krav?
+        </h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            Mange tror at «som den er» betyr ingen rettigheter. Det stemmer
+            ikke. Ved skjulte feil eller feil opplysninger kan du ha krav
+            uavhengig av kjøpsform.
+          </p>
+          <ul className="text-slate-300 space-y-2 ml-4">
+            <li>• Skjult feil som dukket opp etter kjøpet</li>
+            <li>• Selger har gitt uriktige opplysninger om bilen</li>
+            <li>• Bilen er i vesentlig dårligere stand enn forventet</li>
+          </ul>
+        </div>
+      </section>
 
-        {/* CTA */}
-        <div className="mb-10">
-          <button
-            onClick={() => router.push("/bilkjop")}
-            className="inline-flex items-center gap-2 bg-[#1F4F45] text-[#ECFDF5] px-6 py-3 rounded-xl font-semibold hover:bg-[#246457] transition"
-          >
-            Sjekk om du har krav
-            <ArrowRight className="h-5 w-5" />
-          </button>
-          <p className="text-sm text-slate-400 mt-3">
-            Gratis vurdering • Tar vanligvis noen få minutter • Ingen forpliktelser
+      {/* Hvorfor mange får avslag */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">Hvorfor mange får avslag</h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <div className="space-y-3">
+            <div className="border-l-2 border-white/20 pl-4">
+              <p className="font-medium text-white">
+                «Feilen er normal slitasje»
+              </p>
+              <p className="text-sm text-slate-400 mt-1">
+                Vurderingen må ta hensyn til bilens alder, pris og hva som ble
+                opplyst.
+              </p>
+            </div>
+            <div className="border-l-2 border-white/20 pl-4">
+              <p className="font-medium text-white">
+                «Bilen ble solgt som den er»
+              </p>
+              <p className="text-sm text-slate-400 mt-1">
+                «Som den er» beskytter ikke selger mot egne feil eller
+                tilbakeholdt informasjon.
+              </p>
+            </div>
+            <div className="border-l-2 border-white/20 pl-4">
+              <p className="font-medium text-white">
+                «Du burde ha oppdaget feilen»
+              </p>
+              <p className="text-sm text-slate-400 mt-1">
+                Skjulte feil kan ikke forventes oppdaget ved vanlig prøvekjøring.
+              </p>
+            </div>
+          </div>
+          <p className="text-slate-300 mt-4">
+            <Link
+              href="/bilkjop"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              Få en vurdering av saken din før du godtar avslaget →
+            </Link>
           </p>
         </div>
+      </section>
 
-        {/* Long-tail situasjoner */}
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-white/10">
-            Kjøpt bil med feil – vanlige situasjoner
-          </h2>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-            <ul className="text-slate-300 space-y-3">
-              <li>• Kjøpt bil privat med feil som ikke ble opplyst</li>
-              <li>• Kjøpt bruktbil med skjult feil som dukket opp etter kjøpet</li>
-              <li>• Bil solgt «som den er», men med alvorlige mangler</li>
-              <li>• Selger nekter reklamasjon selv om feilen er dokumentert</li>
-              <li>• Store reparasjonskostnader kort tid etter kjøpet</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* Privat vs forhandler */}
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-white/10">
-            Rettigheter ved feil bruktbil – privat eller forhandler?
-          </h2>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
-            <p>
-              Har du kjøpt bil fra forhandler, gjelder forbrukerkjøpsloven. Har du
-              kjøpt bil privat, gjelder kjøpsloven – men du kan fortsatt ha krav
-              ved feil på bilen.
-            </p>
-            <p>
-              Mange tror at «som den er» betyr ingen rettigheter. Det stemmer ikke.
-              Ved skjulte feil eller feil opplysninger kan du kreve prisavslag,
-              heving eller erstatning – <Link href="/bilkjop" className="underline hover:text-white">sjekk om du har krav</Link>.
-            </p>
-          </div>
-        </section>
-
-        {/* FAQ – long-tail */}
-        <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-white/10">
-            Spørsmål mange stiller etter å ha kjøpt bil med feil
-          </h2>
-
-          <div className="space-y-4">
-            <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
-              <summary className="flex items-center justify-between p-4 cursor-pointer">
-                <span>Kan jeg heve bilkjøpet ved feil?</span>
-                <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180" />
+      {/* FAQ */}
+      <section className="mb-16">
+        <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>
+        <div className="space-y-3">
+          {[
+            {
+              q: "Kan jeg heve bilkjøpet ved feil?",
+              a: "Ja, dersom feilen er vesentlig og ikke kan rettes innen rimelig tid. Terskelen er høy, men det er mulig.",
+            },
+            {
+              q: "Hva kan jeg kreve ved feil på bil?",
+              a: "Du kan kreve prisavslag, retting, heving eller erstatning – avhengig av feilen og kjøpsformen.",
+            },
+            {
+              q: "Har jeg reklamasjonsrett ved privat bilkjøp?",
+              a: "Ja. Ved privatkjøp har du normalt 2 års reklamasjonsrett dersom bilen har en mangel etter kjøpsloven.",
+            },
+          ].map((faq, i) => (
+            <details
+              key={i}
+              className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition"
+            >
+              <summary className="flex items-center justify-between p-5 cursor-pointer">
+                <span className="font-medium pr-4">{faq.q}</span>
+                <ChevronDown className="h-5 w-5 text-slate-500 group-open:rotate-180 transition-transform shrink-0" />
               </summary>
-              <div className="px-4 pb-4 text-sm text-slate-300">
-                Ja, dersom feilen er vesentlig og ikke kan rettes innen rimelig tid,
-                kan du ha rett til å heve bilkjøpet.
+              <div className="px-5 pb-5">
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  {faq.a}
+                </p>
               </div>
             </details>
+          ))}
+        </div>
+      </section>
 
-            <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
-              <summary className="flex items-center justify-between p-4 cursor-pointer">
-                <span>Hva kan jeg kreve ved feil på bil?</span>
-                <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180" />
-              </summary>
-              <div className="px-4 pb-4 text-sm text-slate-300">
-                Du kan kreve prisavslag, retting, heving av kjøpet eller erstatning,
-                avhengig av feilen og kjøpet.
-              </div>
-            </details>
-
-            <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
-              <summary className="flex items-center justify-between p-4 cursor-pointer">
-                <span>Har jeg reklamasjonsrett ved privat bilkjøp?</span>
-                <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180" />
-              </summary>
-              <div className="px-4 pb-4 text-sm text-slate-300">
-                Ja. Ved privatkjøp har du normalt 2 års reklamasjonsrett dersom bilen
-                har en mangel etter kjøpsloven.
-              </div>
-            </details>
-
-            <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
-              <summary className="flex items-center justify-between p-4 cursor-pointer">
-                <span>Hva gjør jeg hvis selger nekter reklamasjon?</span>
-                <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180" />
-              </summary>
-              <div className="px-4 pb-4 text-sm text-slate-300">
-                Da bør du vurdere om avslaget er korrekt. Mange avslag gis uten
-                juridisk grunnlag.
-              </div>
-            </details>
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center">
-          <h2 className="text-xl font-bold mb-2">
+      {/* Final CTA */}
+      <section
+        data-final-cta="true"
+        className="relative rounded-3xl overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 to-emerald-500/5" />
+        <div className="absolute inset-0 rounded-3xl border border-emerald-500/15" />
+        <div className="relative p-8 md:p-10 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">
             Vil du sjekke om du har krav?
           </h2>
-          <p className="text-slate-400 mb-5">
-            Svar på noen korte spørsmål og få en veiledende vurdering basert på
-            din situasjon.
+          <p className="text-slate-400 mb-6 max-w-lg mx-auto">
+            Svar på noen spørsmål om bilkjøpet ditt – få en vurdering av saken
+            din på 2 minutter.
           </p>
-          <button
-            onClick={() => router.push("/bilkjop")}
-            className="inline-flex items-center gap-2 bg-[#1F4F45] text-[#ECFDF5] px-6 py-3 rounded-xl font-semibold hover:bg-[#246457] transition"
+          <Link
+            href="/bilkjop"
+            className="group inline-flex items-center gap-2 bg-emerald-500 text-black px-8 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-400 transition-all hover:shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98]"
           >
             Sjekk om du har krav
-            <ArrowRight className="h-5 w-5" />
-          </button>
-        </section>
-
-        <p className="text-xs text-slate-500 text-center mt-8">
-          Innholdet er generell informasjon og ikke juridisk rådgivning.
-        </p>
-      </article>
-
-      <SeoFloatingCTA href="/bilkjop" />
-    </main>
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <p className="text-xs text-slate-600 mt-4">
+            Tar ca. 2 minutter · Ingen registrering
+          </p>
+        </div>
+      </section>
+    </BilSeoHero>
   );
 }

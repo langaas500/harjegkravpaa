@@ -145,10 +145,10 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // 6-månedersregelen
-    let sixMonthInfo = "";
-    if (isConsumerPurchase && daysSincePurchase !== null && daysSincePurchase <= 180) {
-      sixMonthInfo = `Jeg gjør oppmerksom på at kjøpet fant sted for ${daysSincePurchase} dager siden, altså innenfor seksmånedersfristen. Etter ${applicableLaw} presumeres en mangel som viser seg innen seks måneder å ha eksistert ved risikoens overgang.`;
+    // Presumsjonsregelen (2 år etter lovendring 01.01.2024)
+    let presumptionInfo = "";
+    if (isConsumerPurchase && daysSincePurchase !== null && daysSincePurchase <= 730) {
+      presumptionInfo = `Jeg gjør oppmerksom på at kjøpet fant sted for ${daysSincePurchase} dager siden, altså innenfor toårsfristen. Etter forbrukerkjøpsloven § 18 annet ledd presumeres en mangel som viser seg innen to år etter levering å ha eksistert ved leveringen. Det er følgelig selger som må bevise at varen var mangelfri ved overlevering.`;
     }
 
     // Selgers respons
@@ -193,14 +193,21 @@ VIKTIG: Dette gjelder en ${vehicleName}. Bruk riktig terminologi (${vehicleNameD
 
 JURIDISK GRUNNLAG:
 ${isConsumerPurchase ? `
-- Forbrukerkjøpsloven § 15 (mangel foreligger når varen ikke er i samsvar med avtalen)
-- Forbrukerkjøpsloven § 27 (kjøpers krav ved mangel)
-- Forbrukerkjøpsloven § 28 (reklamasjonsfrister - 5 år/2 år for slitedeler)
-- Forbrukerkjøpsloven § 18 (presumpsjon - feil som viser seg innen 6 måneder presumeres å ha eksistert ved levering)
+- Forbrukerkjøpsloven § 15 (tingens egenskaper - krav til varen)
+- Forbrukerkjøpsloven § 16 (mangel - varen samsvarer ikke med § 15)
+- Forbrukerkjøpsloven § 18 (bevisbyrde - mangel innen 2 år presumeres å ha eksistert ved levering)
+- Forbrukerkjøpsloven § 26 (forbrukerens krav ved mangler)
+- Forbrukerkjøpsloven § 27 (reklamasjon - innen rimelig tid, absolutt 2/5 år)
+- Forbrukerkjøpsloven § 29 (retting og omlevering)
+- Forbrukerkjøpsloven § 31 (prisavslag)
+- Forbrukerkjøpsloven § 32 (heving ved vesentlig mangel)
+VIKTIG: «Som den er»-forbehold er OPPHEVET fra 01.01.2024 for forhandlere.
 ` : `
-- Kjøpsloven § 17 (mangel foreligger når tingen ikke er i samsvar med avtalen)
+- Kjøpsloven § 17 (mangel - tingen er ikke i samsvar med avtalen)
+- Kjøpsloven § 18 (ting solgt «som den er» - beskytter ikke mot skjulte feil)
+- Kjøpsloven § 19 (uriktige opplysninger fra selger)
 - Kjøpsloven § 30 (kjøpers krav ved mangel)
-- Kjøpsloven § 32 (reklamasjonsfrister - 2 år)
+- Kjøpsloven § 32 (reklamasjon - innen rimelig tid, absolutt 2 år)
 `}
 
 OPPGAVE:
@@ -251,12 +258,12 @@ ${isNotDriveable ? `Nevn at ${vehicleNameDef} ikke er kjørbar.` : ""}
 
 3️⃣ JURIDISK GRUNNLAG (korrekt lovvalg, relevante paragrafer, kort og presist)
 Forklar hvorfor forholdet utgjør en mangel etter ${applicableLaw}.
-${sixMonthInfo ? `Gjør oppmerksom på: ${sixMonthInfo}` : ""}
+${presumptionInfo ? `Gjør oppmerksom på: ${presumptionInfo}` : ""}
 
 4️⃣ SELGERS ANSVAR
 Forklar kort hvorfor:
 - forholdet utgjør en mangel
-- feilen presumeres å ha eksistert ved levering (hvis innen 6 mnd for forhandler)
+- feilen presumeres å ha eksistert ved levering (§ 18: gjelder innen 2 år for forhandlerkjøp)
 - kjøpers undersøkelsesplikt ikke gjelder for denne typen feil
 ${sellerResponseSection ? `Tidligere kontakt: ${sellerResponseSection}` : ""}
 
@@ -345,7 +352,7 @@ Skriv brevet nå.`;
 
     const message = await runWithTimeout(
       client.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5-20250929",
         max_tokens: 2000,
         messages: [
           {
@@ -367,7 +374,7 @@ Skriv brevet nå.`;
       requestId,
       status: "ok",
       latencyMs: Date.now() - start,
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
     });
 
     return NextResponse.json({ letter });
@@ -383,7 +390,7 @@ Skriv brevet nå.`;
       requestId,
       status: isTimeout ? "timeout" : "error",
       latencyMs,
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
     });
 
     if (isTimeout) {

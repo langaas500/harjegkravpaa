@@ -262,7 +262,7 @@ Skriv brevet nå.`;
 
     const message = await runWithTimeout(
       client.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5-20250929",
         max_tokens: 2000,
         messages: [{ role: "user", content: userPrompt }],
         system: systemPrompt,
@@ -283,7 +283,7 @@ Skriv brevet nå.`;
         requestId,
         status: "ok",
         latencyMs: Date.now() - start,
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5-20250929",
       });
 
       return NextResponse.json({
@@ -330,7 +330,7 @@ ${kundeSignatur}`
       requestId,
       status: "ok",
       latencyMs: Date.now() - start,
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
     });
 
     return NextResponse.json({ kravbrev: brev });
@@ -346,7 +346,7 @@ ${kundeSignatur}`
       requestId,
       status: isTimeout ? "timeout" : "error",
       latencyMs,
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
     });
 
     if (isTimeout) {

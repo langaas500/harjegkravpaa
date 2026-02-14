@@ -193,15 +193,20 @@ export default function DokumenterPage() {
 
   if (isLoading) {
     return (
-      <main className="bg-nordic text-white flex items-center justify-center">
+      <main className="bg-[#0a0f0d] text-white min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </main>
     );
   }
 
   return (
-    <main className="bg-nordic text-white">
-      <div className="mx-auto max-w-4xl px-4 py-10 space-y-6">
+    <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/[0.03] rounded-full blur-[100px]" />
+      </div>
+      <div className="relative z-10 mx-auto max-w-4xl px-4 py-10 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
@@ -389,7 +394,7 @@ export default function DokumenterPage() {
           <div className="pt-6 border-t border-white/10">
             <button
               onClick={() => router.push("/bilkjop/dokumenter/generer")}
-              className="w-full flex items-center justify-center gap-3 py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+              className="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-emerald-500 text-black font-bold text-lg hover:bg-emerald-400 transition"
             >
               <Download className="h-5 w-5" />
               Generer samlet PDF

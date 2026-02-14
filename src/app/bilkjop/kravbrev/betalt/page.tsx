@@ -59,18 +59,15 @@ export default function KravbrevBetaltPage() {
       const parsedData = JSON.parse(stored);
       setData(parsedData);
 
-      // Hent access_token fra saksdata
       if (parsedData.access_token) {
         setAccessToken(parsedData.access_token as string);
       }
 
-      // Pre-fill from existing data if available
       const storedContact = localStorage.getItem("kravbrev-contact");
       if (storedContact) {
         const parsedContact = JSON.parse(storedContact);
         setContactInfo(parsedContact);
       } else {
-        // Pre-fill from wizard data
         setContactInfo({
           buyerName: parsedData.buyerName || "",
           buyerAddress: "",
@@ -87,7 +84,6 @@ export default function KravbrevBetaltPage() {
       setError("Fant ikke saksdata. Vennligst start på nytt.");
     }
 
-    // Load Roboto fonts for PDF
     const loadFonts = async () => {
       try {
         const [regularRes, boldRes] = await Promise.all([
@@ -104,7 +100,7 @@ export default function KravbrevBetaltPage() {
           setFontData({ regular: toBase64(regularBuffer), bold: toBase64(boldBuffer) });
         }
       } catch {
-        // Fall back to helvetica if fonts fail to load
+        // Fall back to helvetica
       }
     };
     loadFonts();
@@ -236,7 +232,6 @@ export default function KravbrevBetaltPage() {
     const contentWidth = pageWidth - margin * 2;
     let currentPage = 1;
 
-    // Load fonts
     if (fontData) {
       doc.addFileToVFS("Roboto-Regular.ttf", fontData.regular);
       doc.addFileToVFS("Roboto-Bold.ttf", fontData.bold);
@@ -247,13 +242,11 @@ export default function KravbrevBetaltPage() {
     const useFont = fontData ? "Roboto" : "helvetica";
     const isDealer = data?.sellerType === "DEALER";
 
-    // Add header to first page
     const addHeader = (isFirstPage: boolean) => {
       doc.setFillColor(30, 41, 59);
       doc.rect(0, 0, pageWidth, isFirstPage ? 30 : 25, "F");
 
       if (isFirstPage) {
-        // Logo
         doc.setFillColor(16, 185, 129);
         doc.roundedRect(margin, 8, 14, 14, 2, 2, "F");
         doc.setTextColor(255, 255, 255);
@@ -261,7 +254,6 @@ export default function KravbrevBetaltPage() {
         doc.setFont(useFont, "bold");
         doc.text("H", margin + 5, 17);
 
-        // Title
         doc.setFontSize(18);
         doc.text("KRAVBREV", margin + 20, 17);
         doc.setFontSize(9);
@@ -293,11 +285,9 @@ export default function KravbrevBetaltPage() {
       return 35;
     };
 
-    // First page header
     addHeader(true);
     let y = 40;
 
-    // Parse and render letter content
     const paragraphs = letter.replace(/\r\n/g, "\n").split("\n\n");
 
     doc.setFontSize(10);
@@ -313,7 +303,6 @@ export default function KravbrevBetaltPage() {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        // Check if it's a title line (REKLAMASJON, etc.)
         const isTitle = line.startsWith("REKLAMASJON") || line.match(/^[A-ZÆØÅ\s\-–]+$/);
 
         if (isTitle && line.length > 3) {
@@ -340,25 +329,28 @@ export default function KravbrevBetaltPage() {
       }
     }
 
-    // Footer on last page
     addFooter();
-
     doc.save(fileName);
     setHasDownloaded(true);
   };
 
   if (error && !data) {
     return (
-      <main className="bg-nordic text-white flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
-          <p className="text-red-400">{error}</p>
-          <button
-            onClick={() => router.push("/bilkjop")}
-            className="text-slate-400 hover:text-white transition"
-          >
-            Start på nytt
-          </button>
+      <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.04) 0%, transparent 70%)" }} />
+        </div>
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center space-y-4">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+            <p className="text-red-400">{error}</p>
+            <button
+              onClick={() => router.push("/bilkjop")}
+              className="text-slate-500 hover:text-white transition"
+            >
+              Start på nytt
+            </button>
+          </div>
         </div>
       </main>
     );
@@ -367,350 +359,366 @@ export default function KravbrevBetaltPage() {
   const vehicle = data?.vehicle as Record<string, string> | undefined;
   const sellerName = vehicle?.seller || "Selger";
 
+  const inputClasses = "w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder:text-slate-600 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition";
+  const inputClassesBlue = "w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder:text-slate-600 focus:border-blue-500/40 focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition";
+
   return (
-    <main className="bg-nordic text-white">
-      <div className="mx-auto max-w-3xl px-4 py-10 space-y-6">
-        <button
-          onClick={() => router.push("/bilkjop")}
-          className="flex items-center gap-2 text-slate-500 hover:text-white transition"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Tilbake til oversikt
-        </button>
+    <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
+      {/* Ambient background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.04) 0%, transparent 70%)" }} />
+        <div className="absolute bottom-[-150px] right-[-150px] w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, rgba(16,185,129,0.025) 0%, transparent 70%)" }} />
+      </div>
 
-        <div className="flex items-center gap-4 p-4 rounded-xl border border-green-500/30 bg-green-500/10">
-          <CheckCircle className="h-8 w-8 text-green-500 shrink-0" />
-          <div>
-            <h1 className="text-xl font-bold text-green-400">Betaling mottatt!</h1>
-            <p className="text-sm text-slate-400">
-              {step === "contact"
-                ? "Fyll ut kontaktinfo for å lage et send-klart brev"
-                : "Utarbeider ditt kravbrev..."}
-            </p>
-          </div>
-        </div>
+      <div className="relative z-10">
+        <div className="mx-auto max-w-3xl px-4 py-10 space-y-6">
+          <button
+            onClick={() => router.push("/bilkjop")}
+            className="flex items-center gap-2 text-slate-500 hover:text-white transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Tilbake til oversikt
+          </button>
 
-        {step === "contact" && (
-          <div className="space-y-6">
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <User className="h-5 w-5 text-emerald-400" />
-                <h2 className="font-semibold">Din kontaktinformasjon</h2>
-              </div>
-
-              <div className="grid gap-4">
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">Fullt navn *</label>
-                  <input
-                    type="text"
-                    value={contactInfo.buyerName}
-                    onChange={(e) => handleContactChange("buyerName", e.target.value)}
-                    placeholder="Ola Nordmann"
-                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">Adresse *</label>
-                  <input
-                    type="text"
-                    value={contactInfo.buyerAddress}
-                    onChange={(e) => handleContactChange("buyerAddress", e.target.value)}
-                    placeholder="Gateveien 123"
-                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-slate-400 mb-1">Postnummer *</label>
-                    <input
-                      type="text"
-                      value={contactInfo.buyerPostcode}
-                      onChange={(e) => handleContactChange("buyerPostcode", e.target.value)}
-                      placeholder="0123"
-                      maxLength={4}
-                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-slate-400 mb-1">Poststed *</label>
-                    <input
-                      type="text"
-                      value={contactInfo.buyerCity}
-                      onChange={(e) => handleContactChange("buyerCity", e.target.value)}
-                      placeholder="Oslo"
-                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-slate-400 mb-1">Telefon</label>
-                    <input
-                      type="tel"
-                      value={contactInfo.buyerPhone}
-                      onChange={(e) => handleContactChange("buyerPhone", e.target.value)}
-                      placeholder="912 34 567"
-                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-slate-400 mb-1">E-post</label>
-                    <input
-                      type="email"
-                      value={contactInfo.buyerEmail}
-                      onChange={(e) => handleContactChange("buyerEmail", e.target.value)}
-                      placeholder="ola@example.no"
-                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-emerald-500 focus:outline-none transition"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Building className="h-5 w-5 text-blue-400" />
-                <h2 className="font-semibold">Selgers adresse</h2>
-                <span className="text-sm text-slate-500">({sellerName})</span>
-              </div>
-
-              <p className="text-sm text-slate-400 mb-4">
-                Hvis du har selgers adresse, fyll den inn under. Hvis ikke, kan du la feltene stå tomme og legge det
-                til manuelt senere.
+          {/* Success banner */}
+          <div className="flex items-center gap-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.08]">
+            <CheckCircle className="h-8 w-8 text-emerald-400 shrink-0" />
+            <div>
+              <h1 className="text-xl font-bold text-emerald-400">Betaling mottatt!</h1>
+              <p className="text-sm text-slate-400">
+                {step === "contact"
+                  ? "Fyll ut kontaktinfo for å lage et send-klart brev"
+                  : "Utarbeider ditt kravbrev..."}
               </p>
-
-              <div className="grid gap-4">
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">Adresse</label>
-                  <input
-                    type="text"
-                    value={contactInfo.sellerAddress}
-                    onChange={(e) => handleContactChange("sellerAddress", e.target.value)}
-                    placeholder="Bilveien 456"
-                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-slate-400 mb-1">Postnummer</label>
-                    <input
-                      type="text"
-                      value={contactInfo.sellerPostcode}
-                      onChange={(e) => handleContactChange("sellerPostcode", e.target.value)}
-                      placeholder="0456"
-                      maxLength={4}
-                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-slate-400 mb-1">Poststed</label>
-                    <input
-                      type="text"
-                      value={contactInfo.sellerCity}
-                      onChange={(e) => handleContactChange("sellerCity", e.target.value)}
-                      placeholder="Oslo"
-                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 focus:border-blue-500 focus:outline-none transition"
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
-
-            {error && (
-              <div className="flex items-center gap-3 p-4 rounded-xl border border-red-500/30 bg-red-500/10">
-                <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
-                <p className="text-sm text-red-400">{error}</p>
-              </div>
-            )}
-
-            <button
-              onClick={handleContactSubmit}
-              className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
-            >
-              Lag kravbrev
-            </button>
           </div>
-        )}
 
-        {step === "letter" && (
-          <>
-            <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-slate-400" />
-                  <span className="font-medium">Ditt kravbrev</span>
+          {/* ═══════════ CONTACT STEP ═══════════ */}
+          {step === "contact" && (
+            <div className="space-y-6">
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <User className="h-5 w-5 text-emerald-400" />
+                  <h2 className="font-semibold">Din kontaktinformasjon</h2>
                 </div>
 
-                {letter && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setStep("contact")}
-                      className="px-3 py-1.5 rounded-lg text-sm border border-white/10 hover:border-white/30 transition"
-                    >
-                      Endre info
-                    </button>
-                    <button
-                      onClick={handleCopy}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border border-white/10 hover:border-white/30 transition"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="h-4 w-4 text-green-500" />
-                          Kopiert!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-4 w-4" />
-                          Kopier
-                        </>
-                      )}
-                    </button>
+                <div className="grid gap-4">
+                  <div>
+                    <label className="block text-sm text-slate-400 mb-1.5">Fullt navn *</label>
+                    <input
+                      type="text"
+                      value={contactInfo.buyerName}
+                      onChange={(e) => handleContactChange("buyerName", e.target.value)}
+                      placeholder="Ola Nordmann"
+                      className={inputClasses}
+                    />
                   </div>
-                )}
-              </div>
 
-              <div ref={letterRef} className="p-6 min-h-[400px] max-h-[600px] overflow-y-auto">
-                {isGenerating ? (
-                  <div className="flex flex-col items-center justify-center h-64 gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-white" />
-                    <p className="text-slate-400">Konstruerer kravbrev...</p>
-                    <p className="text-xs text-slate-600">Vent litt</p>
+                  <div>
+                    <label className="block text-sm text-slate-400 mb-1.5">Adresse *</label>
+                    <input
+                      type="text"
+                      value={contactInfo.buyerAddress}
+                      onChange={(e) => handleContactChange("buyerAddress", e.target.value)}
+                      placeholder="Gateveien 123"
+                      className={inputClasses}
+                    />
                   </div>
-                ) : error ? (
-                  <div className="flex flex-col items-center justify-center h-64 gap-4">
-                    <AlertCircle className="h-8 w-8 text-red-500" />
-                    <p className="text-red-400">{error}</p>
-                    <button
-                      onClick={() => data && generateLetter({ ...data, contactInfo })}
-                      className="px-4 py-2 rounded-lg border border-white/10 hover:border-white/30 transition"
-                    >
-                      Prøv igjen
-                    </button>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1.5">Postnummer *</label>
+                      <input
+                        type="text"
+                        value={contactInfo.buyerPostcode}
+                        onChange={(e) => handleContactChange("buyerPostcode", e.target.value)}
+                        placeholder="0123"
+                        maxLength={4}
+                        className={inputClasses}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1.5">Poststed *</label>
+                      <input
+                        type="text"
+                        value={contactInfo.buyerCity}
+                        onChange={(e) => handleContactChange("buyerCity", e.target.value)}
+                        placeholder="Oslo"
+                        className={inputClasses}
+                      />
+                    </div>
                   </div>
-                ) : letter ? (
-                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-300">
-                    {letter}
-                  </pre>
-                ) : null}
-              </div>
-            </div>
 
-            {letter && (
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={handleDownloadDocx}
-                    className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/10 hover:border-white/30 hover:bg-white/5 transition"
-                  >
-                    <Download className="h-5 w-5" />
-                    <span>Last ned .docx</span>
-                  </button>
-
-                  <button
-                    onClick={handleDownloadTxt}
-                    className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/10 hover:border-white/30 hover:bg-white/5 transition"
-                  >
-                    <Download className="h-5 w-5" />
-                    <span>Last ned .txt</span>
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => router.push("/bilkjop/dokumenter")}
-                  className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition text-emerald-400"
-                >
-                  <FolderPlus className="h-5 w-5" />
-                  <span>Legg til vedlegg og lag samlet PDF</span>
-                </button>
-
-                <button
-                  onClick={handleDownloadPdf}
-                  className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-white/10 hover:border-white/30 hover:bg-white/5 transition"
-                >
-                  <Download className="h-5 w-5" />
-                  <span>Last ned PDF (uten vedlegg)</span>
-                </button>
-
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
-                  <div className="flex items-start gap-3">
-                    <Mail className="h-5 w-5 text-slate-400 mt-0.5 shrink-0" />
-                    <div className="space-y-1">
-                      <p className="font-medium text-sm">Slik sender du brevet</p>
-                      <ul className="text-xs text-slate-400 space-y-1">
-                        <li>- E-post: Send som vedlegg og be om lesebekreftelse</li>
-                        <li>- Rekommandert post: Gir dokumentasjon på at brevet er mottatt</li>
-                        <li>- Ta vare på kopi: Lagre alltid en kopi av alt du sender</li>
-                      </ul>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1.5">Telefon</label>
+                      <input
+                        type="tel"
+                        value={contactInfo.buyerPhone}
+                        onChange={(e) => handleContactChange("buyerPhone", e.target.value)}
+                        placeholder="912 34 567"
+                        className={inputClasses}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1.5">E-post</label>
+                      <input
+                        type="email"
+                        value={contactInfo.buyerEmail}
+                        onChange={(e) => handleContactChange("buyerEmail", e.target.value)}
+                        placeholder="ola@example.no"
+                        className={inputClasses}
+                      />
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
-                  <p className="text-sm text-amber-200">
-                    <strong>Hva skjer nå?</strong> Selger har 14 dager på seg til å svare. Hvis du ikke får svar eller
-                    tilbudet er uakseptabelt, kan du klage til{" "}
-                    <a
-                      href="https://www.forbrukerradet.no"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-white"
-                    >
-                      Forbrukerrådet
-                    </a>
-                    .
-                  </p>
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <Building className="h-5 w-5 text-blue-400" />
+                  <h2 className="font-semibold">Selgers adresse</h2>
+                  <span className="text-sm text-slate-500">({sellerName})</span>
                 </div>
 
-                <div className="text-center text-xs text-slate-600 pt-4">
-                  <p>
-                    Veiledende dokument utarbeidet av harjegkravpå.no.
-                    <br />
-                    Ikke juridisk rådgivning. Kontakt advokat for bindende råd.
-                  </p>
+                <p className="text-sm text-slate-400 mb-4">
+                  Hvis du har selgers adresse, fyll den inn under. Hvis ikke, kan du la feltene stå tomme og legge det
+                  til manuelt senere.
+                </p>
+
+                <div className="grid gap-4">
+                  <div>
+                    <label className="block text-sm text-slate-400 mb-1.5">Adresse</label>
+                    <input
+                      type="text"
+                      value={contactInfo.sellerAddress}
+                      onChange={(e) => handleContactChange("sellerAddress", e.target.value)}
+                      placeholder="Bilveien 456"
+                      className={inputClassesBlue}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1.5">Postnummer</label>
+                      <input
+                        type="text"
+                        value={contactInfo.sellerPostcode}
+                        onChange={(e) => handleContactChange("sellerPostcode", e.target.value)}
+                        placeholder="0456"
+                        maxLength={4}
+                        className={inputClassesBlue}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1.5">Poststed</label>
+                      <input
+                        type="text"
+                        value={contactInfo.sellerCity}
+                        onChange={(e) => handleContactChange("sellerCity", e.target.value)}
+                        placeholder="Oslo"
+                        className={inputClassesBlue}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-3 p-4 rounded-xl border border-red-500/20 bg-red-500/[0.08]">
+                  <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+                  <p className="text-sm text-red-400">{error}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handleContactSubmit}
+                className="w-full py-4 rounded-xl bg-emerald-500 text-black font-bold text-lg hover:bg-emerald-400 transition"
+              >
+                Lag kravbrev
+              </button>
+            </div>
+          )}
+
+          {/* ═══════════ LETTER STEP ═══════════ */}
+          {step === "letter" && (
+            <>
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
+                <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-slate-400" />
+                    <span className="font-medium">Ditt kravbrev</span>
+                  </div>
+
+                  {letter && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setStep("contact")}
+                        className="px-3 py-1.5 rounded-lg text-sm border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                      >
+                        Endre info
+                      </button>
+                      <button
+                        onClick={handleCopy}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="h-4 w-4 text-emerald-400" />
+                            Kopiert!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            Kopier
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {hasDownloaded && (
-                  <>
+                <div ref={letterRef} className="p-6 min-h-[400px] max-h-[600px] overflow-y-auto">
+                  {isGenerating ? (
+                    <div className="flex flex-col items-center justify-center h-64 gap-4">
+                      <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+                      <p className="text-slate-400">Konstruerer kravbrev...</p>
+                      <p className="text-xs text-slate-600">Vent litt</p>
+                    </div>
+                  ) : error ? (
+                    <div className="flex flex-col items-center justify-center h-64 gap-4">
+                      <AlertCircle className="h-8 w-8 text-red-500" />
+                      <p className="text-red-400">{error}</p>
+                      <button
+                        onClick={() => data && generateLetter({ ...data, contactInfo })}
+                        className="px-4 py-2 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                      >
+                        Prøv igjen
+                      </button>
+                    </div>
+                  ) : letter ? (
+                    <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-300">
+                      {letter}
+                    </pre>
+                  ) : null}
+                </div>
+              </div>
+
+              {letter && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <button
-                      onClick={() => router.push("/hva-na")}
-                      className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+                      onClick={handleDownloadDocx}
+                      className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
                     >
-                      Hva gjør jeg nå?
+                      <Download className="h-5 w-5" />
+                      <span>Last ned .docx</span>
                     </button>
 
-                    {accessToken && (
-                      <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
-                        <p className="text-sm text-slate-400">
-                          <strong className="text-white">Lagre denne lenken</strong> – den gir deg tilgang til saken din senere uten innlogging:
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            readOnly
-                            value={`${typeof window !== "undefined" ? window.location.origin : ""}/sak/${accessToken}`}
-                            className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-300 select-all"
-                          />
-                          <button
-                            onClick={async () => {
-                              await navigator.clipboard.writeText(`${window.location.origin}/sak/${accessToken}`);
-                            }}
-                            className="px-3 py-2 rounded-lg border border-white/10 hover:border-white/30 transition text-sm"
-                          >
-                            Kopier
-                          </button>
-                        </div>
+                    <button
+                      onClick={handleDownloadTxt}
+                      className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                    >
+                      <Download className="h-5 w-5" />
+                      <span>Last ned .txt</span>
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => router.push("/bilkjop/dokumenter")}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.08] hover:bg-emerald-500/[0.12] transition text-emerald-400"
+                  >
+                    <FolderPlus className="h-5 w-5" />
+                    <span>Legg til vedlegg og lag samlet PDF</span>
+                  </button>
+
+                  <button
+                    onClick={handleDownloadPdf}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                  >
+                    <Download className="h-5 w-5" />
+                    <span>Last ned PDF (uten vedlegg)</span>
+                  </button>
+
+                  {/* Send-tips */}
+                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <Mail className="h-5 w-5 text-slate-500 mt-0.5 shrink-0" />
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm">Slik sender du brevet</p>
+                        <ul className="text-xs text-slate-500 space-y-1">
+                          <li>– E-post: Send som vedlegg og be om lesebekreftelse</li>
+                          <li>– Rekommandert post: Gir dokumentasjon på at brevet er mottatt</li>
+                          <li>– Ta vare på kopi: Lagre alltid en kopi av alt du sender</li>
+                        </ul>
                       </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-          </>
-        )}
+                    </div>
+                  </div>
+
+                  {/* What happens next */}
+                  <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4">
+                    <p className="text-sm text-amber-200">
+                      <strong>Hva skjer nå?</strong> Selger har 14 dager på seg til å svare. Hvis du ikke får svar eller
+                      tilbudet er uakseptabelt, kan du klage til{" "}
+                      <a
+                        href="https://www.forbrukerradet.no"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-white transition"
+                      >
+                        Forbrukerrådet
+                      </a>
+                      .
+                    </p>
+                  </div>
+
+                  <div className="text-center text-xs text-slate-600 pt-4">
+                    <p>
+                      Veiledende dokument utarbeidet av harjegkravpå.no.
+                      <br />
+                      Ikke juridisk rådgivning. Kontakt advokat for bindende råd.
+                    </p>
+                  </div>
+
+                  {hasDownloaded && (
+                    <>
+                      <button
+                        onClick={() => router.push("/hva-na")}
+                        className="w-full py-4 rounded-xl bg-emerald-500 text-black font-bold text-lg hover:bg-emerald-400 transition"
+                      >
+                        Hva gjør jeg nå?
+                      </button>
+
+                      {accessToken && (
+                        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
+                          <p className="text-sm text-slate-400">
+                            <strong className="text-white">Lagre denne lenken</strong> – den gir deg tilgang til saken din senere uten innlogging:
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              readOnly
+                              value={`${typeof window !== "undefined" ? window.location.origin : ""}/sak/${accessToken}`}
+                              className="flex-1 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.08] text-sm text-slate-300 select-all focus:outline-none"
+                            />
+                            <button
+                              onClick={async () => {
+                                await navigator.clipboard.writeText(`${window.location.origin}/sak/${accessToken}`);
+                              }}
+                              className="px-3 py-2 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition text-sm"
+                            >
+                              Kopier
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </main>
   );

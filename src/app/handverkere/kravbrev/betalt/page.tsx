@@ -606,7 +606,7 @@ function KravbrevBetaltContent() {
 
           <button
             onClick={handleContactSubmit}
-            className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+            className="w-full py-4 rounded-full bg-emerald-500 text-black font-bold text-lg hover:bg-emerald-400 transition"
           >
             Lag kravbrev
           </button>
@@ -721,7 +721,7 @@ function KravbrevBetaltContent() {
               {hasDownloaded && (
                 <button
                   onClick={() => router.push("/hva-na")}
-                  className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+                  className="w-full py-4 rounded-full bg-emerald-500 text-black font-bold text-lg hover:bg-emerald-400 transition"
                 >
                   Hva gjør jeg nå?
                 </button>
@@ -785,7 +785,7 @@ function KravbrevBetaltContent() {
 
 export default function HandverkKravbrevBetaltPage() {
   return (
-    <main className="bg-nordic text-white">
+    <main className="bg-[#0a0f0d] text-white">
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center">

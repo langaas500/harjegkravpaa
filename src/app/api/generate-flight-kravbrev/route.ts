@@ -444,7 +444,7 @@ SPRÅKKRAV:
 
     const message = await runWithTimeout(
       client.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5-20250929",
         max_tokens: 2000,
         messages: [{ role: "user", content: userPrompt }],
         system: systemPrompt,
@@ -641,7 +641,7 @@ ${passengerSignatur}`;
       requestId,
       status: "ok",
       latencyMs: Date.now() - start,
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
     });
 
     return NextResponse.json({ kravbrev: brev });
@@ -657,7 +657,7 @@ ${passengerSignatur}`;
       requestId,
       status: isTimeout ? "timeout" : "error",
       latencyMs,
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
     });
 
     if (isTimeout) {

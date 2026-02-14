@@ -234,8 +234,8 @@ EKSEMPLER PÅ FORBUDTE FORMULERINGER:
 Svar KUN med JSON, ingen annen tekst.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
+      model: "claude-sonnet-4-5-20250929",
+      max_tokens: 2000,
       messages: [{ role: "user", content: prompt }],
     });
 

@@ -7,23 +7,28 @@ import { ArrowLeft, ChevronDown, Send } from "lucide-react";
 const FAQ_ITEMS = [
   {
     question: "Hvordan fungerer rapporten?",
-    answer: "Du svarer på noen spørsmål om saken din. Deretter lager vi en veiledende vurdering basert på det du har oppgitt, med anbefalt neste steg.",
+    answer:
+      "Du svarer på noen spørsmål om saken din. Deretter lager vi en veiledende vurdering basert på det du har oppgitt, med anbefalt neste steg.",
   },
   {
     question: "Hva får jeg for 39 kr?",
-    answer: "Du får en full rapport som oppsummerer saken din, med vurdering, relevante lover og konkrete anbefalinger for hva du bør gjøre videre.",
+    answer:
+      "Du får en full rapport som oppsummerer saken din, med vurdering, relevante lover og konkrete anbefalinger for hva du bør gjøre videre.",
   },
   {
     question: "Hva får jeg for 99 kr?",
-    answer: "Du får et ferdig kravbrev tilpasset saken din, klart til å sendes til selger, håndverker eller flyselskap, med korrekt og tydelig formulering.",
+    answer:
+      "Du får et ferdig kravbrev tilpasset saken din, klart til å sendes til selger, håndverker eller flyselskap, med korrekt og tydelig formulering.",
   },
   {
     question: "Hvordan sender jeg kravbrevet?",
-    answer: "Send det på e-post eller brev slik at du har dokumentasjon. Be om skriftlig svar innen en rimelig frist (vanligvis 14 dager), og ta vare på all videre kommunikasjon.",
+    answer:
+      "Send det på e-post eller brev slik at du har dokumentasjon. Be om skriftlig svar innen en rimelig frist (vanligvis 14 dager), og ta vare på all videre kommunikasjon.",
   },
   {
     question: "Kan jeg bruke dette uten kvittering?",
-    answer: "Ja. Kvittering er nyttig dokumentasjon, men du kan ofte bruke annen dokumentasjon som kontoutskrift, ordrebekreftelse eller kjøpshistorikk hvis du har brukt telefonnummer eller e-post i butikk.",
+    answer:
+      "Ja. Kvittering er nyttig dokumentasjon, men du kan ofte bruke annen dokumentasjon som kontoutskrift, ordrebekreftelse eller kjøpshistorikk hvis du har brukt telefonnummer eller e-post i butikk.",
   },
 ];
 
@@ -55,7 +60,11 @@ export default function KontaktPage() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: message.trim() }),
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          message: message.trim(),
+        }),
       });
 
       const data = await res.json();
@@ -74,33 +83,47 @@ export default function KontaktPage() {
   };
 
   return (
-    <main className="bg-nordic text-white px-4 min-h-screen">
-      <div className="mx-auto max-w-xl py-10">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">
+    <main className="bg-[#0a0f0d] text-white min-h-screen overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/[0.03] rounded-full blur-[100px]" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-xl px-4 py-10">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-white transition"
+        >
           <ArrowLeft className="h-4 w-4" />
           Tilbake
         </Link>
 
         {/* FAQ Section */}
-        <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+        <div className="mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
           <h1 className="text-2xl font-bold">Se hva du får</h1>
 
           <div className="mt-4 space-y-2">
             {FAQ_ITEMS.map((item, index) => (
-              <div key={index} className="border border-white/10 rounded-xl overflow-hidden">
+              <div
+                key={index}
+                className="border border-white/[0.06] rounded-xl overflow-hidden"
+              >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.03] transition"
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.04] transition"
                 >
-                  <span className="font-medium text-white">{item.question}</span>
+                  <span className="font-medium text-white">
+                    {item.question}
+                  </span>
                   <ChevronDown
-                    className={`h-5 w-5 text-slate-400 transition-transform ${
+                    className={`h-5 w-5 text-slate-500 transition-transform shrink-0 ${
                       openFaq === index ? "rotate-180" : ""
                     }`}
                   />
                 </button>
                 {openFaq === index && (
-                  <div className="px-4 pb-4 text-sm text-slate-300 leading-relaxed">
+                  <div className="px-4 pb-4 text-sm text-slate-400 leading-relaxed">
                     {item.answer}
                   </div>
                 )}
@@ -110,7 +133,7 @@ export default function KontaktPage() {
         </div>
 
         {/* Contact Form Section */}
-        <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+        <div className="mt-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
           <h2 className="text-2xl font-bold">Kontakt oss</h2>
 
           {!sent ? (
@@ -124,31 +147,35 @@ export default function KontaktPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ditt navn"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/30 focus:outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-1">E-post *</label>
+                <label className="block text-sm text-slate-400 mb-1">
+                  E-post *
+                </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="din@epost.no"
                   required
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/30 focus:outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Melding *</label>
+                <label className="block text-sm text-slate-400 mb-1">
+                  Melding *
+                </label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Skriv din melding her..."
                   required
                   rows={4}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/30 focus:outline-none transition"
                 />
               </div>
 
@@ -157,7 +184,7 @@ export default function KontaktPage() {
               <button
                 type="submit"
                 disabled={sending}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#1F4F45] px-6 py-3 font-semibold text-[#ECFDF5] hover:bg-[#246457] transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 font-bold text-black hover:bg-emerald-400 transition disabled:opacity-50"
               >
                 {sending ? "Sender..." : "Send melding"}
                 <Send className="h-4 w-4" />
@@ -173,6 +200,39 @@ export default function KontaktPage() {
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/[0.06] py-6 px-4">
+        <div className="max-w-3xl mx-auto text-center text-xs text-slate-600">
+          <Link
+            href="/bruksvilkar"
+            className="hover:text-slate-400 transition-colors"
+          >
+            Bruksvilkår
+          </Link>{" "}
+          ·{" "}
+          <Link
+            href="/personvern"
+            className="hover:text-slate-400 transition-colors"
+          >
+            Personvern
+          </Link>{" "}
+          ·{" "}
+          <Link
+            href="/om-oss"
+            className="hover:text-slate-400 transition-colors"
+          >
+            Om oss
+          </Link>{" "}
+          ·{" "}
+          <a
+            href="mailto:kontakt@harjegkravpaa.no"
+            className="hover:text-slate-400 transition-colors"
+          >
+            kontakt@harjegkravpaa.no
+          </a>
+        </div>
+      </footer>
     </main>
   );
 }

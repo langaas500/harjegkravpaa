@@ -44,17 +44,62 @@ MÅLGRUPPE:
 Leseren kan være ung/eldre, lite/moderat juridisk kyndig, usikker eller frustrert.
 Skriv slik at leseren tenker: "Dette er lett å forstå. Jeg vet hvor jeg står og hva jeg bør gjøre."
 
-NIVÅ-VURDERING:
+NIVÅ-VURDERING (bruk vektingskriteriene aktivt):
 - "GREEN" = Sterkt krav - flere momenter taler for at kjøper kan ha et krav
 - "YELLOW" = Mulig krav - usikkert, avhenger av ytterligere dokumentasjon
 - "RED" = Svakt krav - få momenter taler for kjøpers sak
+
+VEKTINGSKRITERIER:
+Sterke GREEN-indikatorer (2+ av disse → GREEN):
+- Forhandlerkjøp + feil innen 2 år (presumsjonsregelen § 18)
+- Verkstedsrapport som bekrefter teknisk svikt (ikke slitasje)
+- Sikkerhetskritisk feil eller bil ikke kjørbar
+- Selger ga uriktige opplysninger eller brøt løfter
+- Skjult feil som ikke kunne oppdages ved vanlig undersøkelse
+- Rask reklamasjon og god dokumentasjon
+
+Sterke RED-indikatorer (2+ av disse → RED):
+- Privatkjøp + lang tid siden kjøp + ingen dokumentasjon
+- Normal slitasje for bilens alder og kilometerstand
+- Synlig feil som kjøper burde ha oppdaget (åpenbarhetsregelen)
+- Ikke reklamert innen rimelig tid
+- Lav reparasjonskostnad i forhold til kjøpesum
+- Kjøper har bidratt til feilen
+
+YELLOW = motstridende indikatorer eller manglende dokumentasjon
+
+VIKTIG OVERSTYRINGSREGEL:
+- Uriktige opplysninger fra selger overstyrer «som den er»-klausulen (kjøpsloven § 18/§ 19). Hvis selger beviselig ga feil informasjon (f.eks. løy om EU-kontroll, kilometerstand, eller tilstand), skal dette veie tungt — uavhengig av om det er privatkjøp.
+- Når det er motstridende GREEN- og RED-indikatorer, velg YELLOW — ikke RED.
 
 JURIDISK KONTEKST:
 - Gjeldende lov: ${applicableLaw}
 - Reklamasjonsfrist: ${warrantyPeriod}
 - Dager siden kjøp: ${daysSincePurchase || "Ukjent"}
-${isDealer && daysSincePurchase && daysSincePurchase <= 180 ? "- Kjøpet er innen 6 måneder: Etter loven presumeres feil å ha eksistert ved levering" : ""}
-${!isDealer ? "- Ved privatkjøp må kjøper normalt dokumentere at feilen eksisterte ved kjøpet" : ""}
+${isDealer && daysSincePurchase && daysSincePurchase <= 730 ? "- Kjøpet er innen 2 år: Etter forbrukerkjøpsloven § 18 presumeres mangel å ha eksistert ved levering (selger har bevisbyrden)" : ""}
+${isDealer && daysSincePurchase && daysSincePurchase > 730 ? "- Kjøpet er over 2 år: Presumsjonsregelen gjelder ikke lenger, kjøper må dokumentere at feilen eksisterte ved levering" : ""}
+${!isDealer ? "- Ved privatkjøp (kjøpsloven) må kjøper dokumentere at feilen eksisterte ved kjøpet" : ""}
+${isDealer ? `
+KORREKTE PARAGRAFHENVISNINGER (forbrukerkjøpsloven etter 01.01.2024):
+- § 15: Tingens egenskaper (krav til varen)
+- § 16: Mangel (varen har mangel hvis den ikke samsvarer med § 15)
+- § 18: Tidspunkt for mangelsvurdering + bevisbyrde (2 års presumsjon)
+- § 26: Forbrukerens krav ved mangler (oversikt)
+- § 27: Reklamasjon (innen rimelig tid, absolutt frist 2/5 år)
+- § 29: Retting og omlevering (avhjelp)
+- § 31: Prisavslag
+- § 32: Heving (ved vesentlig mangel)
+- § 33: Erstatning
+VIKTIG: «Som den er»-forbehold er OPPHEVET fra 01.01.2024 for forhandlere.` : `
+KORREKTE PARAGRAFHENVISNINGER (kjøpsloven):
+- § 17: Mangel (tingen er ikke i samsvar med avtalen)
+- § 18: Ting solgt «som den er» (beskytter ikke mot skjulte feil eller uriktige opplysninger)
+- § 19: Uriktige opplysninger fra selger
+- § 30: Kjøpers krav ved mangel
+- § 32: Reklamasjon (innen rimelig tid, absolutt frist 2 år)
+- § 34: Retting
+- § 37: Prisavslag
+- § 39: Heving`}
 
 SAKSDATA:
 - Kjøper: ${data.buyerName || "Ikke oppgitt"}
@@ -86,7 +131,7 @@ SVAR I DETTE JSON-FORMATET:
   "summary": "2-3 setninger som forklarer vurderingen. Bruk 'kan utgjøre', 'momenter som taler for', 'grunnlag for'. ALDRI absolutte påstander.",
   "confidence": "Høy" | "Middels" | "Lav",
   "keyPoints": ["Punkt 1 - nøktern formulering", "Punkt 2", "Punkt 3", "Punkt 4"],
-  "legalRefs": [{"heading": "${applicableLaw}", "refs": ["§X: Kort forklaring"]}],
+  "legalRefs": [{"heading": "${applicableLaw}", "refs": ["Bruk KUN paragrafene fra KORREKTE PARAGRAFHENVISNINGER ovenfor"]}],
   "nextSteps": ["Konkret steg 1", "Konkret steg 2", "Konkret steg 3", "Konkret steg 4", "Konkret steg 5"],
   "proTip": "Et konkret tips som kan styrke dokumentasjonen",
   "disclaimer": "Dette er veiledning basert på oppgitt informasjon, ikke juridisk rådgivning. Kontakt advokat for bindende råd."
@@ -106,8 +151,8 @@ EKSEMPLER PÅ FORBUDTE FORMULERINGER:
 Svar KUN med JSON, ingen annen tekst.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
+      model: "claude-sonnet-4-5-20250929",
+      max_tokens: 2000,
       messages: [{ role: "user", content: prompt }],
     });
 

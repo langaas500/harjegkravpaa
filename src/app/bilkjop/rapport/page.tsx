@@ -78,15 +78,20 @@ export default function RapportPage() {
 
   if (!data) {
     return (
-      <main className="bg-nordic text-white flex items-center justify-center">
+      <main className="bg-[#0a0f0d] text-white min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-white" />
       </main>
     );
   }
 
   return (
-    <main className="bg-nordic text-white">
-      <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
+    <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/[0.03] rounded-full blur-[100px]" />
+      </div>
+      <div className="relative z-10 mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-slate-400 hover:text-white transition"
@@ -153,7 +158,7 @@ export default function RapportPage() {
             <button
               onClick={handlePayment}
               disabled={isLoading}
-              className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition disabled:opacity-60"
+              className="group w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-4 font-bold text-lg hover:bg-emerald-400 transition disabled:opacity-60"
             >
               {isLoading ? (
                 <>

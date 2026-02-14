@@ -81,16 +81,16 @@ function BetaltContent() {
 
     if (isDealer) {
       analyses.push(`Ved kjøp av motorvogn fra forhandler reguleres forholdet av forbrukerkjøpsloven av 21. juni 2002 nr. 34. Loven er ufravikelig, og selger kan ikke avtale vilkår som er dårligere for forbrukeren enn det som følger av loven, jf. fkjl. § 3.`);
-      analyses.push(`Fra 1. januar 2024 er det ikke lenger adgang til å selge bruktbiler "som den er" til forbrukere. Tidligere inntatt forbehold etter § 17 er ikke lenger gyldige. Dette styrker kjøperens posisjon betydelig ved reklamasjon.`);
+      analyses.push(`Fra 1. januar 2024 er det ikke lenger adgang til å selge varer "som den er" til forbrukere. Tidligere inntatte forbehold er ikke lenger gyldige. Dette styrker kjøperens posisjon betydelig ved reklamasjon.`);
     } else {
       analyses.push(`Ved kjøp av motorvogn fra privatperson reguleres forholdet av kjøpsloven av 13. mai 1988 nr. 27. Loven gjelder når begge parter er privatpersoner. Selger kan ta forbehold om at tingen selges "som den er", men dette beskytter ikke mot skjulte feil.`);
       if (hadAsIsClause) {
-        analyses.push(`Selv om kjøretøyet er solgt "som den er" (${lawShort} § 19), foreligger det likevel mangel dersom selger har gitt uriktige opplysninger, har unnlatt å opplyse om vesentlige forhold, eller tingen er i vesentlig dårligere stand enn kjøper hadde grunn til å forvente.`);
+        analyses.push(`Selv om kjøretøyet er solgt "som den er" (${lawShort} § 18), foreligger det likevel mangel dersom selger har gitt uriktige opplysninger, har unnlatt å opplyse om vesentlige forhold, eller tingen er i vesentlig dårligere stand enn kjøper hadde grunn til å forvente.`);
       }
     }
 
     if (issues.some(i => i.toLowerCase().includes("motor") || i.toLowerCase().includes("gir") || i.toLowerCase().includes("mekanikk"))) {
-      analyses.push(`Mekaniske feil som oppstår kort tid etter kjøpet vil ofte utgjøre en mangel etter ${lawShort} § 17. ${isDealer ? "Etter fkjl. § 18 annet ledd presumeres feil som viser seg innen ett år etter levering å ha eksistert ved risikoens overgang, med mindre selger kan bevise det motsatte." : "Ved privatkjøp må kjøper sannsynliggjøre at feilen eksisterte ved kjøpet."}`);
+      analyses.push(`Mekaniske feil som oppstår kort tid etter kjøpet vil ofte utgjøre en mangel etter ${lawShort} § 17. ${isDealer ? "Etter fkjl. § 18 annet ledd presumeres feil som viser seg innen to år etter levering å ha eksistert ved leveringen, med mindre selger kan bevise det motsatte." : "Ved privatkjøp må kjøper sannsynliggjøre at feilen eksisterte ved kjøpet."}`);
     }
 
     if (issues.some(i => i.toLowerCase().includes("rust") || i.toLowerCase().includes("karosseri"))) {
@@ -101,7 +101,7 @@ function BetaltContent() {
       analyses.push(`Elektriske feil og feil på sikkerhetssystemer vil normalt utgjøre mangler, særlig dersom de påvirker kjøretøyets sikkerhet eller brukbarhet. Slike feil kan gi grunnlag for både retting og erstatning for følgeskader.`);
     }
 
-    analyses.push(`Etter ${lawShort} ${isDealer ? "§ 26" : "§ 32"} kan kjøperen kreve retting, omlevering, prisavslag eller heving ved mangel. ${isDealer ? "Selger dekker kostnadene ved retting." : "Retting skal skje uten vesentlig ulempe for kjøper."} Ved vesentlig mangel kan kjøper heve kjøpet.`);
+    analyses.push(`Etter ${lawShort} ${isDealer ? "§ 26" : "§ 30"} kan kjøperen kreve retting, omlevering, prisavslag eller heving ved mangel. ${isDealer ? "Selger dekker kostnadene ved retting." : "Retting skal skje uten vesentlig ulempe for kjøper."} Ved vesentlig mangel kan kjøper heve kjøpet.`);
 
     analyses.push(`Erstatning kan kreves for tap som følge av mangelen, jf. ${lawShort} ${isDealer ? "§ 33" : "§ 40"}. Dette omfatter både direkte tap (utgifter til reparasjon, leiebil mv.) og indirekte tap (tapt arbeidsfortjeneste mv.) dersom selger er å bebreide.`);
 
@@ -113,15 +113,15 @@ function BetaltContent() {
     const lawShort = isDealer ? "fkjl." : "kjl.";
     return [
       {
-        title: `Tilbakeholdsrett (${lawShort} ${isDealer ? "§ 20" : "§ 42"})`,
+        title: `Tilbakeholdsrett (${lawShort} ${isDealer ? "§ 28" : "§ 42"})`,
         desc: "Kjøperen kan holde tilbake så mye av kjøpesummen som er nødvendig for å sikre at kravet blir dekket. Dette gjelder også etter levering dersom det oppdages mangler."
       },
       {
         title: `Rett til retting (${lawShort} ${isDealer ? "§ 29" : "§ 34"})`,
-        desc: `Kjøperen kan kreve at selger retter mangelen uten kostnad for kjøper. ${isDealer ? "Forhandler har rett til å foreta to rettingsforsøk for samme mangel." : "Retting skal skje innen rimelig tid og uten vesentlig ulempe."}`
+        desc: `Kjøperen kan kreve at selger retter mangelen uten kostnad for kjøper. ${isDealer ? "Etter lovendringen i 2024 har forhandler kun rett til ett rettingsforsøk, med mindre det er rimelig å gi et nytt forsøk." : "Retting skal skje innen rimelig tid og uten vesentlig ulempe."}`
       },
       {
-        title: `Prisavslag (${lawShort} ${isDealer ? "§ 31" : "§ 38"})`,
+        title: `Prisavslag (${lawShort} ${isDealer ? "§ 31" : "§ 37"})`,
         desc: "Dersom mangelen ikke rettes, kan kjøperen kreve prisavslag tilsvarende mangelens betydning. Prisavslaget skal normalt tilsvare reparasjonskostnadene."
       },
       {
@@ -146,7 +146,7 @@ function BetaltContent() {
 
     if (outcomeLevel === "GREEN") {
       if (isDealer) {
-        points.push("Gi selger anledning til å rette mangelen. Forhandler har rett til inntil to rettingsforsøk for samme mangel. Dersom retting ikke lykkes, kan du kreve prisavslag eller heving.");
+        points.push("Gi selger anledning til å rette mangelen. Etter 2024-loven har forhandler som hovedregel kun ett rettingsforsøk. Dersom retting ikke lykkes, kan du kreve prisavslag eller heving.");
       } else {
         points.push("Gi selger rimelig anledning til å rette mangelen før du eventuelt reparerer hos verksted. Ta vare på alle kvitteringer for utlegg du har hatt som følge av mangelen.");
       }
@@ -475,7 +475,7 @@ function BetaltContent() {
           // Forklaring per problemtype
           let explanation = "";
           if (issue.toLowerCase().includes("motor") || issue.toLowerCase().includes("mekanikk")) {
-            explanation = `Motorproblemer som oppstår kort tid etter kjøp vil ofte utgjøre en mangel etter ${isDealer ? "fkjl." : "kjl."} § 17. ${isDealer ? "Ved forhandlerkjøp presumeres feil innen ett år å ha eksistert ved kjøpet." : "Kjøper må sannsynliggjøre at feilen eksisterte ved kjøpet."}`;
+            explanation = `Motorproblemer som oppstår kort tid etter kjøp vil ofte utgjøre en mangel etter ${isDealer ? "fkjl." : "kjl."} § 17. ${isDealer ? "Ved forhandlerkjøp presumeres feil innen to år å ha eksistert ved levering (fkjl. § 18)." : "Kjøper må sannsynliggjøre at feilen eksisterte ved kjøpet."}`;
           } else if (issue.toLowerCase().includes("gir") || issue.toLowerCase().includes("kløtsj")) {
             explanation = "Feil på girkasse eller clutch er kostbare å reparere og vil normalt utgjøre en mangel dersom feilen eksisterte ved kjøpet.";
           } else if (issue.toLowerCase().includes("rust") || issue.toLowerCase().includes("karosseri")) {
@@ -824,7 +824,7 @@ function BetaltContent() {
 
   if (!data) {
     return (
-      <div className="bg-nordic text-white flex items-center justify-center">
+      <div className="bg-[#0a0f0d] text-white min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-white" />
           <p>Laster rapport...</p>
@@ -859,7 +859,7 @@ function BetaltContent() {
         <button
           onClick={generatePDF}
           disabled={isGenerating}
-          className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition disabled:opacity-60"
+          className="group w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-4 font-bold text-lg hover:bg-emerald-400 transition disabled:opacity-60"
         >
           {isGenerating ? (
             <>
@@ -899,7 +899,7 @@ function BetaltContent() {
                 </ul>
                 <button
                   onClick={() => router.push("/bilkjop/kravbrev")}
-                  className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition"
+                  className="group w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition"
                 >
                   Bestill kravbrev - 99 kr
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -924,14 +924,21 @@ function BetaltContent() {
 
 export default function BetaltPage() {
   return (
-    <main className="bg-nordic text-white">
-      <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-white" />
-        </div>
-      }>
-        <BetaltContent />
-      </Suspense>
+    <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/[0.03] rounded-full blur-[100px]" />
+      </div>
+      <div className="relative z-10">
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        }>
+          <BetaltContent />
+        </Suspense>
+      </div>
     </main>
   );
 }

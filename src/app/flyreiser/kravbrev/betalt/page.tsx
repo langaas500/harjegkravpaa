@@ -469,7 +469,7 @@ function KravbrevBetaltContent() {
           {hasDownloaded && (
             <button
               onClick={() => router.push("/hva-na")}
-              className="w-full py-4 rounded-full bg-teal-500 text-[#0c1220] font-bold text-lg hover:bg-teal-400 transition"
+              className="w-full py-4 rounded-full bg-emerald-500 text-black font-bold text-lg hover:bg-emerald-400 transition"
             >
               Hva gjør jeg nå?
             </button>
@@ -531,7 +531,13 @@ function KravbrevBetaltContent() {
 
 export default function FlyreiserKravbrevBetaltPage() {
   return (
-    <main className="bg-nordic text-white min-h-screen">
+    <main className="bg-[#0a0f0d] text-white min-h-screen">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/[0.03] rounded-full blur-[100px]" />
+      </div>
+
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center">

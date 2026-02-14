@@ -391,8 +391,14 @@ export default function FlyreiserPage() {
   };
 
   return (
-    <main className="bg-nordic text-white">
-      <div className="mx-auto w-full max-w-2xl px-4 py-10">
+    <main className="bg-[#0a0f0d] text-white">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-600/[0.03] rounded-full blur-[100px]" />
+      </div>
+
+      <div className="mx-auto w-full max-w-2xl px-4 py-10 relative z-10">
 
         {step === "INTRO" && (
           <section className="space-y-6">
@@ -621,7 +627,7 @@ export default function FlyreiserPage() {
               <button
                 onClick={() => setStep("PROBLEM_DETAILS")}
                 disabled={!canProceedFlightDetails}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40 disabled:hover:bg-teal-500"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40 disabled:hover:bg-emerald-500"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1035,7 +1041,7 @@ export default function FlyreiserPage() {
                         }}
                         className={`rounded-xl border p-3 text-sm transition ${
                           expenseTypes.includes(opt.id)
-                            ? "border-teal-500 bg-teal-500/10 text-teal-400"
+                            ? "border-teal-500 bg-emerald-500/10 text-teal-400"
                             : "border-white/10 hover:border-white/20"
                         }`}
                       >
@@ -1043,7 +1049,7 @@ export default function FlyreiserPage() {
                           <div
                             className={`w-4 h-4 rounded border flex items-center justify-center ${
                               expenseTypes.includes(opt.id)
-                                ? "border-teal-500 bg-teal-500"
+                                ? "border-teal-500 bg-emerald-500"
                                 : "border-white/30"
                             }`}
                           >
@@ -1226,7 +1232,7 @@ export default function FlyreiserPage() {
               <button
                 onClick={() => setStep(problemType === "BAGGAGE" ? "AIRLINE_CONTACT" : "EXTRAORDINARY")}
                 disabled={!canProceedProblemDetails}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1311,7 +1317,7 @@ export default function FlyreiserPage() {
               <button
                 onClick={() => setStep("AIRLINE_CONTACT")}
                 disabled={!canProceedExtraordinary}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1373,7 +1379,7 @@ export default function FlyreiserPage() {
               <button
                 onClick={() => setStep("DESCRIPTION")}
                 disabled={!canProceedAirlineContact}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-semibold hover:bg-teal-400 transition disabled:opacity-40"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-semibold hover:bg-emerald-400 transition disabled:opacity-40"
               >
                 Neste
                 <ArrowRight className="h-5 w-5" />
@@ -1428,7 +1434,7 @@ export default function FlyreiserPage() {
                           }}
                           className={`rounded-lg border p-2 text-xs transition ${
                             eu261ExpenseTypes.includes(opt.id)
-                              ? "border-teal-500 bg-teal-500/10 text-teal-400"
+                              ? "border-teal-500 bg-emerald-500/10 text-teal-400"
                               : "border-white/10 hover:border-white/20"
                           }`}
                         >
@@ -1520,7 +1526,7 @@ export default function FlyreiserPage() {
               <button
                 onClick={analyzeCase}
                 disabled={isAnalyzing}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-bold hover:bg-teal-400 transition disabled:opacity-60"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition disabled:opacity-60"
               >
                 {isAnalyzing ? (
                   <>
@@ -1612,7 +1618,7 @@ export default function FlyreiserPage() {
               </button>
               <button
                 onClick={goToReport}
-                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-3 font-bold hover:bg-teal-400 transition"
+                className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"
               >
                 <FileText className="h-5 w-5" />
                 Se full rapport

@@ -87,14 +87,14 @@ export default function HandverkKravbrevPage() {
 
   if (!data) {
     return (
-      <main className="bg-nordic text-white flex items-center justify-center">
+      <main className="bg-[#0a0f0d] text-white flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-white" />
       </main>
     );
   }
 
   return (
-    <main className="bg-nordic text-white">
+    <main className="bg-[#0a0f0d] text-white">
       <div className="mx-auto max-w-2xl px-4 py-10 space-y-6">
         <button
           onClick={() => router.back()}
@@ -228,7 +228,7 @@ export default function HandverkKravbrevPage() {
             <button
               onClick={handlePayment}
               disabled={!canProceed || isLoading}
-              className="group w-full flex items-center justify-center gap-2 rounded-full bg-teal-500 text-[#0c1220] py-4 font-bold text-lg hover:bg-teal-400 transition disabled:opacity-40 disabled:hover:bg-teal-500"
+              className="group w-full flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-4 font-bold text-lg hover:bg-emerald-400 transition disabled:opacity-40 disabled:hover:bg-emerald-500"
             >
               {isLoading ? (
                 <>
