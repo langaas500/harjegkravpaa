@@ -11,6 +11,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/bilkjop/reklamasjon",
     "/bilkjop/garanti",
     "/bilkjop/heving",
+    "/bilkjop/heving-privat",
+    "/bilkjop/heving-forhandler",
+    "/bilkjop/heving-tidsfrist",
+    "/bilkjop/kan-selger-heve",
     "/bilkjop/privat-kjop",
     "/bilkjop/forhandler",
     // MC-kjop SEO pages
@@ -52,6 +56,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/handverkere`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
     },
   ];
 

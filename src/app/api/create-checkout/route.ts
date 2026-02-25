@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 // LIVE Price IDs fra Stripe Dashboard
-const PRICE_IDS = {
+const PRICE_IDS: Record<string, string> = {
   REPORT: "price_1SqW7hCCpSOV7VNPm41GEzmK",   // 39 NOK
   KRAVBREV: "price_1SqW8vCCpSOV7VNPxmhEQDYQ", // 99 NOK
-} as const;
+};
+
+const VALID_PRODUCT_TYPES = Object.keys(PRICE_IDS);
 
 export async function POST(req: NextRequest) {
   // Sjekk env vars
@@ -48,8 +50,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Velg price basert på productType
-    const priceId = productType === "KRAVBREV" ? PRICE_IDS.KRAVBREV : PRICE_IDS.REPORT;
+    // Strict productType validation – reject unknown types
+    if (!productType || !VALID_PRODUCT_TYPES.includes(productType)) {
+      console.error("[create-checkout] Ugyldig productType:", productType);
+      return NextResponse.json(
+        { error: "Ugyldig produkttype" },
+        { status: 400 }
+      );
+    }
+
+    // Strict mapping – no fallback
+    const priceId = PRICE_IDS[productType];
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -63,14 +74,14 @@ export async function POST(req: NextRequest) {
       client_reference_id: token,
       metadata: {
         token,
-        productType: productType || "REPORT",
+        productType,
         category: category || "",
       },
       success_url: `${siteUrl}${returnPath}?token=${encodeURIComponent(token)}&paid=1`,
       cancel_url: `${siteUrl}${returnPath}?token=${encodeURIComponent(token)}&canceled=1`,
     });
 
-    console.log("[create-checkout] Session created:", { sessionId: session.id, priceId });
+    console.log("[create-checkout] Session created:", { sessionId: session.id, productType, priceId });
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("[create-checkout] Stripe error:", error instanceof Error ? error.message : "Unknown error");

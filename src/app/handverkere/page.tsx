@@ -481,7 +481,7 @@ export default function HandverkerePage() {
             <div className="text-sm text-slate-400 space-y-1">
               <p>• Tar ca. 3–4 minutter</p>
               <p>• Gratis vurdering</p>
-              <p>• Valgfri PDF-rapport (39 kr)</p>
+              <p>• Kravbrev inkl. vurdering (99 kr)</p>
             </div>
 
             <button

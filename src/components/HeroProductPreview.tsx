@@ -293,10 +293,7 @@ export default function HeroProductPreview() {
 
               <div className="mt-auto space-y-1.5">
                 <div className="w-full rounded-lg bg-emerald-500 py-2 text-center text-xs font-bold text-black">
-                  Last ned rapport — 39 kr
-                </div>
-                <div className="w-full rounded-lg border border-emerald-500/30 bg-emerald-500/[0.06] py-2 text-center text-[11px] font-semibold text-emerald-400">
-                  Generer kravbrev — 99 kr
+                  Kravbrev + vurdering — 99 kr
                 </div>
               </div>
             </div>

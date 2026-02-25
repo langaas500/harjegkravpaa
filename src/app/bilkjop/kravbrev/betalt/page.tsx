@@ -11,11 +11,20 @@ import {
   Loader2,
   ArrowLeft,
   AlertCircle,
-  Mail,
   FolderPlus,
   User,
   Building,
+  ChevronDown,
 } from "lucide-react";
+import { generateReportPdf } from "@/lib/bilkjop/generateReportPdf";
+
+function track(event: string, product?: string) {
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event, category: "bilkjop", product, ts: Date.now() }),
+  }).catch(() => {});
+}
 
 interface ContactInfo {
   buyerName: string;
@@ -36,9 +45,14 @@ export default function KravbrevBetaltPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [hasCopied, setHasCopied] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const [entitlement, setEntitlement] = useState<"loading" | "verified" | "denied" | "error">("loading");
   const [step, setStep] = useState<"contact" | "letter">("contact");
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
   const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     buyerName: "",
@@ -106,6 +120,64 @@ export default function KravbrevBetaltPage() {
     loadFonts();
   }, []);
 
+  // Entitlement verification against Supabase
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    const justPaid = params.get("paid") === "1";
+    const stored = localStorage.getItem("bilkjop-data");
+    const storedToken = stored
+      ? (JSON.parse(stored)?.access_token as string)
+      : null;
+    const token = urlToken || storedToken;
+
+    if (!token) {
+      setEntitlement("denied");
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = justPaid ? 4 : 1;
+    let timeoutId: NodeJS.Timeout;
+    let cancelled = false;
+
+    const verify = () => {
+      attempts++;
+      fetch("/api/verify-entitlement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, productType: "KRAVBREV" }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          if (cancelled) return;
+          if (result.ok) {
+            setEntitlement("verified");
+            track("checkout_success", "KRAVBREV");
+          } else if (attempts < maxAttempts) {
+            timeoutId = setTimeout(verify, 2000);
+          } else {
+            setEntitlement("denied");
+          }
+        })
+        .catch(() => {
+          if (cancelled) return;
+          if (attempts < maxAttempts) {
+            timeoutId = setTimeout(verify, 2000);
+          } else {
+            setEntitlement("error");
+          }
+        });
+    };
+
+    verify();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   const handleContactChange = (field: keyof ContactInfo, value: string) => {
     setContactInfo((prev) => ({ ...prev, [field]: value }));
   };
@@ -158,7 +230,9 @@ export default function KravbrevBetaltPage() {
 
     try {
       await navigator.clipboard.writeText(letter);
+      track("copy_letter", "KRAVBREV");
       setCopied(true);
+      setHasCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Copy failed:", err);
@@ -183,6 +257,7 @@ export default function KravbrevBetaltPage() {
 
   const handleDownloadDocx = async () => {
     if (!letter) return;
+    track("download_docx", "KRAVBREV");
 
     const { Document, Packer, Paragraph, TextRun } = await import("docx");
 
@@ -334,6 +409,19 @@ export default function KravbrevBetaltPage() {
     setHasDownloaded(true);
   };
 
+  const handleDownloadReportPdf = async () => {
+    if (!data) return;
+    setIsGeneratingReport(true);
+    try {
+      await generateReportPdf(data, fontData);
+    } catch (err) {
+      console.error("Report PDF error:", err);
+      alert("Kunne ikke generere PDF-vurdering. Prøv igjen.");
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
   if (error && !data) {
     return (
       <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
@@ -350,6 +438,52 @@ export default function KravbrevBetaltPage() {
             >
               Start på nytt
             </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (entitlement !== "verified") {
+    return (
+      <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.04) 0%, transparent 70%)" }} />
+        </div>
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center space-y-4">
+            {entitlement === "loading" && (
+              <>
+                <Loader2 className="h-8 w-8 animate-spin text-emerald-400 mx-auto" />
+                <p className="text-slate-400">Verifiserer betaling...</p>
+              </>
+            )}
+            {entitlement === "denied" && (
+              <>
+                <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+                <p className="text-lg font-semibold">Betaling ikke funnet</p>
+                <p className="text-sm text-slate-400">Vi fant ingen gyldig betaling for kravbrev knyttet til denne saken.</p>
+                <button
+                  onClick={() => router.push("/bilkjop")}
+                  className="px-6 py-3 rounded-xl bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition"
+                >
+                  Gå til betaling
+                </button>
+              </>
+            )}
+            {entitlement === "error" && (
+              <>
+                <AlertCircle className="h-12 w-12 text-amber-500 mx-auto" />
+                <p className="text-lg font-semibold">Kunne ikke verifisere</p>
+                <p className="text-sm text-slate-400">Det oppstod en feil. Prøv å laste siden på nytt.</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-3 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                >
+                  Prøv igjen
+                </button>
+              </>
+            )}
           </div>
         </div>
       </main>
@@ -605,70 +739,183 @@ export default function KravbrevBetaltPage() {
               </div>
 
               {letter && (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={handleDownloadDocx}
-                      className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
-                    >
-                      <Download className="h-5 w-5" />
-                      <span>Last ned .docx</span>
-                    </button>
-
-                    <button
-                      onClick={handleDownloadTxt}
-                      className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
-                    >
-                      <Download className="h-5 w-5" />
-                      <span>Last ned .txt</span>
-                    </button>
+                <div className="space-y-4">
+                  {/* ═══ KOMPAKT 1-2-3 ═══ */}
+                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] px-5 py-3 space-y-1.5">
+                    <p className="text-xs text-emerald-400 font-bold uppercase tracking-wider">Ferdig på 60 sek</p>
+                    <div className="text-sm space-y-1">
+                      <p><span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-emerald-500 text-black font-bold text-xs mr-1.5">1</span>Kopier brevet</p>
+                      <p><span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs mr-1.5">2</span>Lim inn i e-post og legg ved .docx</p>
+                      <p><span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs mr-1.5">3</span>Send og sett rimelig svarfrist (ofte 14 dager)</p>
+                    </div>
                   </div>
 
+                  {/* ═══ PRIMÆR CTA: KOPIER ═══ */}
                   <button
-                    onClick={() => router.push("/bilkjop/dokumenter")}
-                    className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.08] hover:bg-emerald-500/[0.12] transition text-emerald-400"
+                    onClick={handleCopy}
+                    className="w-full py-5 rounded-xl bg-emerald-500 text-black font-bold text-lg hover:bg-emerald-400 transition flex items-center justify-center gap-3"
                   >
-                    <FolderPlus className="h-5 w-5" />
-                    <span>Legg til vedlegg og lag samlet PDF</span>
+                    {copied ? (
+                      <>
+                        <Check className="h-6 w-6" />
+                        Kopiert til utklippstavlen!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-6 w-6" />
+                        Kopier kravbrevet
+                      </>
+                    )}
                   </button>
 
+                  {/* ═══ SEND I DAG ═══ */}
+                  {hasCopied && (
+                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-5 space-y-4">
+                      <p className="text-sm font-bold text-emerald-400 uppercase tracking-wider">Send i dag</p>
+
+                      {/* Emne */}
+                      <div className="space-y-1.5">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider">Emne</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-sm text-slate-300 truncate">
+                            Reklamasjon – {vehicle?.make} {vehicle?.model} {vehicle?.year}
+                          </div>
+                          <button
+                            onClick={async () => {
+                              const subject = `Reklamasjon – ${vehicle?.make || ""} ${vehicle?.model || ""} ${vehicle?.year || ""}`.trim();
+                              await navigator.clipboard.writeText(subject);
+                              setCopiedField("subject");
+                              setTimeout(() => setCopiedField(null), 2000);
+                            }}
+                            className="shrink-0 px-3 py-2 rounded-lg border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition text-xs"
+                          >
+                            {copiedField === "subject" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* E-posttekst */}
+                      <div className="space-y-1.5">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider">E-posttekst</p>
+                        <div className="flex items-start gap-2">
+                          <div className="flex-1 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-sm text-slate-300">
+                            Vedlagt følger formell reklamasjon. Jeg ber vennligst om tilbakemelding innen fristen angitt i brevet.
+                          </div>
+                          <button
+                            onClick={async () => {
+                              await navigator.clipboard.writeText("Vedlagt følger formell reklamasjon. Jeg ber vennligst om tilbakemelding innen fristen angitt i brevet.");
+                              setCopiedField("body");
+                              setTimeout(() => setCopiedField(null), 2000);
+                            }}
+                            className="shrink-0 px-3 py-2 rounded-lg border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition text-xs"
+                          >
+                            {copiedField === "body" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Tips */}
+                      <div className="text-xs text-slate-500 space-y-1">
+                        <p>• Legg ved .docx-filen som vedlegg</p>
+                        <p>• Be om lesebekreftelse</p>
+                      </div>
+
+                      {/* Kopier alt */}
+                      <button
+                        onClick={async () => {
+                          const subject = `Reklamasjon – ${vehicle?.make || ""} ${vehicle?.model || ""} ${vehicle?.year || ""}`.trim();
+                          await navigator.clipboard.writeText(`Emne: ${subject}\n\nVedlagt følger formell reklamasjon. Jeg ber vennligst om tilbakemelding innen fristen angitt i brevet.`);
+                          setCopiedField("all");
+                          setTimeout(() => setCopiedField(null), 2000);
+                        }}
+                        className="w-full py-3 rounded-xl border border-emerald-500/30 text-emerald-400 font-semibold hover:bg-emerald-500/10 transition flex items-center justify-center gap-2"
+                      >
+                        {copiedField === "all" ? (
+                          <>
+                            <Check className="h-4 w-4" />
+                            Kopiert emne + tekst!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            Kopier alt (emne + tekst)
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* ═══ SEKUNDÆR: LAST NED .DOCX ═══ */}
                   <button
-                    onClick={handleDownloadPdf}
+                    onClick={handleDownloadDocx}
                     className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
                   >
                     <Download className="h-5 w-5" />
-                    <span>Last ned PDF (uten vedlegg)</span>
+                    <span>Last ned .docx</span>
                   </button>
 
-                  {/* Send-tips */}
-                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <Mail className="h-5 w-5 text-slate-500 mt-0.5 shrink-0" />
-                      <div className="space-y-1">
-                        <p className="font-medium text-sm">Slik sender du brevet</p>
-                        <ul className="text-xs text-slate-500 space-y-1">
-                          <li>– E-post: Send som vedlegg og be om lesebekreftelse</li>
-                          <li>– Rekommandert post: Gir dokumentasjon på at brevet er mottatt</li>
-                          <li>– Ta vare på kopi: Lagre alltid en kopi av alt du sender</li>
-                        </ul>
-                      </div>
+                  {/* ═══ FLERE VALG (collapsible) ═══ */}
+                  <button
+                    onClick={() => setShowMore(!showMore)}
+                    aria-expanded={showMore}
+                    className="w-full flex items-center justify-center gap-2 py-3 text-sm text-slate-500 hover:text-slate-300 transition"
+                  >
+                    <ChevronDown className={`h-4 w-4 transition-transform ${showMore ? "rotate-180" : ""}`} />
+                    Flere valg
+                  </button>
+
+                  {showMore && (
+                    <div className="space-y-3">
+                      <button
+                        onClick={handleDownloadTxt}
+                        className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                      >
+                        <Download className="h-5 w-5" />
+                        <span>Last ned .txt</span>
+                      </button>
+
+                      <button
+                        onClick={handleDownloadPdf}
+                        className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                      >
+                        <Download className="h-5 w-5" />
+                        <span>Last ned PDF (uten vedlegg)</span>
+                      </button>
+
+                      <button
+                        onClick={handleDownloadReportPdf}
+                        disabled={isGeneratingReport}
+                        className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.08] hover:bg-emerald-500/[0.12] transition text-emerald-400 disabled:opacity-60"
+                      >
+                        {isGeneratingReport ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <span>Genererer vurdering...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="h-5 w-5" />
+                            <span>Last ned PDF-vurdering (inkludert)</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => router.push("/bilkjop/dokumenter")}
+                        className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition"
+                      >
+                        <FolderPlus className="h-5 w-5" />
+                        <span>Legg til vedlegg og lag samlet PDF</span>
+                      </button>
                     </div>
-                  </div>
+                  )}
 
                   {/* What happens next */}
                   <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4">
                     <p className="text-sm text-amber-200">
-                      <strong>Hva skjer nå?</strong> Selger har 14 dager på seg til å svare. Hvis du ikke får svar eller
-                      tilbudet er uakseptabelt, kan du klage til{" "}
-                      <a
-                        href="https://www.forbrukerradet.no"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-white transition"
-                      >
-                        Forbrukerrådet
-                      </a>
-                      .
+                      <strong>Hva skjer videre?</strong> Vi anbefaler å gi selger rimelig tid til å svare (ofte 14 dager).
+                      Hører du ikke noe, eller tilbudet er uakseptabelt, kan mekling eller klagebehandling
+                      gjennom relevante tvisteløsningsorganer være aktuelt som neste steg.
                     </p>
                   </div>
 

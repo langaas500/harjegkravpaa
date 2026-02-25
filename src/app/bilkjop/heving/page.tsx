@@ -1,6 +1,79 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import BilSeoHero from "@/components/seo/BilSeoHero";
+
+const CANONICAL_URL = "https://harjegkravpå.no/bilkjop/heving";
+
+const faqs = [
+  {
+    q: "Kan jeg heve hvis bilen har vært på verksted flere ganger?",
+    a: "Flere mislykkede reparasjonsforsøk kan styrke et hevingskrav. Hvor mye som kreves avhenger av feiltype og bilens alder.",
+  },
+  {
+    q: "Kan selger nekte heving?",
+    a: "Selger kan forsøke retting først, men retten til å rette har grenser. Dersom retting ikke lykkes, kan heving være aktuelt.",
+  },
+  {
+    q: "Hvor lang tid har jeg på å heve bilkjøpet?",
+    a: "Du må reklamere innen rimelig tid etter at du oppdaget feilen. Det finnes også absolutte frister som varierer med kjøpsform.",
+  },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: f.a,
+    },
+  })),
+};
+
+const webPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Heve bilkjøp? Regler, frister og hva som kreves",
+  description:
+    "Sjekk når du kan heve bilkjøp ved feil eller skjulte opplysninger. Vesentlig mangel, frister og forskjellen på privat og forhandler.",
+  url: CANONICAL_URL,
+  isPartOf: {
+    "@type": "WebSite",
+    name: "Harjegkravpå.no",
+    url: "https://harjegkravpå.no",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Harjegkravpå.no",
+    url: "https://harjegkravpå.no",
+  },
+};
+
+export const metadata: Metadata = {
+  title: "Heve bilkjøp? Regler, frister og hva som kreves",
+  description:
+    "Sjekk når du kan heve bilkjøp ved feil eller skjulte opplysninger. Vesentlig mangel, frister og forskjellen på privat og forhandler.",
+  alternates: {
+    canonical: CANONICAL_URL,
+  },
+  openGraph: {
+    title: "Heve bilkjøp? Sjekk om du kan få pengene tilbake",
+    description:
+      "Regler og frister for heving av bilkjøp. Se krav til vesentlig mangel, privat vs forhandler og hva som typisk gir avslag.",
+    url: CANONICAL_URL,
+    siteName: "Harjegkravpå.no",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Heve bilkjøp? Sjekk om du kan få pengene tilbake",
+    description:
+      "Heving av bilkjøp: vesentlig mangel, frister og forskjellen på privat og forhandler. Kort og praktisk oversikt + FAQ.",
+  },
+};
 
 export default function HevingPage() {
   return (
@@ -22,11 +95,67 @@ export default function HevingPage() {
       primaryCtaButton="Se om du kan få pengene tilbake"
       secondaryCtaText="Sjekk saken din nå →"
     >
+      {/* Relaterte guider (hub) */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">Relaterte guider</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Link
+            href="/bilkjop/heving-privat"
+            className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 hover:bg-white/[0.04] transition"
+          >
+            <p className="font-semibold text-white">Heving ved privatkjøp</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Når du kjøpte av privatperson: terskel, bevis og typiske fallgruver.
+            </p>
+            <span className="inline-flex items-center gap-2 text-emerald-400 mt-4 text-sm">
+              Les guiden <ArrowRight className="h-4 w-4" />
+            </span>
+          </Link>
+
+          <Link
+            href="/bilkjop/heving-forhandler"
+            className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 hover:bg-white/[0.04] transition"
+          >
+            <p className="font-semibold text-white">Heving hos forhandler</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Når du kjøpte av forhandler: retting, frister og hva du kan kreve.
+            </p>
+            <span className="inline-flex items-center gap-2 text-emerald-400 mt-4 text-sm">
+              Les guiden <ArrowRight className="h-4 w-4" />
+            </span>
+          </Link>
+
+          <Link
+            href="/bilkjop/heving-tidsfrist"
+            className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 hover:bg-white/[0.04] transition"
+          >
+            <p className="font-semibold text-white">Tidsfrist for heving</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Hva betyr “rimelig tid”, og hvilke absolutte frister gjelder i praksis?
+            </p>
+            <span className="inline-flex items-center gap-2 text-emerald-400 mt-4 text-sm">
+              Les guiden <ArrowRight className="h-4 w-4" />
+            </span>
+          </Link>
+
+          <Link
+            href="/bilkjop/kan-selger-heve"
+            className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 hover:bg-white/[0.04] transition"
+          >
+            <p className="font-semibold text-white">Kan selger heve kjøpet?</p>
+            <p className="text-slate-400 text-sm mt-1">
+              Når selger kan heve: betalingsmislighold, kontraktsbrudd og unntak.
+            </p>
+            <span className="inline-flex items-center gap-2 text-emerald-400 mt-4 text-sm">
+              Les guiden <ArrowRight className="h-4 w-4" />
+            </span>
+          </Link>
+        </div>
+      </section>
+
       {/* Kravet om vesentlig mangel */}
       <section className="mb-14">
-        <h2 className="text-2xl font-bold mb-6">
-          Kravet om vesentlig mangel
-        </h2>
+        <h2 className="text-2xl font-bold mb-6">Kravet om vesentlig mangel</h2>
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
           <p className="text-slate-300">
             For å heve må feilen være så alvorlig at kjøpet ikke gir deg det du
@@ -47,29 +176,21 @@ export default function HevingPage() {
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
           <div className="space-y-3">
             <div className="border-l-2 border-white/20 pl-4">
-              <p className="font-medium text-white">
-                «Feilen er ikke alvorlig nok»
-              </p>
+              <p className="font-medium text-white">«Feilen er ikke alvorlig nok»</p>
               <p className="text-sm text-slate-400 mt-1">
                 Vurderingen avhenger av pris, alder og hva du kunne forvente.
               </p>
             </div>
             <div className="border-l-2 border-white/20 pl-4">
-              <p className="font-medium text-white">
-                «Vi har tilbudt reparasjon»
-              </p>
+              <p className="font-medium text-white">«Vi har tilbudt reparasjon»</p>
               <p className="text-sm text-slate-400 mt-1">
-                Selger har rett til å forsøke retting, men retten er ikke
-                ubegrenset.
+                Selger har rett til å forsøke retting, men retten er ikke ubegrenset.
               </p>
             </div>
             <div className="border-l-2 border-white/20 pl-4">
-              <p className="font-medium text-white">
-                «Du har brukt bilen for lenge»
-              </p>
+              <p className="font-medium text-white">«Du har brukt bilen for lenge»</p>
               <p className="text-sm text-slate-400 mt-1">
-                Bruk etter oppdaget feil kan påvirke, men stopper ikke
-                nødvendigvis kravet.
+                Bruk etter oppdaget feil kan påvirke, men stopper ikke nødvendigvis kravet.
               </p>
             </div>
           </div>
@@ -88,20 +209,7 @@ export default function HevingPage() {
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>
         <div className="space-y-3">
-          {[
-            {
-              q: "Kan jeg heve hvis bilen har vært på verksted flere ganger?",
-              a: "Flere mislykkede reparasjonsforsøk kan styrke et hevingskrav. Hvor mye som kreves avhenger av feiltype og bilens alder.",
-            },
-            {
-              q: "Kan selger nekte heving?",
-              a: "Selger kan forsøke retting først, men retten til å rette har grenser. Dersom retting ikke lykkes, kan heving være aktuelt.",
-            },
-            {
-              q: "Hvor lang tid har jeg på å heve bilkjøpet?",
-              a: "Du må reklamere innen rimelig tid etter at du oppdaget feilen. Det finnes også absolutte frister som varierer med kjøpsform.",
-            },
-          ].map((faq, i) => (
+          {faqs.map((faq, i) => (
             <details
               key={i}
               className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition"
@@ -111,20 +219,26 @@ export default function HevingPage() {
                 <ChevronDown className="h-5 w-5 text-slate-500 group-open:rotate-180 transition-transform shrink-0" />
               </summary>
               <div className="px-5 pb-5">
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  {faq.a}
-                </p>
+                <p className="text-slate-400 text-sm leading-relaxed">{faq.a}</p>
               </div>
             </details>
           ))}
         </div>
+
+        {/* FAQ JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+        {/* WebPage JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+        />
       </section>
 
       {/* Final CTA */}
-      <section
-        data-final-cta="true"
-        className="relative rounded-3xl overflow-hidden"
-      >
+      <section data-final-cta="true" className="relative rounded-3xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 to-emerald-500/5" />
         <div className="absolute inset-0 rounded-3xl border border-emerald-500/15" />
         <div className="relative p-8 md:p-10 text-center">
@@ -132,8 +246,7 @@ export default function HevingPage() {
             Heving krever en konkret vurdering
           </h2>
           <p className="text-slate-400 mb-6 max-w-lg mx-auto">
-            Svar på noen spørsmål om bilkjøpet ditt – få en vurdering av saken
-            din på 2 minutter.
+            Svar på noen spørsmål om bilkjøpet ditt – få en vurdering av saken din på 2 minutter.
           </p>
           <Link
             href="/bilkjop"
@@ -142,9 +255,7 @@ export default function HevingPage() {
             Start gratis vurdering
             <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
-          <p className="text-xs text-slate-600 mt-4">
-            Tar ca. 2 minutter · Ingen registrering
-          </p>
+          <p className="text-xs text-slate-600 mt-4">Tar ca. 2 minutter · Ingen registrering</p>
         </div>
       </section>
     </BilSeoHero>

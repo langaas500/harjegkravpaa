@@ -20,6 +20,7 @@ import {
   Scale,
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
+import ReportPaywall from "@/components/bilkjop/ReportPaywall";
 import { createCase, updateCase } from "@/lib/supabase";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
@@ -342,6 +343,7 @@ function BilkjopPageContent() {
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
   const [caseAccessToken, setCaseAccessToken] = useState<string | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const toggleIssue = (id: string) => {
     setIssues((prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]);
@@ -434,7 +436,7 @@ function BilkjopPageContent() {
     }
   };
 
-  const goToReport = () => {
+  const saveToLocalStorage = () => {
     const data = {
       vehicleType, sellerType, vehicle, buyerName, sellerName,
       issues: issues.map((id) => ISSUE_OPTIONS.find((o) => o.id === id)?.label || id),
@@ -448,7 +450,11 @@ function BilkjopPageContent() {
       outcome, caseId, access_token: caseAccessToken || crypto.randomUUID(),
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
-    router.push("/bilkjop/rapport");
+  };
+
+  const goToReport = () => {
+    saveToLocalStorage();
+    setShowPaywall(true);
   };
 
   const isWizardStep = step !== "INTRO" && step !== "RESULT";
@@ -898,20 +904,34 @@ function BilkjopPageContent() {
                   </span>
                 </div>
                 <h2 className="text-xl font-bold mb-2">{outcome.title}</h2>
-                <p className="text-slate-300">{outcome.summary}</p>
+                <p className="text-slate-400 text-sm">
+                  {outcome.level === "RED"
+                    ? "Basert på svarene dine er det usikkert om vilkårene er oppfylt."
+                    : "Basert på svarene dine kan det foreligge en mangel."}
+                </p>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm text-slate-500 uppercase tracking-wide font-medium">Nøkkelpunkter</p>
-                <ul className="text-slate-300 space-y-1.5">
-                  {outcome.keyPoints.map((point, i) => (
-                    <li key={i} className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500/50 mt-0.5 shrink-0" />{point}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button onClick={() => setStep("ADDITIONAL")} className="flex items-center gap-2 rounded-xl border border-white/[0.08] px-5 py-3 text-slate-400 hover:bg-white/[0.03] transition"><ArrowLeft className="h-4 w-4" />Tilbake</button>
-                <button onClick={goToReport} className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"><FileText className="h-5 w-5" />Se full rapport<ArrowRight className="h-5 w-5" /></button>
-              </div>
+
+              {!showPaywall && (
+                <div className="flex gap-3 pt-2">
+                  <button onClick={() => setStep("ADDITIONAL")} className="flex items-center gap-2 rounded-xl border border-white/[0.08] px-5 py-3 text-slate-400 hover:bg-white/[0.03] transition"><ArrowLeft className="h-4 w-4" />Tilbake</button>
+                  <button onClick={goToReport} className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"><FileText className="h-5 w-5" />Se full rapport<ArrowRight className="h-5 w-5" /></button>
+                </div>
+              )}
+
+              {showPaywall && (
+                <div className="border-t border-white/10 pt-6">
+                  <ReportPaywall
+                    accessToken={caseAccessToken}
+                    outcome={outcome}
+                    buyerName={buyerName}
+                    sellerName={sellerName}
+                    sellerType={sellerType}
+                    vehicle={vehicle}
+                  />
+                  <button onClick={() => setShowPaywall(false)} className="mt-4 flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition"><ArrowLeft className="h-4 w-4" />Tilbake til resultat</button>
+                </div>
+              )}
+
               <p className="text-xs text-slate-600 text-center">Veiledende vurdering, ikke juridisk rådgivning</p>
             </section>
           </div>

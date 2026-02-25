@@ -113,11 +113,11 @@ export async function POST(request: NextRequest) {
     if (shouldClaimHeving) {
       claimType = "HEVING";
       claimText = "heving av kjøpet med tilbakebetaling av kjøpesummen";
-      claimExplanation = `Feilen er av en slik karakter at den utgjør et vesentlig kontraktsbrudd. ${
+      claimExplanation = `Jeg mener feilen er av en slik karakter at den utgjør et vesentlig kontraktsbrudd. ${
         isSafetyCritical
-          ? "Feilen er sikkerhetskritisk og gjør at bilen ikke trygt kan brukes til sitt tiltenkte formål."
+          ? "Feilen er oppgitt som sikkerhetskritisk og gjør etter min vurdering at kjøretøyet ikke trygt kan brukes til sitt tiltenkte formål."
           : ""
-      } ${isNotDriveable ? "Bilen er ikke lenger kjørbar." : ""} Jeg kan ikke lenger ha tillit til kjøretøyets tekniske tilstand, og mener derfor at vilkårene for heving er oppfylt. Ved heving ber jeg om full tilbakebetaling av kjøpesummen på ${price} mot at kjøretøyet tilbakeleveres.`;
+      } ${isNotDriveable ? "Kjøretøyet er ikke lenger kjørbart." : ""} Jeg kan ikke lenger ha tillit til kjøretøyets tekniske tilstand, og mener det foreligger grunnlag for heving. Ved heving ber jeg om full tilbakebetaling av kjøpesummen på ${price} mot at kjøretøyet tilbakeleveres.`;
     } else if (outcome === "prisavslag") {
       claimType = "PRISAVSLAG";
       claimText = "et forholdsmessig prisavslag";
@@ -145,10 +145,10 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Presumsjonsregelen (2 år etter lovendring 01.01.2024)
+    // Presumsjonsregelen
     let presumptionInfo = "";
-    if (isConsumerPurchase && daysSincePurchase !== null && daysSincePurchase <= 730) {
-      presumptionInfo = `Jeg gjør oppmerksom på at kjøpet fant sted for ${daysSincePurchase} dager siden, altså innenfor toårsfristen. Etter forbrukerkjøpsloven § 18 annet ledd presumeres en mangel som viser seg innen to år etter levering å ha eksistert ved leveringen. Det er følgelig selger som må bevise at varen var mangelfri ved overlevering.`;
+    if (isConsumerPurchase && daysSincePurchase !== null) {
+      presumptionInfo = `Jeg gjør oppmerksom på at kjøpet fant sted for ${daysSincePurchase} dager siden. Etter forbrukerkjøpsloven § 18 annet ledd kan det gjelde en presumsjonsregel som normalt legger bevisbyrden på selger for feil som viser seg innen en viss tid etter levering. Jeg gjør gjeldende at selger må sannsynliggjøre at varen var mangelfri ved overlevering.`;
     }
 
     // Selgers respons
@@ -180,10 +180,10 @@ FORMÅL:
 Kravbrevet skal:
 - være juridisk korrekt
 - tydelig beskrive faktum
-- fastslå ansvar
+- gjøre gjeldende ansvar
 - fremme konkrete krav
-- sette en klar svarfrist
-- tåle videre behandling hos Forbrukerrådet eller FTU
+- sette en rimelig svarfrist
+- tåle videre behandling hos relevante tvisteløsningsorganer
 
 MÅLGRUPPE:
 Mottaker er profesjonell eller privat selger (potensiell motpart i tvist).
@@ -195,19 +195,19 @@ JURIDISK GRUNNLAG:
 ${isConsumerPurchase ? `
 - Forbrukerkjøpsloven § 15 (tingens egenskaper - krav til varen)
 - Forbrukerkjøpsloven § 16 (mangel - varen samsvarer ikke med § 15)
-- Forbrukerkjøpsloven § 18 (bevisbyrde - mangel innen 2 år presumeres å ha eksistert ved levering)
+- Forbrukerkjøpsloven § 18 (bevisbyrde - det kan gjelde en presumsjonsregel for feil som viser seg innen en viss tid etter levering)
 - Forbrukerkjøpsloven § 26 (forbrukerens krav ved mangler)
-- Forbrukerkjøpsloven § 27 (reklamasjon - innen rimelig tid, absolutt 2/5 år)
+- Forbrukerkjøpsloven § 27 (reklamasjon - innen rimelig tid, innenfor gjeldende absolutte frister)
 - Forbrukerkjøpsloven § 29 (retting og omlevering)
 - Forbrukerkjøpsloven § 31 (prisavslag)
 - Forbrukerkjøpsloven § 32 (heving ved vesentlig mangel)
-VIKTIG: «Som den er»-forbehold er OPPHEVET fra 01.01.2024 for forhandlere.
+VIKTIG: Adgangen til å selge med «som den er»-forbehold til forbrukere er vesentlig begrenset etter gjeldende regler.
 ` : `
 - Kjøpsloven § 17 (mangel - tingen er ikke i samsvar med avtalen)
-- Kjøpsloven § 18 (ting solgt «som den er» - beskytter ikke mot skjulte feil)
+- Kjøpsloven § 18 (ting solgt «som den er» - gir typisk ikke beskyttelse mot skjulte feil eller tilbakeholdte opplysninger)
 - Kjøpsloven § 19 (uriktige opplysninger fra selger)
 - Kjøpsloven § 30 (kjøpers krav ved mangel)
-- Kjøpsloven § 32 (reklamasjon - innen rimelig tid, absolutt 2 år)
+- Kjøpsloven § 32 (reklamasjon - innen rimelig tid, innenfor gjeldende absolutte frister)
 `}
 
 OPPGAVE:
@@ -235,6 +235,20 @@ KRAVBREVET SKAL ALDRI:
 ❌ være langt (maks 550 ord)
 ❌ være uklart om hva som kreves
 ❌ være truende eller aggressivt
+❌ inneholde dato- eller lovendringspåstander (f.eks. "fra 01.01.2024", "etter lovendringen")
+❌ bruke "du har krav på" som absolutt – bruk "jeg gjør gjeldende at", "jeg mener det foreligger grunnlag for", "jeg krever"
+❌ påstå spesifikke frister som lovpålagte (fristen i brevet er en foreslått frist, ikke en lovregel)
+❌ komme med absolutte prosess-påstander om Forbrukerrådet/FKU/forliksrådet/domstol med beløpsgrenser
+
+SPRÅKSTIL FOR KRAV OG JUSS:
+✅ "Jeg gjør gjeldende at det foreligger en mangel"
+✅ "Jeg mener det foreligger grunnlag for heving/prisavslag"
+✅ "Jeg krever derfor..."
+✅ "Etter min vurdering..."
+✅ "Jeg ber om tilbakemelding innen [dato]"
+❌ "Du har krav på..." (for absolutt)
+❌ "Loven krever at du..." (for absolutt)
+❌ "Du MÅ betale..." (truende)
 
 STRUKTUR (MÅ FØLGES):
 
@@ -263,7 +277,7 @@ ${presumptionInfo ? `Gjør oppmerksom på: ${presumptionInfo}` : ""}
 4️⃣ SELGERS ANSVAR
 Forklar kort hvorfor:
 - forholdet utgjør en mangel
-- feilen presumeres å ha eksistert ved levering (§ 18: gjelder innen 2 år for forhandlerkjøp)
+- det kan gjelde en presumsjon for at feilen eksisterte ved levering (jf. § 18)
 - kjøpers undersøkelsesplikt ikke gjelder for denne typen feil
 ${sellerResponseSection ? `Tidligere kontakt: ${sellerResponseSection}` : ""}
 
@@ -274,8 +288,8 @@ ${claimExplanation}
 Oppgi sekundære krav dersom primærkrav ikke oppfylles innen rimelig tid.
 
 6️⃣ FRIST OG VIDERE STEG
-Konkret svarfrist: ${deadline}
-Rolig informasjon om videre oppfølging ved manglende svar: "Dersom jeg ikke hører fra dere innen fristen, vil jeg vurdere å bringe saken inn for Forbrukerrådet eller andre tvisteløsningsorganer."
+Sett en rimelig svarfrist. Foreslått dato: ${deadline}. Formuler fristen som en høflig anmodning (f.eks. "Jeg ber om tilbakemelding innen ${deadline}"), ikke som en lovpålagt frist.
+Dersom selger ikke svarer innen fristen: "Dersom jeg ikke hører fra dere innen fristen, vil jeg vurdere neste steg, herunder mekling eller klagebehandling gjennom relevante tvisteløsningsorganer."
 
 7️⃣ AVSLUTNING
 "Jeg håper vi kan finne en minnelig løsning på denne saken. Ta gjerne kontakt dersom dere ønsker ytterligere opplysninger."
@@ -332,7 +346,7 @@ ${issues.area ? `Feilområde: ${issues.area}` : ""}
 
 KRITISKE JURIDISKE MOMENTER:
 ${sellerPromises ? `- Selgers løfter/påstander ved salg: "${sellerPromises}" (Dette styrker saken betydelig hvis det viste seg å være feil!)` : ""}
-${hadAsIsClause === true ? `- ⚠️ "Som den er"-klausul: JA ${isConsumerPurchase && daysSincePurchase !== null && daysSincePurchase < 365 ? "(UGYLDIG - Forhandler kan ikke bruke slike klausuler etter 01.01.2024!)" : "(Kan ha betydning, men beskytter ikke mot skjulte feil)"}` : ""}
+${hadAsIsClause === true ? `- ⚠️ "Som den er"-klausul: JA ${isConsumerPurchase ? "(Adgangen til slike forbehold er vesentlig begrenset i forbrukerkjøp etter gjeldende regler)" : "(Gir typisk ikke beskyttelse mot skjulte feil eller tilbakeholdte opplysninger)"}` : ""}
 ${hadAsIsClause === false ? `- "Som den er"-klausul: Nei, normalt salg` : ""}
 ${visibleDefect === false ? `- Synlig feil ved kjøp: NEI - Feilen var SKJULT (styrker saken)` : ""}
 ${visibleDefect === true ? `- ⚠️ Synlig feil ved kjøp: JA - Feilen kunne sees (kan svekke, men ikke umuliggjør krav)` : ""}

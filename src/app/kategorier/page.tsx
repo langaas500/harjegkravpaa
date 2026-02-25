@@ -240,7 +240,7 @@ export default function KategorierPage() {
 
         {/* Diskret info */}
         <p className="mt-8 text-xs text-slate-600 text-center">
-          Gratis å starte · Full rapport: 39 kr · Kravbrev: 99 kr
+          Gratis å starte · Kravbrev inkl. vurdering: 99 kr
         </p>
       </div>
     </main>
