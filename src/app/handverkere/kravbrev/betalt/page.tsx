@@ -65,12 +65,8 @@ function KravbrevBetaltContent() {
   const letterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("handverk-data");
-    if (stored) {
-      const parsedData = JSON.parse(stored);
+    const initData = (parsedData: Record<string, unknown>) => {
       setData(parsedData);
-
-      // Bruk strukturerte adresser direkte fra wizard
       setContactInfo({
         customerName: (parsedData.navn as string) || "",
         customerAddress: (parsedData.kundeAdresse as string) || "",
@@ -83,14 +79,41 @@ function KravbrevBetaltContent() {
         contractorPostcode: (parsedData.handverkerPostnummer as string) || "",
         contractorCity: (parsedData.handverkerPoststed as string) || "",
       });
-
-      // Hent access_token fra saksdata
       if (parsedData.access_token) {
         setAccessToken(parsedData.access_token as string);
       }
+    };
 
+    const stored = localStorage.getItem("handverk-data");
+    if (stored) {
+      initData(JSON.parse(stored));
     } else {
-      setError("Fant ikke saksdata. Vennligst start på nytt.");
+      // Fallback: recover case data from Supabase using URL token
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get("token");
+      if (urlToken) {
+        fetch(`/api/sak/${urlToken}`)
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.payload) {
+              const recovered = {
+                ...result.payload,
+                outcome: result.outcome,
+                caseId: result.id,
+                access_token: urlToken,
+              } as Record<string, unknown>;
+              localStorage.setItem("handverk-data", JSON.stringify(recovered));
+              initData(recovered);
+            } else {
+              setError("Fant ikke saksdata. Vennligst start på nytt.");
+            }
+          })
+          .catch(() => {
+            setError("Fant ikke saksdata. Vennligst start på nytt.");
+          });
+      } else {
+        setError("Fant ikke saksdata. Vennligst start på nytt.");
+      }
     }
 
     // Load Roboto fonts for PDF

@@ -68,22 +68,17 @@ export default function KravbrevBetaltPage() {
   const letterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("bilkjop-data");
-    if (stored) {
-      const parsedData = JSON.parse(stored);
+    const initData = (parsedData: Record<string, unknown>) => {
       setData(parsedData);
-
       if (parsedData.access_token) {
         setAccessToken(parsedData.access_token as string);
       }
-
       const storedContact = localStorage.getItem("kravbrev-contact");
       if (storedContact) {
-        const parsedContact = JSON.parse(storedContact);
-        setContactInfo(parsedContact);
+        setContactInfo(JSON.parse(storedContact));
       } else {
         setContactInfo({
-          buyerName: parsedData.buyerName || "",
+          buyerName: (parsedData.buyerName as string) || "",
           buyerAddress: "",
           buyerPostcode: "",
           buyerCity: "",
@@ -94,8 +89,38 @@ export default function KravbrevBetaltPage() {
           sellerCity: "",
         });
       }
+    };
+
+    const stored = localStorage.getItem("bilkjop-data");
+    if (stored) {
+      initData(JSON.parse(stored));
     } else {
-      setError("Fant ikke saksdata. Vennligst start på nytt.");
+      // Fallback: recover case data from Supabase using URL token
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get("token");
+      if (urlToken) {
+        fetch(`/api/sak/${urlToken}`)
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.payload) {
+              const recovered = {
+                ...result.payload,
+                outcome: result.outcome,
+                caseId: result.id,
+                access_token: urlToken,
+              } as Record<string, unknown>;
+              localStorage.setItem("bilkjop-data", JSON.stringify(recovered));
+              initData(recovered);
+            } else {
+              setError("Fant ikke saksdata. Vennligst start på nytt.");
+            }
+          })
+          .catch(() => {
+            setError("Fant ikke saksdata. Vennligst start på nytt.");
+          });
+      } else {
+        setError("Fant ikke saksdata. Vennligst start på nytt.");
+      }
     }
 
     const loadFonts = async () => {
