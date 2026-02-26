@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { runWithTimeout } from "@/lib/runWithTimeout";
 import { logEvent, generateRequestId } from "@/lib/logger";
+import { safeMoney, isNonEmpty } from "@/lib/safeFormat";
 
 const client = new Anthropic();
 
@@ -105,8 +106,15 @@ export async function POST(req: NextRequest) {
     const problemType = data.problemType as string;
     const isBaggage = problemType === "BAGGAGE";
 
-    // Kritiske felt-sjekk
+    // Required field validation — return 400 if critical fields missing
     const missingFields = getMissingFields(data);
+    if (!isNonEmpty(problemType)) missingFields.push("Problemtype");
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: "missing_fields", fields: missingFields },
+        { status: 400 }
+      );
+    }
 
     // Datoer
     const dagensDato = new Date().toLocaleDateString("nb-NO", {
@@ -224,6 +232,13 @@ export async function POST(req: NextRequest) {
     };
     const expenseTypes = data.expenseTypes as string[] | undefined;
     const totalExpenseAmount = safeStr(data.totalExpenseAmount, "");
+    // Safe formatted versions for template interpolation (prevents NaN)
+    const safeTotalExpense = totalExpenseAmount && Number.isFinite(Number(totalExpenseAmount))
+      ? Number(totalExpenseAmount).toLocaleString("nb-NO")
+      : "";
+    const safeEu261Expense = eu261ExpenseAmount && Number.isFinite(Number(eu261ExpenseAmount))
+      ? Number(eu261ExpenseAmount).toLocaleString("nb-NO")
+      : "";
 
     // Bygg missing fields-seksjon
     let missingFieldsSection = "";
@@ -349,7 +364,7 @@ ${baggageDelayText ? `• Forsinkelsens varighet: ${baggageDelayText}` : ""}
 
 DOKUMENTERTE UTGIFTER:
 ${expenseList || "Ikke spesifisert"}
-${totalExpenseAmount ? `\nTOTALT KRAV: kr ${totalExpenseAmount}` : ""}
+${totalExpenseAmount ? `\nTOTALT KRAV: kr ${safeTotalExpense}` : ""}
 
 SAKSBESKRIVELSE:
 ${bearbeidetBeskrivelse || "Bagasjen ankom ikke som planlagt. Passasjeren pådro seg nødvendige utgifter i venteperioden."}
@@ -417,7 +432,7 @@ ${problemType === "CANCELLED" && cancellationNoticeDate ? `• Varsel mottatt: $
 
 KOMPENSASJONSKRAV:
 • Standardkompensasjon: ${compensationAmount} (EU261 art. 7)
-${hadExpenses && eu261ExpenseAmount ? `• Tilleggsutgifter (art. 9): kr ${eu261ExpenseAmount}${eu261ExpenseList ? ` (${eu261ExpenseList})` : ""}` : ""}
+${hadExpenses && eu261ExpenseAmount ? `• Tilleggsutgifter (art. 9): kr ${safeEu261Expense}${eu261ExpenseList ? ` (${eu261ExpenseList})` : ""}` : ""}
 • Hjemmel: EU-forordning 261/2004 art. 5, 7${hadExpenses ? ", 9" : ""}
 
 SAKSBESKRIVELSE:
@@ -453,7 +468,7 @@ VIKTIGE KRAV TIL INNHOLDET:
 4. Plasser bevisbyrden eksplisitt hos flyselskapet
 5. Inkluder én rettskilde-henvisning (f.eks. Sturgeon C-402/07 for forsinkelse)
 6. Avslutt med klar eskaleringsplan (Transportklagenemnda → rettslige skritt)
-${hadExpenses && eu261ExpenseAmount ? `7. Inkluder Art. 9-utgifter (kr ${eu261ExpenseAmount}) i SPESIFISERT KRAV-seksjonen` : ""}
+${hadExpenses && eu261ExpenseAmount ? `7. Inkluder Art. 9-utgifter (kr ${safeEu261Expense}) i SPESIFISERT KRAV-seksjonen` : ""}
 ${bankAccount ? `8. Inkluder kontonummer ${bankAccount} i betalingsinformasjonen` : ""}
 
 SPRÅKKRAV:
@@ -513,7 +528,7 @@ ${bookingReference ? `Bookingreferanse: ${bookingReference}` : ""}
 
 KONKLUSJON OG KRAV
 
-Jeg krever erstatning på kr ${totalExpenseAmount || "[BELØP]"} for dokumenterte utgifter som følge av ${baggageTypeText} bagasje på ovennevnte flyvning.
+Jeg krever erstatning på kr ${safeTotalExpense || "[BELØP]"} for dokumenterte utgifter som følge av ${baggageTypeText} bagasje på ovennevnte flyvning.
 
 Kravet fremmes med hjemmel i Montrealkonvensjonen art. 17 og 19. Flyselskapet har objektivt ansvar for forsinket innsjekket bagasje.
 
@@ -545,7 +560,7 @@ Følgende utgifter kreves erstattet:
 
 ${expenseListFormatted}
 
-Totalt krav: kr ${totalExpenseAmount || "[FYLL INN BELØP]"}
+Totalt krav: kr ${safeTotalExpense || "[FYLL INN BELØP]"}
 
 Kvitteringer for samtlige utgifter er vedlagt.
 
@@ -625,9 +640,9 @@ Bevisbyrden for ekstraordinære omstendigheter ligger hos flyselskapet (art. 5 n
 SPESIFISERT KRAV
 
 1. Standardkompensasjon etter EU 261/2004 art. 7: ${compensationAmount}
-${hadExpenses && eu261ExpenseAmount ? `2. Dokumenterte tilleggsutgifter (art. 9): kr ${eu261ExpenseAmount}${eu261ExpenseDescription ? ` (${eu261ExpenseDescription})` : ""}` : ""}
+${hadExpenses && eu261ExpenseAmount ? `2. Dokumenterte tilleggsutgifter (art. 9): kr ${safeEu261Expense}${eu261ExpenseDescription ? ` (${eu261ExpenseDescription})` : ""}` : ""}
 
-${hadExpenses && eu261ExpenseAmount ? `Totalt krav: ${compensationAmount} + kr ${eu261ExpenseAmount}` : `Totalt krav: ${compensationAmount}`}
+${hadExpenses && eu261ExpenseAmount ? `Totalt krav: ${compensationAmount} + kr ${safeEu261Expense}` : `Totalt krav: ${compensationAmount}`}
 
 ────────────────────────────────────────────────────────────────
 

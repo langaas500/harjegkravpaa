@@ -13,6 +13,7 @@ export default function HandverkKravbrevPage() {
 
   const [claimType, setClaimType] = useState<ClaimType | null>(null);
   const [prisavslagBelop, setPrisavslagBelop] = useState("");
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem("handverk-data");
@@ -37,6 +38,27 @@ export default function HandverkKravbrevPage() {
 
   const handlePayment = async () => {
     if (!canProceed) return;
+
+    // Validate required fields before checkout
+    const errors: string[] = [];
+    if (!data?.navn || typeof data.navn !== "string" || !(data.navn as string).trim())
+      errors.push("Kundenavn mangler");
+    if (!data?.handverkerNavn || typeof data.handverkerNavn !== "string" || !(data.handverkerNavn as string).trim())
+      errors.push("Håndverkers navn mangler");
+    if (!Array.isArray(data?.fag) || (data.fag as string[]).length === 0)
+      errors.push("Fagtype mangler");
+    if (!Array.isArray(data?.problemer) || (data.problemer as string[]).length === 0)
+      errors.push("Problembeskrivelse mangler");
+    if (claimType === "prisavslag" && prisavslagBelop.trim()) {
+      if (!Number.isFinite(Number(prisavslagBelop)) || Number(prisavslagBelop) <= 0)
+        errors.push("Prisavslagsbeløp må være et gyldig positivt tall");
+    }
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+    setValidationErrors([]);
     setIsLoading(true);
 
     const updatedData = {
@@ -224,6 +246,18 @@ export default function HandverkKravbrevPage() {
                 <p className="text-2xl font-bold">99 kr</p>
               </div>
             </div>
+
+            {validationErrors.length > 0 && (
+              <div className="rounded-xl border border-red-500/20 bg-red-500/[0.08] p-4 mb-4">
+                <p className="text-sm font-semibold text-red-400 mb-2">Kan ikke starte betaling:</p>
+                <ul className="text-sm text-red-400 space-y-1">
+                  {validationErrors.map((e, i) => (
+                    <li key={i}>• {e}</li>
+                  ))}
+                </ul>
+                <p className="text-xs text-slate-500 mt-2">Gå tilbake og fyll ut manglende informasjon.</p>
+              </div>
+            )}
 
             <button
               onClick={handlePayment}

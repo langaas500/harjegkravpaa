@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { runWithTimeout } from "@/lib/runWithTimeout";
 import { logEvent, generateRequestId } from "@/lib/logger";
+import { isNonEmpty } from "@/lib/safeFormat";
 
 const client = new Anthropic();
 
@@ -66,6 +67,19 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // --- Required field validation ---
+    const validationErrors: string[] = [];
+    if (!isNonEmpty(data.navn)) validationErrors.push("kundenavn");
+    if (!isNonEmpty(data.handverkerNavn)) validationErrors.push("håndverkers navn");
+    if (!Array.isArray(data.fag) || data.fag.length === 0) validationErrors.push("fagtype");
+    if (!Array.isArray(data.problemer) || data.problemer.length === 0) validationErrors.push("problembeskrivelse");
+    if (validationErrors.length > 0) {
+      return NextResponse.json(
+        { error: "missing_fields", fields: validationErrors },
+        { status: 400 }
+      );
+    }
+
     const claimType =
       data.claimType ||
       (data.onsker === "retting"
@@ -85,7 +99,10 @@ export async function POST(req: NextRequest) {
         ? String(data.frist)
         : "14";
 
-    const prisavslagBelop = safeStr(data.prisavslagBelop, "");
+    const rawPrisavslag = safeStr(data.prisavslagBelop, "");
+    const prisavslagBelop = rawPrisavslag && Number.isFinite(Number(rawPrisavslag))
+      ? Number(rawPrisavslag).toLocaleString("nb-NO")
+      : "";
 
     // Bearbeid brukerens fritekst
     const bearbeidetHistorie = reformulateText(data.dinHistorie || "");

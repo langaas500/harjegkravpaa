@@ -39,6 +39,7 @@ export default function FlyreiserKravbrevPage() {
   const router = useRouter();
   const [data, setData] = useState<FlightData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     passengerName: "",
     address: "",
@@ -116,6 +117,19 @@ export default function FlyreiserKravbrevPage() {
 
   const handlePayment = async () => {
     if (!canProceed) return;
+
+    // Validate flight data required for kravbrev
+    const errors: string[] = [];
+    if (!data?.flight?.airline?.trim()) errors.push("Flyselskap mangler");
+    if (!data?.flight?.flightNumber?.trim()) errors.push("Flynummer mangler");
+    if (!data?.flight?.flightDate?.trim()) errors.push("Flydato mangler");
+    if (!data?.problemType) errors.push("Problemtype mangler");
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+    setValidationErrors([]);
     setIsLoading(true);
 
     // Save contact info to localStorage
@@ -366,6 +380,18 @@ export default function FlyreiserKravbrevPage() {
                 <p className="text-2xl font-bold">99 kr</p>
               </div>
             </div>
+
+            {validationErrors.length > 0 && (
+              <div className="rounded-xl border border-red-500/20 bg-red-500/[0.08] p-4 mb-4">
+                <p className="text-sm font-semibold text-red-400 mb-2">Kan ikke starte betaling:</p>
+                <ul className="text-sm text-red-400 space-y-1">
+                  {validationErrors.map((e, i) => (
+                    <li key={i}>• {e}</li>
+                  ))}
+                </ul>
+                <p className="text-xs text-slate-500 mt-2">Gå tilbake og fyll ut manglende informasjon.</p>
+              </div>
+            )}
 
             <button
               onClick={handlePayment}

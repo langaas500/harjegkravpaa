@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { runWithTimeout } from "@/lib/runWithTimeout";
 import { logEvent, generateRequestId } from "@/lib/logger";
+import { safeMoney, safeNumber, daysSince, isNonEmpty } from "@/lib/safeFormat";
 
 const client = new Anthropic();
 
@@ -34,12 +35,35 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // --- Required field validation ---
+    const rawVehicle = data.vehicle || {};
+    const missingFields: string[] = [];
+    if (!isNonEmpty(rawVehicle.purchaseDate)) missingFields.push("kjøpsdato");
+    if (!Number.isFinite(Number(rawVehicle.price)) || Number(rawVehicle.price) <= 0)
+      missingFields.push("kjøpesum");
+    const hasVehicleId = isNonEmpty(rawVehicle.regNumber) || isNonEmpty(rawVehicle.regNum) ||
+      (isNonEmpty(rawVehicle.make) && isNonEmpty(rawVehicle.model));
+    if (!hasVehicleId) missingFields.push("bilidentifikasjon (reg.nr eller merke+modell)");
+    if (!isNonEmpty(data.buyerName) && !isNonEmpty(data.contactInfo?.buyerName))
+      missingFields.push("kjøpers navn");
+    if (!isNonEmpty(data.sellerName) && !isNonEmpty(rawVehicle.seller) && !isNonEmpty(data.contactInfo?.sellerName))
+      missingFields.push("selgers navn");
+    const hasContent = (Array.isArray(data.issues) && data.issues.length > 0) ||
+      isNonEmpty(data.userDescription);
+    if (!hasContent) missingFields.push("feilbeskrivelse");
+
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: "missing_fields", fields: missingFields },
+        { status: 400 }
+      );
+    }
+
     const vehicleType = data.vehicleType || "CAR";
     const vehicleName = vehicleType === "MOTORCYCLE" ? "motorsykkel" : "bil";
     const vehicleNameDef = vehicleType === "MOTORCYCLE" ? "motorsykkelen" : "bilen";
 
     const sellerType = data.sellerType || "forhandler";
-    const rawVehicle = data.vehicle || {};
     // Normalize vehicle fields - accept both wizard field names and expected names
     const vehicle = {
       ...rawVehicle,
@@ -100,20 +124,11 @@ export async function POST(request: NextRequest) {
         })
       : "[kjøpsdato]";
 
-    const daysSincePurchase = vehicle.purchaseDate
-      ? Math.floor(
-          (Date.now() - new Date(vehicle.purchaseDate).getTime()) /
-            (1000 * 60 * 60 * 24)
-        )
-      : null;
+    const daysSincePurchase = daysSince(vehicle.purchaseDate);
 
-    const price = vehicle.price
-      ? `kr ${Number(vehicle.price).toLocaleString("nb-NO")},-`
-      : "[kjøpesum]";
+    const price = safeMoney(vehicle.price, "[kjøpesum]");
 
-    const mileage = vehicle.mileage
-      ? `${Number(vehicle.mileage).toLocaleString("nb-NO")} km`
-      : "[kilometerstand]";
+    const mileage = safeNumber(vehicle.mileage, "km", "[kilometerstand]");
 
     const isConsumerPurchase = sellerType === "forhandler";
     const applicableLaw = isConsumerPurchase ? "forbrukerkjøpsloven" : "kjøpsloven";
@@ -356,7 +371,7 @@ Km-stand ved kjøp: ${mileage}
 KJØP:
 Dato: ${purchaseDate}
 Pris: ${price}
-Dager siden kjøp: ${daysSincePurchase || "ukjent"}
+Dager siden kjøp: ${daysSincePurchase !== null ? daysSincePurchase : "ukjent"}
 
 PROBLEMET:
 "${userDescription || `Det har oppstått problemer med ${vehicleNameDef} etter kjøpet.`}"

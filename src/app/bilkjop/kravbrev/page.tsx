@@ -20,6 +20,7 @@ export default function KravbrevPage() {
 
   const [claimType, setClaimType] = useState<ClaimType | null>(null);
   const [discountAmount, setDiscountAmount] = useState("");
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem("bilkjop-data");
@@ -51,6 +52,31 @@ export default function KravbrevPage() {
 
   const handlePayment = async () => {
     if (!canProceed) return;
+
+    // Validate required fields before checkout
+    const errors: string[] = [];
+    const v = data?.vehicle as Record<string, unknown> | undefined;
+    if (!v?.purchaseDate || typeof v.purchaseDate !== "string" || !v.purchaseDate.trim())
+      errors.push("Kjøpsdato mangler");
+    if (!v?.price || !Number.isFinite(Number(v.price)) || Number(v.price) <= 0)
+      errors.push("Kjøpesum mangler eller er ugyldig");
+    const hasId = (v?.regNumber && String(v.regNumber).trim()) ||
+      (v?.regNum && String(v.regNum).trim()) ||
+      (v?.make && String(v.make).trim() && v?.model && String(v.model).trim());
+    if (!hasId) errors.push("Bilidentifikasjon mangler (reg.nr eller merke+modell)");
+    if (!data?.buyerName || typeof data.buyerName !== "string" || !data.buyerName.trim())
+      errors.push("Kjøpers navn mangler");
+    if (!data?.sellerName || typeof data.sellerName !== "string" || !data.sellerName.trim())
+      errors.push("Selgers navn mangler");
+    const hasContent = (Array.isArray(data?.issues) && data.issues.length > 0) ||
+      (typeof data?.userDescription === "string" && data.userDescription.trim().length > 0);
+    if (!hasContent) errors.push("Feilbeskrivelse mangler");
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+    setValidationErrors([]);
     setIsLoading(true);
 
     const updatedData = {
@@ -228,6 +254,18 @@ export default function KravbrevPage() {
                   <p className="text-2xl font-extrabold">99 kr</p>
                 </div>
               </div>
+
+              {validationErrors.length > 0 && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/[0.08] p-4 mb-4">
+                  <p className="text-sm font-semibold text-red-400 mb-2">Kan ikke starte betaling:</p>
+                  <ul className="text-sm text-red-400 space-y-1">
+                    {validationErrors.map((e, i) => (
+                      <li key={i}>• {e}</li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-slate-500 mt-2">Gå tilbake og fyll ut manglende informasjon.</p>
+                </div>
+              )}
 
               <button
                 onClick={handlePayment}
