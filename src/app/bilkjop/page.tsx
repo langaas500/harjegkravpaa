@@ -103,6 +103,7 @@ function BilkjopPageContent() {
   const [outcome, setOutcome] = useState<OutcomeType | null>(null);
   const [caseId, setCaseId] = useState<string | null>(null);
   const [caseAccessToken, setCaseAccessToken] = useState<string | null>(null);
+  const caseAccessTokenRef = React.useRef<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
   const toggleIssue = (id: string) => {
@@ -142,6 +143,7 @@ function BilkjopPageContent() {
       if (supabaseCase) {
         setCaseId(supabaseCase.id);
         setCaseAccessToken(supabaseCase.access_token);
+        caseAccessTokenRef.current = supabaseCase.access_token;
       }
 
       const response = await fetch("/api/analyze-case", {
@@ -191,7 +193,36 @@ function BilkjopPageContent() {
     }
   };
 
-  const saveToLocalStorage = () => {
+  const saveToLocalStorage = async () => {
+    let token = caseAccessTokenRef.current || caseAccessToken;
+
+    // If no token exists (Supabase failed during analysis), try creating case now
+    if (!token) {
+      const issueLabels = issues.map((id) => ISSUE_OPTIONS.find((o) => o.id === id)?.label || id);
+      const costLabel = COST_OPTIONS.find((o) => o.id === costBracket)?.label || costBracket;
+      const payload = {
+        vehicleType, sellerType, vehicle, buyerName, sellerName,
+        issues: issueLabels, safetyCritical, notDriveable, costBracket: costLabel,
+        complainedQuickly, defectSoonAfter, contactedSeller,
+        sellerResponse: contactedSeller ? sellerResponse : null,
+        userDescription, additionalInfo, sellerPromises, hadAsIsClause, visibleDefect,
+        hasWorkshopReport, workshopReportText: hasWorkshopReport ? workshopReportText : null,
+        uploadedFiles, finnUrl: finnUrl || null, adEvidenceFiles, adClaims: adClaims || null,
+      };
+      const retryCase = await createCase("BIL", payload);
+      if (retryCase) {
+        setCaseId(retryCase.id);
+        setCaseAccessToken(retryCase.access_token);
+        caseAccessTokenRef.current = retryCase.access_token;
+        token = retryCase.access_token;
+      }
+    }
+
+    if (!token) {
+      alert("Feil: Kunne ikke opprette sak. Sjekk internettforbindelsen og prøv igjen.");
+      return false;
+    }
+
     const data = {
       vehicleType, sellerType, vehicle, buyerName, sellerName,
       issues: issues.map((id) => ISSUE_OPTIONS.find((o) => o.id === id)?.label || id),
@@ -202,14 +233,15 @@ function BilkjopPageContent() {
       userDescription, additionalInfo, sellerPromises, hadAsIsClause, visibleDefect,
       hasWorkshopReport, workshopReportText: hasWorkshopReport ? workshopReportText : null,
       uploadedFiles, finnUrl: finnUrl || null, adEvidenceFiles, adClaims: adClaims || null,
-      outcome, caseId, access_token: caseAccessToken || crypto.randomUUID(),
+      outcome, caseId, access_token: token,
     };
     localStorage.setItem("bilkjop-data", JSON.stringify(data));
+    return true;
   };
 
-  const goToReport = () => {
-    saveToLocalStorage();
-    setShowPaywall(true);
+  const goToReport = async () => {
+    const saved = await saveToLocalStorage();
+    if (saved) setShowPaywall(true);
   };
 
   const isWizardStep = step !== "RESULT";
