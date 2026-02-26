@@ -90,6 +90,34 @@ export default function ReklamasjonPage() {
         </div>
       </section>
 
+      {/* Når reklamasjon kan gi grunnlag for heving */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">
+          Når kan reklamasjon føre til heving?
+        </h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            En reklamasjon er første steg i prosessen. Dersom mangelen viser seg
+            å være vesentlig – for eksempel en alvorlig motorfeil, skjult
+            rustskade eller tilbakeholdte opplysninger – kan reklamasjonen danne
+            grunnlag for å kreve heving. Selger har som regel rett til å forsøke
+            retting først, men dersom retting mislykkes eller ikke tilbys innen
+            rimelig tid, kan du ha rett til å heve kjøpet og få pengene
+            tilbake.
+          </p>
+          <p className="text-slate-300">
+            Les mer om vilkårene og terskelen i vår guide om{" "}
+            <Link
+              href="/bilkjop/heving"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving av bilkjøp
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>

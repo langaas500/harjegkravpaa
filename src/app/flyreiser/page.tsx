@@ -1599,15 +1599,6 @@ export default function FlyreiserPage() {
               </ul>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-sm text-slate-400 uppercase tracking-wide">Neste steg</p>
-              <ul className="text-slate-300 space-y-1">
-                {outcome.nextSteps.map((step, i) => (
-                  <li key={i}>{i + 1}. {step}</li>
-                ))}
-              </ul>
-            </div>
-
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("DESCRIPTION")}

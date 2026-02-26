@@ -86,7 +86,8 @@ export default function HevingPage() {
           Har bilen alvorlige feil, eller fikk du uriktige/skjulte opplysninger?
           Du kan ha krav på å levere bilen tilbake og få pengene igjen. Det
           avgjørende er om feilen er vesentlig og hva som har skjedd etter
-          kjøpet.
+          kjøpet. Reglene følger av kjøpsloven (privatkjøp) og
+          forbrukerkjøpsloven (kjøp fra forhandler).
         </p>
       }
       heroImageAlt="Heving av bilkjøp – sjekk om du kan få pengene tilbake"
@@ -150,6 +151,67 @@ export default function HevingPage() {
               Les guiden <ArrowRight className="h-4 w-4" />
             </span>
           </Link>
+        </div>
+      </section>
+
+      {/* Kan jeg heve kjøp av bil? */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">Kan jeg heve kjøp av bil?</h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            Du kan heve kjøp av bil dersom bilen har en mangel som er så alvorlig
+            at den utgjør et vesentlig kontraktsbrudd. Det betyr at feilen må
+            være av en slik karakter at du ikke ville inngått avtalen om du
+            visste om den på forhånd.
+          </p>
+          <p className="text-slate-300">
+            Hvilket regelverk som gjelder avhenger av hvem du kjøpte av. Ved{" "}
+            <Link
+              href="/bilkjop/heving-privat"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving av privatkjøp
+            </Link>{" "}
+            reguleres saken av kjøpsloven, mens{" "}
+            <Link
+              href="/bilkjop/heving-forhandler"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving hos forhandler
+            </Link>{" "}
+            følger forbrukerkjøpsloven, som gir deg sterkere vern.
+          </p>
+          <p className="text-slate-300">
+            For å heve kjøp av bil må du ha reklamert i tide, og selger må som
+            hovedregel ha fått mulighet til å forsøke retting først. Dersom
+            retting mislykkes eller er uforholdsmessig, kan du heve kjøp av bil
+            og kreve kjøpesummen tilbake.
+          </p>
+        </div>
+      </section>
+
+      {/* Kan selger heve bilkjøpet? */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">Kan selger heve bilkjøpet?</h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            Ja, i noen tilfeller kan selger heve bilkjøpet. Det skjer oftest når
+            kjøper ikke betaler i tide, eller ved andre vesentlige
+            kontraktsbrudd fra kjøpers side. Selger må varsle kjøper og gi
+            rimelig frist før heving kan gjennomføres.
+          </p>
+          <p className="text-slate-300">
+            Det er viktig å vite at spørsmålet om selger kan heve bilkjøpet
+            vurderes strengt – selger kan ikke heve kun fordi han angrer. Les
+            mer om{" "}
+            <Link
+              href="/bilkjop/kan-selger-heve"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              når selger kan heve bilkjøpet
+            </Link>
+            .
+          </p>
         </div>
       </section>
 

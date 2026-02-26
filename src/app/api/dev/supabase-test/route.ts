@@ -2,13 +2,18 @@ import { NextResponse } from "next/server";
 import { createCase } from "@/lib/supabase";
 
 export async function GET() {
+  // Kill in production
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
   // Sjekk env
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   console.log("[supabase-test] ENV check:", {
-    url: url ? "✓ found" : "✗ missing",
-    key: key ? "✓ found (length: " + key.length + ")" : "✗ missing",
+    url: url ? "found" : "missing",
+    key: key ? "found (length: " + key.length + ")" : "missing",
   });
 
   if (!url || !key) {

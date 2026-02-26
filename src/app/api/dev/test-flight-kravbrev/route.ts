@@ -4,6 +4,11 @@ import { NextResponse } from "next/server";
 // Bruk: GET /api/dev/test-flight-kravbrev?type=A eller ?type=B
 
 export async function GET(request: Request) {
+  // Kill in production
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
   const { searchParams } = new URL(request.url);
   const type = searchParams.get("type") || "A";
 

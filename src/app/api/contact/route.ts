@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { rateLimit, getIP } from "@/lib/rateLimit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
+  const blocked = rateLimit(req, "contact");
+  if (blocked) return blocked;
+
   try {
     const { name, email, message } = await req.json();
 
@@ -24,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     // Check if Resend is configured
     if (!process.env.RESEND_API_KEY) {
-      console.log("Contact form submission (no email configured):", { name, email, message });
+      console.log("Contact form submission (no email configured):", { name, email });
       return NextResponse.json({ ok: true, note: "Mottatt (e-post ikke konfigurert ennå)" });
     }
 
@@ -35,6 +39,9 @@ export async function POST(req: NextRequest) {
       subject: `Kontaktskjema: ${name || "Ukjent avsender"}`,
       text: `Navn: ${name || "Ikke oppgitt"}\nE-post: ${email}\n\nMelding:\n${message}`,
     });
+
+    const ip = getIP(req);
+    console.log(`[contact] ip=${ip.slice(0, 8)}*** ok`);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

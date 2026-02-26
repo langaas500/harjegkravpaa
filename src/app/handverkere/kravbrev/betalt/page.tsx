@@ -29,6 +29,14 @@ interface ContactInfo {
   contractorCity: string;
 }
 
+function track(event: string, product?: string) {
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event, category: "handverkere", product, ts: Date.now() }),
+  }).catch(() => {});
+}
+
 function KravbrevBetaltContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,6 +49,7 @@ function KravbrevBetaltContent() {
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [entitlement, setEntitlement] = useState<"loading" | "verified" | "denied" | "error">("loading");
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     customerName: "",
     customerAddress: "",
@@ -80,15 +89,6 @@ function KravbrevBetaltContent() {
         setAccessToken(parsedData.access_token as string);
       }
 
-      // Sjekk om vi har alle nødvendige adresser fra wizard
-      const hasAllInfo = parsedData.kundeAdresse && parsedData.kundePostnummer && parsedData.kundePoststed &&
-                         parsedData.handverkerAdresse && parsedData.handverkerPostnummer && parsedData.handverkerPoststed;
-
-      if (hasAllInfo) {
-        // Gå direkte til brev-generering
-        setStep("letter");
-        generateLetterFromWizardData(parsedData);
-      }
     } else {
       setError("Fant ikke saksdata. Vennligst start på nytt.");
     }
@@ -115,6 +115,76 @@ function KravbrevBetaltContent() {
     };
     loadFonts();
   }, []);
+
+  // Entitlement verification against Supabase
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    const justPaid = params.get("paid") === "1";
+    const stored = localStorage.getItem("handverk-data");
+    const storedToken = stored
+      ? (JSON.parse(stored)?.access_token as string)
+      : null;
+    const token = urlToken || storedToken;
+
+    if (!token) {
+      setEntitlement("denied");
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = justPaid ? 4 : 1;
+    let timeoutId: NodeJS.Timeout;
+    let cancelled = false;
+
+    const verify = () => {
+      attempts++;
+      fetch("/api/verify-entitlement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, productType: "KRAVBREV" }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          if (cancelled) return;
+          if (result.ok) {
+            setEntitlement("verified");
+            track("checkout_success", "KRAVBREV");
+          } else if (attempts < maxAttempts) {
+            timeoutId = setTimeout(verify, 2000);
+          } else {
+            setEntitlement("denied");
+          }
+        })
+        .catch(() => {
+          if (cancelled) return;
+          if (attempts < maxAttempts) {
+            timeoutId = setTimeout(verify, 2000);
+          } else {
+            setEntitlement("error");
+          }
+        });
+    };
+
+    verify();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // Auto-start letter generation when entitlement is verified and all addresses exist
+  useEffect(() => {
+    if (entitlement === "verified" && data && !letter && !isGenerating) {
+      const hasAllInfo = data.kundeAdresse && data.kundePostnummer && data.kundePoststed &&
+                         data.handverkerAdresse && data.handverkerPostnummer && data.handverkerPoststed;
+      if (hasAllInfo) {
+        setStep("letter");
+        generateLetterFromWizardData(data);
+      }
+    }
+  }, [entitlement, data]);
 
   const handleContactChange = (field: keyof ContactInfo, value: string) => {
     setContactInfo((prev) => ({ ...prev, [field]: value }));
@@ -232,6 +302,7 @@ function KravbrevBetaltContent() {
     try {
       await navigator.clipboard.writeText(letter);
       setCopied(true);
+      track("copy_letter", "KRAVBREV");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Copy failed:", err);
@@ -283,6 +354,7 @@ function KravbrevBetaltContent() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     setHasDownloaded(true);
+    track("download_docx", "KRAVBREV");
   };
 
   const handleDownloadPdf = async () => {
@@ -431,6 +503,51 @@ function KravbrevBetaltContent() {
   }
 
   const contractorName = contactInfo.contractorName || (data?.handverkerNavn as string) || "Håndverker";
+
+  if (entitlement === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-white mx-auto" />
+          <p className="text-slate-400">Verifiserer betaling...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (entitlement === "denied") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+          <p className="text-red-400">Betaling ikke bekreftet. Har du fullført betalingen?</p>
+          <button
+            onClick={() => router.push("/handverkere")}
+            className="text-slate-400 hover:text-white transition"
+          >
+            Start på nytt
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (entitlement === "error") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto" />
+          <p className="text-amber-400">Kunne ikke verifisere betaling. Prøv igjen om litt.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-slate-400 hover:text-white transition"
+          >
+            Prøv igjen
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 space-y-6">

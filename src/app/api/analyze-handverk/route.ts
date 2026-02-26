@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { rateLimit, getIP } from "@/lib/rateLimit";
+import { withTimeout } from "@/lib/withTimeout";
 
 const client = new Anthropic();
 
+const MAX_PAYLOAD = 50_000;
+
 export async function POST(req: NextRequest) {
+  const blocked = rateLimit(req, "analyze");
+  if (blocked) return blocked;
+
   try {
-    const data = await req.json();
+    const raw = await req.text();
+    if (raw.length > MAX_PAYLOAD) {
+      return NextResponse.json({ error: "payload_too_large" }, { status: 413 });
+    }
+
+    const data = JSON.parse(raw);
 
     // Beregn dager siden reklamasjon og oppdagelse
     const oppdagetDato = data.oppdagetDato;
@@ -175,11 +187,18 @@ EKSEMPLER PÅ FORBUDTE FORMULERINGER:
 
 Svar KUN med JSON, ingen annen tekst.`;
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 2000,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const ip = getIP(req);
+    console.log(`[analyze-handverk] ip=${ip.slice(0, 8)}*** start`);
+
+    const message = await withTimeout(
+      client.messages.create({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: 2000,
+        messages: [{ role: "user", content: prompt }],
+      }),
+      45_000,
+      "analyze-handverk"
+    );
 
     const content = message.content[0];
     if (content.type !== "text") {
@@ -200,8 +219,13 @@ Svar KUN med JSON, ingen annen tekst.`;
 
     const outcome = JSON.parse(jsonText);
 
+    console.log(`[analyze-handverk] ip=${ip.slice(0, 8)}*** ok`);
     return NextResponse.json({ outcome });
   } catch (error) {
+    if (error instanceof Error && error.message.startsWith("TIMEOUT")) {
+      console.log(`[analyze-handverk] 504 timeout`);
+      return NextResponse.json({ error: "timeout" }, { status: 504 });
+    }
     console.error("Handverk analysis error:", error);
     return NextResponse.json(
       { error: "Kunne ikke analysere saken" },

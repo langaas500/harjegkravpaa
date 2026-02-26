@@ -69,6 +69,34 @@ export default function GarantiPage() {
         </div>
       </section>
 
+      {/* Når garantiavslag kan gi grunnlag for heving */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">
+          Kan garantiavslag likevel gi grunnlag for heving?
+        </h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            Ja. Garantien og reklamasjonsretten er to uavhengige spor. Selv om
+            garantien ikke dekker feilen, kan mangelen likevel være vesentlig
+            nok til å gi grunnlag for heving etter loven. Det gjelder
+            særlig der selger har tilbakeholdt opplysninger, eller der
+            feilen gjør bilen ubrukelig eller vesentlig dårligere enn
+            forventet.
+          </p>
+          <p className="text-slate-300">
+            Oversikt over vilkårene for å kreve pengene tilbake finner du i vår
+            guide om{" "}
+            <Link
+              href="/bilkjop/heving"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving av bilkjøp
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>

@@ -58,6 +58,14 @@ interface FlightData {
   } | null;
 }
 
+function track(event: string, product?: string) {
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event, category: "flyreiser", product, ts: Date.now() }),
+  }).catch(() => {});
+}
+
 function KravbrevBetaltContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -69,6 +77,7 @@ function KravbrevBetaltContent() {
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [entitlement, setEntitlement] = useState<"loading" | "verified" | "denied" | "error">("loading");
   const letterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,13 +86,9 @@ function KravbrevBetaltContent() {
       const parsedData = JSON.parse(stored) as FlightData;
       setData(parsedData);
 
-      // Hent access_token fra saksdata
       if (parsedData.access_token) {
         setAccessToken(parsedData.access_token);
       }
-
-      // Generate letter automatically
-      generateLetter(parsedData);
     } else {
       setError("Fant ikke saksdata. Vennligst start på nytt.");
     }
@@ -109,6 +114,64 @@ function KravbrevBetaltContent() {
       }
     };
     loadFonts();
+  }, []);
+
+  // Entitlement verification against Supabase
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    const justPaid = params.get("paid") === "1";
+    const stored = localStorage.getItem("flyreiser-data");
+    const storedToken = stored
+      ? (JSON.parse(stored)?.access_token as string)
+      : null;
+    const token = urlToken || storedToken;
+
+    if (!token) {
+      setEntitlement("denied");
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = justPaid ? 4 : 1;
+    let timeoutId: NodeJS.Timeout;
+    let cancelled = false;
+
+    const verify = () => {
+      attempts++;
+      fetch("/api/verify-entitlement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, productType: "KRAVBREV" }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          if (cancelled) return;
+          if (result.ok) {
+            setEntitlement("verified");
+            track("checkout_success", "KRAVBREV");
+          } else if (attempts < maxAttempts) {
+            timeoutId = setTimeout(verify, 2000);
+          } else {
+            setEntitlement("denied");
+          }
+        })
+        .catch(() => {
+          if (cancelled) return;
+          if (attempts < maxAttempts) {
+            timeoutId = setTimeout(verify, 2000);
+          } else {
+            setEntitlement("error");
+          }
+        });
+    };
+
+    verify();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const generateLetter = async (flightData: FlightData) => {
@@ -145,6 +208,7 @@ function KravbrevBetaltContent() {
     try {
       await navigator.clipboard.writeText(letter);
       setCopied(true);
+      track("copy_letter", "KRAVBREV");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Copy failed:", err);
@@ -196,6 +260,7 @@ function KravbrevBetaltContent() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     setHasDownloaded(true);
+    track("download_docx", "KRAVBREV");
   };
 
   const handleDownloadPdf = async () => {
@@ -338,6 +403,58 @@ function KravbrevBetaltContent() {
             className="text-slate-400 hover:text-white transition"
           >
             Start på nytt
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Gate: generate letter only after entitlement is verified
+  useEffect(() => {
+    if (entitlement === "verified" && data && !letter && !isGenerating) {
+      generateLetter(data);
+    }
+  }, [entitlement, data]);
+
+  if (entitlement === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-white mx-auto" />
+          <p className="text-slate-400">Verifiserer betaling...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (entitlement === "denied") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+          <p className="text-red-400">Betaling ikke bekreftet. Har du fullført betalingen?</p>
+          <button
+            onClick={() => router.push("/flyreiser")}
+            className="text-slate-400 hover:text-white transition"
+          >
+            Start på nytt
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (entitlement === "error") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-amber-500 mx-auto" />
+          <p className="text-amber-400">Kunne ikke verifisere betaling. Prøv igjen om litt.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-slate-400 hover:text-white transition"
+          >
+            Prøv igjen
           </button>
         </div>
       </div>

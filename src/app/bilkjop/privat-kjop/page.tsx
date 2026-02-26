@@ -86,6 +86,33 @@ export default function PrivatKjopPage() {
         </div>
       </section>
 
+      {/* Når privatkjøp kan gi grunnlag for heving */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">
+          Kan du heve et privat bilkjøp?
+        </h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            Ja, men terskelen er høyere enn ved kjøp fra forhandler. Kjøpsloven
+            krever at mangelen er vesentlig – det betyr i praksis at feilen må
+            være alvorlig nok til at du ikke ville gjennomført kjøpet dersom du
+            visste om den. Skjulte feil, tilbakeholdte opplysninger og
+            feilinformasjon om kilometer eller skadehistorikk kan alle gi
+            grunnlag for heving.
+          </p>
+          <p className="text-slate-300">
+            Se hvilke vilkår som må oppfylles i vår guide om{" "}
+            <Link
+              href="/bilkjop/heving"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving av bilkjøp
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>

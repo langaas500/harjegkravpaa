@@ -53,10 +53,36 @@ export default function RapportPage() {
         <ReportPaywall
           accessToken={data.access_token}
           outcome={data.outcome}
-          buyerName={data.buyerName}
-          sellerName={data.sellerName}
-          sellerType={data.sellerType}
-          vehicle={data.vehicle}
+          category="bilkjop"
+          kravbrevReturnPath="/bilkjop/kravbrev/betalt"
+          reportReturnPath="/bilkjop/betalt"
+          summaryRows={[
+            { label: "Kjøper", value: data.buyerName || "Ikke oppgitt" },
+            { label: "Selger", value: data.sellerName || "Ikke oppgitt" },
+            {
+              label: "Bil",
+              value:
+                `${data.vehicle?.make || ""} ${data.vehicle?.model || ""}`.trim() ||
+                "Ikke oppgitt",
+            },
+            {
+              label: "Kjøpsdato",
+              value: data.vehicle?.purchaseDate
+                ? new Date(data.vehicle.purchaseDate).toLocaleDateString("nb-NO", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "Ikke oppgitt",
+            },
+            {
+              label: "Lov",
+              value:
+                data.sellerType === "DEALER"
+                  ? "Forbrukerkjøpsloven"
+                  : "Kjøpsloven",
+            },
+          ]}
         />
       </div>
     </main>

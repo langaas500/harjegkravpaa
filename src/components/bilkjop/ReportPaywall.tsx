@@ -3,30 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, CreditCard, FileText, CheckCircle2 } from "lucide-react";
 
-function track(event: string, product?: string) {
-  fetch("/api/track", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, category: "bilkjop", product, ts: Date.now() }),
-  }).catch(() => {});
-}
-
 interface ReportPaywallProps {
   accessToken: string | null;
   outcome: { level: string; title: string } | null;
-  buyerName: string;
-  sellerName: string;
-  sellerType: "PRIVATE" | "DEALER" | null;
-  vehicle: { make: string; model: string; purchaseDate: string };
-}
-
-function formatDate(dateString: string) {
-  if (!dateString) return "Ikke oppgitt";
-  return new Date(dateString).toLocaleDateString("nb-NO", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  category?: string;
+  kravbrevReturnPath?: string;
+  reportReturnPath?: string;
+  summaryRows: { label: string; value: string }[];
 }
 
 const SHOW_REPORT_OPTION = false;
@@ -34,12 +17,20 @@ const SHOW_REPORT_OPTION = false;
 export default function ReportPaywall({
   accessToken,
   outcome,
-  buyerName,
-  sellerName,
-  sellerType,
-  vehicle,
+  category = "bilkjop",
+  kravbrevReturnPath = "/bilkjop/kravbrev/betalt",
+  reportReturnPath = "/bilkjop/betalt",
+  summaryRows,
 }: ReportPaywallProps) {
   const [isLoading, setIsLoading] = useState(false);
+
+  function track(event: string, product?: string) {
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event, category, product, ts: Date.now() }),
+    }).catch(() => {});
+  }
 
   useEffect(() => {
     track("paywall_open");
@@ -64,8 +55,8 @@ export default function ReportPaywall({
         body: JSON.stringify({
           token: accessToken,
           productType: "REPORT",
-          category: "bilkjop",
-          returnPath: "/bilkjop/betalt",
+          category,
+          returnPath: reportReturnPath,
         }),
       });
 
@@ -106,8 +97,8 @@ export default function ReportPaywall({
         body: JSON.stringify({
           token: accessToken,
           productType: "KRAVBREV",
-          category: "bilkjop",
-          returnPath: "/bilkjop/kravbrev/betalt",
+          category,
+          returnPath: kravbrevReturnPath,
         }),
       });
 
@@ -146,30 +137,17 @@ export default function ReportPaywall({
       </div>
 
       <div className="space-y-3 text-sm">
-        <div className="flex justify-between py-2 border-b border-white/5">
-          <span className="text-slate-400">Kjøper</span>
-          <span>{buyerName || "Ikke oppgitt"}</span>
-        </div>
-        <div className="flex justify-between py-2 border-b border-white/5">
-          <span className="text-slate-400">Selger</span>
-          <span>{sellerName || "Ikke oppgitt"}</span>
-        </div>
-        <div className="flex justify-between py-2 border-b border-white/5">
-          <span className="text-slate-400">Bil</span>
-          <span>
-            {vehicle?.make} {vehicle?.model}
-          </span>
-        </div>
-        <div className="flex justify-between py-2 border-b border-white/5">
-          <span className="text-slate-400">Kjøpsdato</span>
-          <span>{formatDate(vehicle?.purchaseDate)}</span>
-        </div>
-        <div className="flex justify-between py-2">
-          <span className="text-slate-400">Lov</span>
-          <span>
-            {sellerType === "DEALER" ? "Forbrukerkjøpsloven" : "Kjøpsloven"}
-          </span>
-        </div>
+        {summaryRows.map((row, i) => (
+          <div
+            key={i}
+            className={`flex justify-between py-2 ${
+              i < summaryRows.length - 1 ? "border-b border-white/5" : ""
+            }`}
+          >
+            <span className="text-slate-400">{row.label}</span>
+            <span>{row.value || "Ikke oppgitt"}</span>
+          </div>
+        ))}
       </div>
 
       {SHOW_REPORT_OPTION && (
@@ -214,7 +192,7 @@ export default function ReportPaywall({
       )}
 
       <div className="border-t border-white/10 pt-6">
-        <h3 className="text-xl font-bold mb-1">Få ferdig juridisk kravbrev til selger – 99 kr</h3>
+        <h3 className="text-xl font-bold mb-1">Få ferdig juridisk kravbrev – 99 kr</h3>
         <p className="text-sm text-slate-400 mb-5">Du får et ferdig skrevet brev du kan kopiere og sende direkte.</p>
 
         <ul className="space-y-2.5 mb-6">
@@ -222,7 +200,7 @@ export default function ReportPaywall({
             "Tilpasset din sak",
             "Relevant lovhenvisning inkludert",
             "Juridisk korrekt svarfrist inkludert",
-            "Hva du gjør hvis selger sier nei",
+            "Hva du gjør hvis motparten sier nei",
             "Full juridisk vurdering i PDF (3–5 sider)",
           ].map((text) => (
             <li key={text} className="flex items-start gap-2.5 text-sm text-slate-300">

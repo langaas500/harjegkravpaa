@@ -1747,20 +1747,6 @@ export default function HandverkerePage() {
               </ul>
             </div>
 
-            {outcome.whatToWriteNow && (
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
-                <p className="text-sm text-emerald-400 font-medium mb-1">Hva du bør skrive nå</p>
-                <p className="text-slate-300 text-sm">{outcome.whatToWriteNow}</p>
-              </div>
-            )}
-
-            {outcome.deadlineSuggestion && (
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-sm text-slate-400 mb-1">Anbefalt frist</p>
-                <p className="text-white">{outcome.deadlineSuggestion}</p>
-              </div>
-            )}
-
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("UPLOAD")}

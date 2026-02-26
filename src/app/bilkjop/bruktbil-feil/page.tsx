@@ -84,6 +84,33 @@ export default function BruktbilFeilPage() {
         </div>
       </section>
 
+      {/* Når feil kan gi grunnlag for heving */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">
+          Når kan feil på bruktbil gi grunnlag for heving?
+        </h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            Ikke alle feil gir rett til heving, men dersom feilen er vesentlig
+            kan du ha krav på å levere bilen tilbake og få kjøpesummen igjen.
+            Typiske eksempler er alvorlige motorskader, girkassefeil eller
+            skjulte kollisjonsreparasjoner som ikke ble opplyst. Vurderingen
+            avhenger av bilens pris, alder og hva selger opplyste ved
+            kjøpstidspunktet.
+          </p>
+          <p className="text-slate-300">
+            Se fullstendig oversikt over vilkår og frister i vår guide om{" "}
+            <Link
+              href="/bilkjop/heving"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving av bilkjøp
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>

@@ -2,16 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, CreditCard, FileText } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import ReportPaywall from "@/components/bilkjop/ReportPaywall";
 
 interface ReportData {
-  caseType: string;
   fag: string[];
   problemer: string[];
-  prisAvtalt: string | null;
-  prisSkriftlig: boolean | null;
-  prisform: string | null;
-  dinHistorie: string;
   navn: string | null;
   handverkerNavn: string | null;
   outcome: {
@@ -20,12 +16,12 @@ interface ReportData {
     summary: string;
     keyPoints: string[];
   } | null;
+  access_token?: string;
 }
 
 export default function HandverkRapportPage() {
   const router = useRouter();
   const [data, setData] = useState<ReportData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("handverk-data");
@@ -33,48 +29,6 @@ export default function HandverkRapportPage() {
       setData(JSON.parse(stored));
     }
   }, []);
-
-  const handlePayment = async () => {
-    setIsLoading(true);
-    try {
-      // Hent access_token fra localStorage
-      const stored = localStorage.getItem("handverk-data");
-      const token = stored ? JSON.parse(stored).access_token : null;
-
-      if (!token) {
-        alert("Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt.");
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await fetch("/api/create-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token,
-          productType: "REPORT",
-          category: "handverkere",
-          returnPath: "/handverkere/betalt",
-        }),
-      });
-
-      const { url, error } = await response.json();
-
-      if (error) {
-        alert("Feil: " + error);
-        return;
-      }
-
-      if (url) {
-        window.location.href = url;
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      alert("Kunne ikke starte betaling. Prøv igjen.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (!data) {
     return (
@@ -95,84 +49,20 @@ export default function HandverkRapportPage() {
           Tilbake
         </button>
 
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold">Din rapport er klar</h1>
-
-          <div
-            className={`rounded-xl p-5 ${
-              data.outcome?.level === "GREEN"
-                ? "bg-emerald-500/10 border border-emerald-500/30"
-                : data.outcome?.level === "YELLOW"
-                ? "bg-amber-500/10 border border-amber-500/30"
-                : "bg-red-500/10 border border-red-500/30"
-            }`}
-          >
-            <p className="font-semibold text-lg">{data.outcome?.title}</p>
-            <p className="text-slate-400 mt-1">{data.outcome?.summary}</p>
-          </div>
-
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-400">Kunde</span>
-              <span>{data.navn || "Ikke oppgitt"}</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-400">Håndverker</span>
-              <span>{data.handverkerNavn || "Ikke oppgitt"}</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-400">Fag</span>
-              <span>{data.fag?.join(", ") || "Ikke oppgitt"}</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-white/5">
-              <span className="text-slate-400">Problem</span>
-              <span className="text-right max-w-[200px]">{data.problemer?.join(", ") || "Ikke oppgitt"}</span>
-            </div>
-            <div className="flex justify-between py-2">
-              <span className="text-slate-400">Lov</span>
-              <span>Håndverkertjenesteloven</span>
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-6">
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 mb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl border border-white/10 bg-white/[0.03]">
-                    <FileText className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Komplett PDF-rapport</p>
-                    <p className="text-xs text-slate-400">Vurdering med lovhenvisninger</p>
-                  </div>
-                </div>
-                <p className="text-2xl font-bold">39 kr</p>
-              </div>
-            </div>
-
-            <button
-              onClick={handlePayment}
-              disabled={isLoading}
-              className="group w-full flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-4 font-bold text-lg hover:bg-emerald-400 transition disabled:opacity-60"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Starter betaling...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-5 w-5" />
-                  Betal og last ned
-                </>
-              )}
-            </button>
-
-            <p className="text-xs text-slate-500 text-center mt-3">
-              Sikker betaling via Stripe. Rapporten lastes ned etter betaling.
-            </p>
-          </div>
-        </div>
+        <ReportPaywall
+          accessToken={data.access_token || null}
+          outcome={data.outcome}
+          category="handverkere"
+          kravbrevReturnPath="/handverkere/kravbrev/betalt"
+          reportReturnPath="/handverkere/betalt"
+          summaryRows={[
+            { label: "Kunde", value: data.navn || "Ikke oppgitt" },
+            { label: "Håndverker", value: data.handverkerNavn || "Ikke oppgitt" },
+            { label: "Fag", value: data.fag?.join(", ") || "Ikke oppgitt" },
+            { label: "Problem", value: data.problemer?.join(", ") || "Ikke oppgitt" },
+            { label: "Lov", value: "Håndverkertjenesteloven" },
+          ]}
+        />
       </div>
     </main>
   );

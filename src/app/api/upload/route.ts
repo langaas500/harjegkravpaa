@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import crypto from "crypto";
+import { rateLimit, getIP } from "@/lib/rateLimit";
 
 const ALLOWED_TYPES = [
   "image/jpeg",
@@ -32,17 +33,16 @@ function getR2Client(): S3Client | null {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    // Debug: Logg R2 konfigurasjon (uten secrets)
-    console.log("R2 Config check:", {
-      hasAccountId: !!process.env.R2_ACCOUNT_ID,
-      hasAccessKey: !!process.env.R2_ACCESS_KEY_ID,
-      hasSecret: !!process.env.R2_SECRET_ACCESS_KEY,
-      bucket: process.env.R2_BUCKET_NAME,
-      domain: process.env.R2_PUBLIC_DOMAIN,
-      endpoint: process.env.R2_ACCOUNT_ID ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : "missing",
-    });
+  const blocked = rateLimit(req, "upload");
+  if (blocked) return blocked;
 
+  // Content-Length hard cap before reading body
+  const contentLength = req.headers.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > MAX_FILE_SIZE) {
+    return NextResponse.json({ error: "payload_too_large" }, { status: 413 });
+  }
+
+  try {
     const R2 = getR2Client();
     if (!R2) {
       return NextResponse.json(
@@ -82,16 +82,16 @@ export async function POST(req: NextRequest) {
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: "Filtype ikke støttet. Bruk JPG, PNG, WebP, HEIC eller PDF." },
-        { status: 400 }
+        { error: "unsupported_media_type" },
+        { status: 415 }
       );
     }
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: "Filen er for stor. Maks 10MB." },
-        { status: 400 }
+        { error: "payload_too_large" },
+        { status: 413 }
       );
     }
 
@@ -118,6 +118,9 @@ export async function POST(req: NextRequest) {
     // Public URL for accessing the file
     const publicUrl = `https://${publicDomain}/${key}`;
 
+    const ip = getIP(req);
+    console.log(`[upload] ip=${ip.slice(0, 8)}*** ok size=${file.size}`);
+
     return NextResponse.json({
       key,
       size: file.size,
@@ -126,16 +129,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Upload error:", error);
-
-    // Logg mer detaljer for debugging
-    if (error instanceof Error) {
-      console.error("Error name:", error.name);
-      console.error("Error message:", error.message);
-      if ("$metadata" in error) {
-        console.error("AWS metadata:", (error as { $metadata: unknown }).$metadata);
-      }
-    }
-
     return NextResponse.json(
       { error: "Kunne ikke laste opp fil" },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { createClient } from "@supabase/supabase-js";
 import { runWithTimeout } from "@/lib/runWithTimeout";
 import { logEvent, generateRequestId } from "@/lib/logger";
 
@@ -43,6 +44,27 @@ export async function POST(req: NextRequest) {
 
   try {
     const data = await req.json();
+
+    // Server-side entitlement check
+    const accessToken = data.access_token as string | undefined;
+    if (!accessToken) {
+      return NextResponse.json({ error: "Mangler saksreferanse" }, { status: 403 });
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data: caseData } = await supabase
+        .from("cases")
+        .select("status")
+        .eq("access_token", accessToken)
+        .single();
+
+      if (!caseData || caseData.status !== "paid_kravbrev") {
+        return NextResponse.json({ error: "Betaling ikke bekreftet" }, { status: 403 });
+      }
+    }
 
     const claimType =
       data.claimType ||

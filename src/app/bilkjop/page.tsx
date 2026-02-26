@@ -705,10 +705,16 @@ function BilkjopPageContent() {
                   <ReportPaywall
                     accessToken={caseAccessToken}
                     outcome={outcome}
-                    buyerName={buyerName}
-                    sellerName={sellerName}
-                    sellerType={sellerType}
-                    vehicle={vehicle}
+                    category="bilkjop"
+                    kravbrevReturnPath="/bilkjop/kravbrev/betalt"
+                    reportReturnPath="/bilkjop/betalt"
+                    summaryRows={[
+                      { label: "Kjøper", value: buyerName || "Ikke oppgitt" },
+                      { label: "Selger", value: sellerName || "Ikke oppgitt" },
+                      { label: "Bil", value: `${vehicle.make} ${vehicle.model}`.trim() || "Ikke oppgitt" },
+                      { label: "Kjøpsdato", value: vehicle.purchaseDate ? new Date(vehicle.purchaseDate).toLocaleDateString("nb-NO", { day: "numeric", month: "long", year: "numeric" }) : "Ikke oppgitt" },
+                      { label: "Lov", value: sellerType === "DEALER" ? "Forbrukerkjøpsloven" : "Kjøpsloven" },
+                    ]}
                   />
                   <button onClick={() => setShowPaywall(false)} className="mt-4 flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition"><ArrowLeft className="h-4 w-4" />Tilbake til resultat</button>
                 </div>
