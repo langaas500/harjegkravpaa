@@ -14,10 +14,6 @@ import {
   FileText,
   Sparkles,
   Loader2,
-  ShieldCheck,
-  Users,
-  Zap,
-  Scale,
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 import ReportPaywall from "@/components/bilkjop/ReportPaywall";
@@ -25,7 +21,7 @@ import { createCase, updateCase } from "@/lib/supabase";
 
 type SellerType = "PRIVATE" | "DEALER" | null;
 type VehicleType = "CAR" | "MOTORCYCLE" | null;
-type Step = "INTRO" | "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "PROMISES" | "AS_IS_CLAUSE" | "VISIBLE_DEFECT" | "WORKSHOP_REPORT" | "AD_EVIDENCE" | "ADDITIONAL" | "RESULT";
+type Step = "BASICS" | "SELLER" | "ISSUES" | "SEVERITY" | "COST" | "TIMING" | "CONTACT" | "DESCRIPTION" | "PROMISES" | "AS_IS_CLAUSE" | "VISIBLE_DEFECT" | "WORKSHOP_REPORT" | "AD_EVIDENCE" | "ADDITIONAL" | "RESULT";
 
 interface VehicleInfo {
   make: string;
@@ -66,255 +62,19 @@ const COST_OPTIONS = [
   { id: "extreme", label: "Over 60 000 kr", desc: "Omfattende / totalskade" },
 ];
 
-const WIZARD_STEPS: Step[] = ["INTRO", "BASICS", "SELLER", "ISSUES", "SEVERITY", "COST", "TIMING", "CONTACT", "DESCRIPTION", "PROMISES", "AS_IS_CLAUSE", "VISIBLE_DEFECT", "WORKSHOP_REPORT", "AD_EVIDENCE", "ADDITIONAL", "RESULT"];
-
-/* ─── Hero Illustration ─── */
-function HeroIllustration() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setTimeout(() => setMounted(true), 100);
-  }, []);
-
-  return (
-    <div className="relative w-full max-w-[420px] aspect-[4/3] mx-auto">
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full transition-opacity duration-[1500ms]"
-        style={{ background: "radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)", filter: "blur(40px)", opacity: mounted ? 1 : 0 }}
-      />
-      <div
-        className="absolute top-[30%] left-[40%] -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] rounded-full transition-opacity duration-[2000ms] delay-300"
-        style={{ background: "radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 70%)", filter: "blur(30px)", opacity: mounted ? 1 : 0 }}
-      />
-
-      <svg viewBox="0 0 420 315" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full relative z-[1]">
-        <defs>
-          <linearGradient id="carGrad" x1="60" y1="160" x2="360" y2="220">
-            <stop offset="0%" stopColor="#10b981" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#059669" stopOpacity="0.3" />
-          </linearGradient>
-          <linearGradient id="glassGrad" x1="160" y1="140" x2="280" y2="180">
-            <stop offset="0%" stopColor="#34d399" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
-          </linearGradient>
-          <linearGradient id="shieldGrad" x1="300" y1="50" x2="370" y2="140">
-            <stop offset="0%" stopColor="#10b981" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#059669" stopOpacity="0.7" />
-          </linearGradient>
-          <linearGradient id="alertGrad" x1="50" y1="60" x2="100" y2="120">
-            <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#d97706" stopOpacity="0.7" />
-          </linearGradient>
-          <linearGradient id="groundGrad" x1="0" y1="250" x2="420" y2="250">
-            <stop offset="0%" stopColor="transparent" />
-            <stop offset="20%" stopColor="rgba(16,185,129,0.06)" />
-            <stop offset="80%" stopColor="rgba(16,185,129,0.06)" />
-            <stop offset="100%" stopColor="transparent" />
-          </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-            <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
-
-        <line x1="40" y1="248" x2="380" y2="248" stroke="url(#groundGrad)" strokeWidth="1" className="transition-opacity duration-1000 delay-500" style={{ opacity: mounted ? 1 : 0 }} />
-        <ellipse cx="210" cy="250" rx="140" ry="8" fill="rgba(16,185,129,0.03)" className="transition-opacity duration-1000 delay-[600ms]" style={{ opacity: mounted ? 1 : 0 }} />
-
-        <g className="transition-all duration-1000 delay-300" style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateX(0)" : "translateX(-20px)" }}>
-          <path d="M80 215 L95 185 L140 155 L170 145 L260 145 L300 160 L330 185 L345 215 Z" fill="url(#carGrad)" stroke="rgba(16,185,129,0.4)" strokeWidth="1.5" />
-          <path d="M155 155 L175 125 L270 125 L295 155" fill="none" stroke="rgba(16,185,129,0.5)" strokeWidth="1.5" />
-          <path d="M160 152 L178 128 L230 128 L230 152 Z" fill="url(#glassGrad)" stroke="rgba(52,211,153,0.2)" strokeWidth="1" />
-          <path d="M240 152 L240 128 L268 128 L288 152 Z" fill="url(#glassGrad)" stroke="rgba(52,211,153,0.2)" strokeWidth="1" />
-          <line x1="95" y1="195" x2="330" y2="195" stroke="rgba(16,185,129,0.15)" strokeWidth="0.5" />
-          <line x1="230" y1="128" x2="230" y2="152" stroke="rgba(52,211,153,0.15)" strokeWidth="1" />
-          <ellipse cx="338" cy="200" rx="8" ry="6" fill="rgba(16,185,129,0.3)" filter="url(#glow)" />
-          <ellipse cx="85" cy="200" rx="6" ry="5" fill="rgba(239,68,68,0.3)" filter="url(#glow)" />
-        </g>
-
-        <g className="transition-opacity duration-[800ms] delay-[600ms]" style={{ opacity: mounted ? 1 : 0 }}>
-          <circle cx="140" cy="240" r="22" fill="#0a0f0d" stroke="rgba(16,185,129,0.3)" strokeWidth="1.5" />
-          <circle cx="140" cy="240" r="14" fill="none" stroke="rgba(16,185,129,0.15)" strokeWidth="1" />
-          <circle cx="140" cy="240" r="4" fill="rgba(16,185,129,0.3)" />
-          <circle cx="290" cy="240" r="22" fill="#0a0f0d" stroke="rgba(16,185,129,0.3)" strokeWidth="1.5" />
-          <circle cx="290" cy="240" r="14" fill="none" stroke="rgba(16,185,129,0.15)" strokeWidth="1" />
-          <circle cx="290" cy="240" r="4" fill="rgba(16,185,129,0.3)" />
-        </g>
-
-        <g className="transition-all duration-[800ms] delay-[800ms]" style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0) scale(1)" : "translateY(10px) scale(0.8)" }}>
-          <circle cx="340" cy="85" r="32" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)" strokeWidth="1" />
-          <path d="M340 60 L340 60 C340 60 358 64 358 64 L358 82 C358 95 340 105 340 105 C340 105 322 95 322 82 L322 64 Z" fill="url(#shieldGrad)" fillOpacity="0.15" stroke="url(#shieldGrad)" strokeWidth="1.5" />
-          <polyline points="332,82 337,87 348,76" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)" />
-        </g>
-
-        <g className="transition-all duration-[800ms] delay-1000" style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0) scale(1)" : "translateY(10px) scale(0.8)" }}>
-          <circle cx="80" cy="85" r="28" fill="rgba(245,158,11,0.06)" stroke="rgba(245,158,11,0.15)" strokeWidth="1" />
-          <path d="M80 68 L93 92 L67 92 Z" fill="none" stroke="url(#alertGrad)" strokeWidth="1.5" strokeLinejoin="round" />
-          <line x1="80" y1="76" x2="80" y2="84" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="80" cy="88" r="1" fill="#f59e0b" />
-        </g>
-
-        <g className="transition-opacity duration-[1500ms] delay-[1200ms]" style={{ opacity: mounted ? 0.6 : 0 }}>
-          <line x1="120" y1="120" x2="120" y2="260" stroke="rgba(16,185,129,0.08)" strokeWidth="0.5" strokeDasharray="4 6" />
-          <line x1="210" y1="110" x2="210" y2="260" stroke="rgba(16,185,129,0.06)" strokeWidth="0.5" strokeDasharray="4 6" />
-          <line x1="300" y1="120" x2="300" y2="260" stroke="rgba(16,185,129,0.08)" strokeWidth="0.5" strokeDasharray="4 6" />
-        </g>
-
-        <g className="transition-opacity duration-1000 delay-[1400ms]" style={{ opacity: mounted ? 1 : 0 }}>
-          <circle cx="220" cy="170" r="3" fill="#10b981" filter="url(#glow)">
-            <animate attributeName="opacity" values="0.4;1;0.4" dur="3s" repeatCount="indefinite" />
-          </circle>
-          <line x1="223" y1="170" x2="260" y2="155" stroke="rgba(16,185,129,0.2)" strokeWidth="0.5" />
-          <circle cx="140" cy="210" r="2.5" fill="#f59e0b" filter="url(#glow)">
-            <animate attributeName="opacity" values="0.4;1;0.4" dur="2.5s" repeatCount="indefinite" begin="0.5s" />
-          </circle>
-          <circle cx="100" cy="190" r="2.5" fill="#ef4444" filter="url(#glow)">
-            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite" begin="1s" />
-          </circle>
-        </g>
-
-        <g className="transition-all duration-[800ms] delay-[1600ms]" style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(8px)" }}>
-          <rect x="255" y="50" width="48" height="22" rx="6" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.2)" strokeWidth="0.5" />
-          <text x="279" y="64" textAnchor="middle" fill="#34d399" fontSize="8" fontWeight="600" fontFamily="system-ui">47k kr</text>
-        </g>
-
-        <g className="transition-opacity duration-1000 delay-[1800ms]" style={{ opacity: mounted ? 1 : 0 }}>
-          <text x="55" y="145" fill="rgba(16,185,129,0.12)" fontSize="36" fontWeight="700" fontFamily="Georgia, serif">§</text>
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-/* ─── Animated Counter ─── */
-function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [value, setValue] = useState(0);
-  const [started, setStarted] = useState(false);
-  useEffect(() => { setTimeout(() => setStarted(true), 800); }, []);
-  useEffect(() => {
-    if (!started) return;
-    let current = 0;
-    const step = target / (2000 / 16);
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) { setValue(target); clearInterval(timer); }
-      else setValue(Math.floor(current));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [started, target]);
-  return <>{value.toLocaleString("no-NO")}{suffix}</>;
-}
-
-/* ─── Intro Splash (auto-advance) ─── */
-function IntroSplash({ onSkip, caseCount }: { onSkip: () => void; caseCount: number }) {
-  const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState(0);
-  const DURATION = 5000;
-
-  const phases = [
-    { text: "Forbereder vurdering", icon: Scale },
-    { text: "Laster juridisk grunnlag", icon: ShieldCheck },
-    { text: "Klargjør skjema", icon: FileText },
-    { text: "Starter wizard", icon: Sparkles },
-  ];
-
-  useEffect(() => {
-    const start = Date.now();
-    const tick = () => {
-      const elapsed = Date.now() - start;
-      const pct = Math.min((elapsed / DURATION) * 100, 100);
-      setProgress(pct);
-      setPhase(Math.min(Math.floor(elapsed / (DURATION / phases.length)), phases.length - 1));
-
-      if (elapsed >= DURATION) {
-        onSkip();
-        return;
-      }
-      requestAnimationFrame(tick);
-    };
-    const raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [onSkip]);
-
-  const CurrentIcon = phases[phase].icon;
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      <style>{`
-        @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-        @keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 0; } 100% { transform: scale(0.9); opacity: 0; } }
-        @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-      `}</style>
-
-      {/* Illustration */}
-      <div className="w-full max-w-[320px] mb-10 animate-[float_6s_ease-in-out_infinite]">
-        <HeroIllustration />
-      </div>
-
-      {/* Phase text */}
-      <div className="text-center mb-8" key={phase} style={{ animation: "fade-up 0.4s ease-out" }}>
-        <div className="inline-flex items-center gap-3 mb-3">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-[pulse-ring_2s_ease-out_infinite]" />
-            <div className="relative p-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              <CurrentIcon className="h-5 w-5 text-emerald-400" />
-            </div>
-          </div>
-          <span className="text-lg font-semibold text-white">{phases[phase].text}</span>
-        </div>
-        <p className="text-sm text-slate-500">Bilkjøp – juridisk vurdering</p>
-      </div>
-
-      {/* Progress bar */}
-      <div className="w-full max-w-xs mb-6">
-        <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-none"
-            style={{ width: `${progress}%`, boxShadow: "0 0 12px rgba(16,185,129,0.4)" }}
-          />
-        </div>
-        <div className="flex justify-between mt-2">
-          <span className="text-[11px] text-slate-600">{Math.round(progress)}%</span>
-          <span className="text-[11px] text-slate-600">{Math.max(0, Math.ceil((DURATION - (progress / 100) * DURATION) / 1000))}s</span>
-        </div>
-      </div>
-
-      {/* Skip */}
-      <button
-        onClick={onSkip}
-        className="group flex items-center gap-2 text-sm text-slate-500 hover:text-emerald-400 transition"
-      >
-        Hopp over
-        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-      </button>
-
-      {/* Trust badges */}
-      <div className="flex items-center gap-5 mt-10 text-[11px] text-slate-600">
-        <span className="flex items-center gap-1.5"><Zap className="h-3 w-3 text-emerald-500/40" />2 min</span>
-        <span className="flex items-center gap-1.5"><Users className="h-3 w-3 text-emerald-500/40" />{caseCount > 0 ? `${caseCount}+ saker` : "Gratis vurdering"}</span>
-        <span className="flex items-center gap-1.5"><ShieldCheck className="h-3 w-3 text-emerald-500/40" />Gratis</span>
-      </div>
-    </div>
-  );
-}
+const WIZARD_STEPS: Step[] = ["BASICS", "SELLER", "ISSUES", "SEVERITY", "COST", "TIMING", "CONTACT", "DESCRIPTION", "PROMISES", "AS_IS_CLAUSE", "VISIBLE_DEFECT", "WORKSHOP_REPORT", "AD_EVIDENCE", "ADDITIONAL", "RESULT"];
 
 function BilkjopPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [step, setStep] = useState<Step>("INTRO");
-  const [vehicleType, setVehicleType] = useState<VehicleType>(null);
-  const [caseCount, setCaseCount] = useState(0);
+  const [step, setStep] = useState<Step>("BASICS");
+  const [vehicleType, setVehicleType] = useState<VehicleType>("CAR");
 
   useEffect(() => {
     const vehicleParam = searchParams.get("vehicle");
     if (vehicleParam === "motorcycle") setVehicleType("MOTORCYCLE");
     else if (vehicleParam === "car") setVehicleType("CAR");
   }, [searchParams]);
-
-  useEffect(() => {
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((d) => { if (d.count > 0) setCaseCount(d.count); })
-      .catch(() => {});
-  }, []);
 
   const [sellerType, setSellerType] = useState<SellerType>(null);
   const [vehicle, setVehicle] = useState<VehicleInfo>({ make: "", model: "", year: "", km: "", price: "", regNum: "", purchaseDate: "" });
@@ -360,12 +120,7 @@ function BilkjopPageContent() {
 
   const currentStepIndex = WIZARD_STEPS.indexOf(step);
   const totalSteps = WIZARD_STEPS.length - 1;
-  const progressPct = step === "INTRO" ? 0 : step === "RESULT" ? 100 : Math.round((currentStepIndex / totalSteps) * 100);
-
-  const handleIntroComplete = React.useCallback(() => {
-    setVehicleType((prev) => prev || "CAR");
-    setStep("BASICS");
-  }, []);
+  const progressPct = step === "RESULT" ? 100 : Math.round((currentStepIndex / totalSteps) * 100);
 
   const analyzeCase = async () => {
     setIsAnalyzing(true);
@@ -457,7 +212,7 @@ function BilkjopPageContent() {
     setShowPaywall(true);
   };
 
-  const isWizardStep = step !== "INTRO" && step !== "RESULT";
+  const isWizardStep = step !== "RESULT";
 
   return (
     <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
@@ -475,11 +230,6 @@ function BilkjopPageContent() {
       )}
 
       <div className="relative z-10">
-        {/* ═══════════ INTRO (auto-advance splash) ═══════════ */}
-        {step === "INTRO" && (
-          <IntroSplash onSkip={handleIntroComplete} caseCount={caseCount} />
-        )}
-
         {/* ═══════════ WIZARD STEPS ═══════════ */}
         {isWizardStep && (
           <div className="mx-auto w-full max-w-2xl px-4 py-12 pt-14">
@@ -535,7 +285,7 @@ function BilkjopPageContent() {
                 </div>
                 <p className="text-xs text-slate-600">* Obligatoriske felter</p>
                 <div className="flex gap-3 pt-2">
-                  <button onClick={() => setStep("INTRO")} className="flex items-center gap-2 rounded-xl border border-white/[0.08] px-5 py-3 text-slate-400 hover:bg-white/[0.03] transition"><ArrowLeft className="h-4 w-4" />Tilbake</button>
+                  <button onClick={() => router.push("/kategorier")} className="flex items-center gap-2 rounded-xl border border-white/[0.08] px-5 py-3 text-slate-400 hover:bg-white/[0.03] transition"><ArrowLeft className="h-4 w-4" />Tilbake</button>
                   <button onClick={() => setStep("SELLER")} disabled={!canProceedBasics} className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition disabled:opacity-30">Neste<ArrowRight className="h-5 w-5" /></button>
                 </div>
               </section>
