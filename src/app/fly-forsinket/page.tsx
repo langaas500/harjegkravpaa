@@ -5,6 +5,7 @@ import BilSeoHero from "@/components/seo/BilSeoHero";
 export default function FlyForsinketPage() {
   return (
     <BilSeoHero
+      heroImageUrl="/fly-hero.jpg"
       eyebrow="Flypassasjerrettigheter"
       h1Top="Fly forsinket mer enn 3 timer?"
       h1Accent="Du kan ha krav på opptil 600 euro."

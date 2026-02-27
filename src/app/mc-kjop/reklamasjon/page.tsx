@@ -1,166 +1,116 @@
-import Link from "next/link";
-import { ArrowRight, Bike, ChevronDown } from "lucide-react";
-import SeoFloatingCTA from "@/components/SeoFloatingCTA";
+import { ChevronDown } from "lucide-react";
+import BilSeoHero from "@/components/seo/BilSeoHero";
 
 export default function McReklamasjonPage() {
   return (
-    <main className="bg-nordic text-white min-h-screen">
-
-      <nav className="border-b border-white/10">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex justify-end">
-          <div className="flex items-center gap-8 text-base">
-            <Link
-              href="/bilkjop?vehicle=motorcycle"
-              className="text-white font-medium hover:text-slate-300 transition"
-            >
-              Kjøretøy
-            </Link>
-            <Link
-              href="/flyreiser"
-              className="text-slate-400 hover:text-white transition"
-            >
-              Flyreiser
-            </Link>
-            <Link
-              href="/bilkjop?vehicle=motorcycle"
-              className="text-white hover:text-slate-300 transition"
-            >
-              Sjekk saken din →
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <article className="max-w-3xl mx-auto px-4 py-12">
-
-        <div className="flex items-center gap-3 mb-6">
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <Bike className="h-6 w-6 text-white" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold">
-            Reklamasjon på MC – slik går du frem
-          </h1>
-        </div>
-
-        <p className="text-lg text-slate-300 mb-10">
-          Har du kjøpt en motorsykkel med feil? Da har du rett til å reklamere. Her forklarer vi reglene for reklamasjon, frister og hva du kan kreve.
+    <BilSeoHero
+      heroImageUrl="/mc-hero.jpg"
+      eyebrow="Motorsykkelrettigheter"
+      h1Top="Reklamasjon på MC"
+      h1Accent="Slik går du frem."
+      intro={
+        <p className="text-lg text-slate-300 leading-relaxed">
+          Har du kjøpt en motorsykkel med feil? Da har du rett til å reklamere.
+          Her forklarer vi reglene for reklamasjon, frister og hva du kan kreve.
         </p>
-
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-white/10">
-            Reklamasjonsfrister
-          </h2>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                <p className="font-medium text-white mb-2">Fra forhandler</p>
-                <p className="text-sm text-slate-400">
-                  5 års reklamasjonsfrist for feil som forventes å vare. 1 års omvendt bevisbyrde.
-                </p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                <p className="font-medium text-white mb-2">Fra privatperson</p>
-                <p className="text-sm text-slate-400">
-                  2 års reklamasjonsfrist. Du må selv bevise at feilen fantes ved kjøpet.
-                </p>
-              </div>
+      }
+      heroImageAlt="Reklamasjon på MC – sjekk dine rettigheter"
+      primaryCtaTitle="Problemer med MC-en?"
+      primaryCtaText="Svar på noen enkle spørsmål om ditt MC-kjøp, så finner vi ut om du har krav mot selger."
+      primaryCtaButton="Sjekk saken din"
+      secondaryCtaText="Sjekk saken din nå →"
+      ctaHref="/bilkjop?vehicle=motorcycle"
+    >
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">Reklamasjonsfrister</h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
+              <p className="font-medium text-white mb-2">Fra forhandler</p>
+              <p className="text-sm text-slate-400">
+                5 års reklamasjonsfrist for feil som forventes å vare. 1 års
+                omvendt bevisbyrde.
+              </p>
             </div>
-            <p className="text-slate-300">
-              Du må reklamere innen rimelig tid etter at du oppdaget eller burde oppdaget feilen. Som hovedregel bør du reklamere innen 2–3 måneder.
-            </p>
-          </div>
-        </section>
-
-        <section className="mb-10">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-white/10">
-            Hva kan du kreve?
-          </h2>
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 space-y-4">
-            <div className="space-y-4">
-              <div className="border-l-2 border-white/20 pl-4">
-                <p className="font-medium text-white">Retting</p>
-                <p className="text-sm text-slate-400 mt-1">
-                  Selger reparerer feilen uten kostnad for deg.
-                </p>
-              </div>
-              <div className="border-l-2 border-white/20 pl-4">
-                <p className="font-medium text-white">Prisavslag</p>
-                <p className="text-sm text-slate-400 mt-1">
-                  Du beholder MC-en og får kompensasjon for verdireduksjonen.
-                </p>
-              </div>
-              <div className="border-l-2 border-white/20 pl-4">
-                <p className="font-medium text-white">Heving</p>
-                <p className="text-sm text-slate-400 mt-1">
-                  Kjøpet oppheves og du får pengene tilbake. Krever vesentlig mangel.
-                </p>
-              </div>
-              <div className="border-l-2 border-white/20 pl-4">
-                <p className="font-medium text-white">Erstatning</p>
-                <p className="text-sm text-slate-400 mt-1">
-                  Dekning av økonomisk tap som følge av mangelen.
-                </p>
-              </div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
+              <p className="font-medium text-white mb-2">Fra privatperson</p>
+              <p className="text-sm text-slate-400">
+                2 års reklamasjonsfrist. Du må selv bevise at feilen fantes ved
+                kjøpet.
+              </p>
             </div>
           </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b border-white/10">
-            Ofte stilte spørsmål
-          </h2>
-          <div className="space-y-4">
-            <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
-              <summary className="flex items-center justify-between p-4 cursor-pointer">
-                <span className="font-medium">Må jeg reklamere skriftlig?</span>
-                <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform" />
-              </summary>
-              <div className="px-4 pb-4 text-slate-300 text-sm">
-                Det er ikke et krav, men skriftlig reklamasjon gir deg dokumentasjon på at du har reklamert i tide. Send e-post eller brev og behold kopi.
-              </div>
-            </details>
-
-            <details className="group rounded-xl border border-white/10 bg-white/[0.03]">
-              <summary className="flex items-center justify-between p-4 cursor-pointer">
-                <span className="font-medium">Hva hvis selger avviser reklamasjonen?</span>
-                <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform" />
-              </summary>
-              <div className="px-4 pb-4 text-slate-300 text-sm">
-                Du kan ta saken til Forbrukerrådet (ved forhandlerkjøp) eller bruke en megler. Siste utvei er domstolen.
-              </div>
-            </details>
-          </div>
-        </section>
-
-        <section data-final-cta="true" className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center">
-          <h2 className="text-xl font-bold mb-2">
-            Vil du sjekke saken din?
-          </h2>
-          <p className="text-slate-400 mb-5">
-            Svar på noen spørsmål og få en vurdering av om du har krav mot selger.
+          <p className="text-slate-300">
+            Du må reklamere innen rimelig tid etter at du oppdaget eller burde
+            oppdaget feilen. Som hovedregel bør du reklamere innen 2–3 måneder.
           </p>
-          <Link
-            href="/bilkjop?vehicle=motorcycle"
-            className="inline-flex items-center gap-2 bg-[#1F4F45] text-[#ECFDF5] px-6 py-3 rounded-xl font-semibold hover:bg-[#246457] transition"
-          >
-            Sjekk saken din
-            <ArrowRight className="h-5 w-5" />
-          </Link>
-        </section>
-
-        <p className="text-xs text-slate-600 text-center mt-8">
-          Innholdet er generell informasjon og ikke juridisk rådgivning.
-        </p>
-      </article>
-
-      <footer className="border-t border-white/10 py-6 px-4 mt-10">
-        <div className="max-w-3xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-slate-500">
-          <span>© 2025 harjegkravpå.no</span>
-          <span>Veiledende informasjon, ikke juridisk rådgivning</span>
         </div>
-      </footer>
+      </section>
 
-      <SeoFloatingCTA href="/bilkjop?vehicle=motorcycle" />
-    </main>
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">Hva kan du kreve?</h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <div className="space-y-4">
+            <div className="border-l-2 border-white/20 pl-4">
+              <p className="font-medium text-white">Retting</p>
+              <p className="text-sm text-slate-400 mt-1">
+                Selger reparerer feilen uten kostnad for deg.
+              </p>
+            </div>
+            <div className="border-l-2 border-white/20 pl-4">
+              <p className="font-medium text-white">Prisavslag</p>
+              <p className="text-sm text-slate-400 mt-1">
+                Du beholder MC-en og får kompensasjon for verdireduksjonen.
+              </p>
+            </div>
+            <div className="border-l-2 border-white/20 pl-4">
+              <p className="font-medium text-white">Heving</p>
+              <p className="text-sm text-slate-400 mt-1">
+                Kjøpet oppheves og du får pengene tilbake. Krever vesentlig
+                mangel.
+              </p>
+            </div>
+            <div className="border-l-2 border-white/20 pl-4">
+              <p className="font-medium text-white">Erstatning</p>
+              <p className="text-sm text-slate-400 mt-1">
+                Dekning av økonomisk tap som følge av mangelen.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-16">
+        <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>
+        <div className="space-y-3">
+          <details className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition">
+            <summary className="flex items-center justify-between p-5 cursor-pointer">
+              <span className="font-medium">
+                Må jeg reklamere skriftlig?
+              </span>
+              <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform" />
+            </summary>
+            <div className="px-5 pb-5 text-slate-300 text-sm">
+              Det er ikke et krav, men skriftlig reklamasjon gir deg
+              dokumentasjon på at du har reklamert i tide. Send e-post eller
+              brev og behold kopi.
+            </div>
+          </details>
+
+          <details className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition">
+            <summary className="flex items-center justify-between p-5 cursor-pointer">
+              <span className="font-medium">
+                Hva hvis selger avviser reklamasjonen?
+              </span>
+              <ChevronDown className="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform" />
+            </summary>
+            <div className="px-5 pb-5 text-slate-300 text-sm">
+              Du kan ta saken til Forbrukerrådet (ved forhandlerkjøp) eller
+              bruke en megler. Siste utvei er domstolen.
+            </div>
+          </details>
+        </div>
+      </section>
+    </BilSeoHero>
   );
 }

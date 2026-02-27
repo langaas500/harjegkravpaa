@@ -11,6 +11,7 @@ import BilSeoHero from "@/components/seo/BilSeoHero";
 export default function FlyKansellertPage() {
   return (
     <BilSeoHero
+      heroImageUrl="/fly-hero.jpg"
       eyebrow="Flypassasjerrettigheter"
       h1Top="Fly kansellert?"
       h1Accent="Du kan ha krav på opptil 600 euro."

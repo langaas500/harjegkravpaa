@@ -12,6 +12,7 @@ import BilSeoHero from "@/components/seo/BilSeoHero";
 export default function MistetBagasjePage() {
   return (
     <BilSeoHero
+      heroImageUrl="/fly-hero.jpg"
       eyebrow="Flypassasjerrettigheter"
       h1Top="Mistet eller forsinket bagasje?"
       h1Accent="Du kan ha krav på opptil 16 000 kr."

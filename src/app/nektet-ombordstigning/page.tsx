@@ -5,6 +5,7 @@ import BilSeoHero from "@/components/seo/BilSeoHero";
 export default function NektetOmbordstigningPage() {
   return (
     <BilSeoHero
+      heroImageUrl="/fly-hero.jpg"
       eyebrow="Flypassasjerrettigheter"
       h1Top="Nektet ombordstigning?"
       h1Accent="Du kan ha krav på opptil 600 euro."
