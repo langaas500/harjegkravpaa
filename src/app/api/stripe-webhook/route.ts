@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import { getCaseByAccessTokenAdmin, updateCaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   // Sjekk env vars
@@ -47,29 +47,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    // Marker som betalt i Supabase (idempotent)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const sessionId = session.id;
 
-    if (supabaseUrl && supabaseKey) {
-      const supabase = createClient(supabaseUrl, supabaseKey);
+    // Check idempotency
+    const existing = await getCaseByAccessTokenAdmin(token);
+    if (!existing) {
+      console.error("[stripe-webhook] Case not found for token:", token.substring(0, 8));
+      return NextResponse.json({ error: "Case not found" }, { status: 404 });
+    }
+    if (existing.stripe_session_id === sessionId) {
+      // Already processed — return 200 to stop Stripe retries
+      return NextResponse.json({ received: true, status: "already_processed" });
+    }
 
-      // Bestem ny status basert på productType
-      const newStatus = productType === "KRAVBREV" ? "paid_kravbrev" : "paid";
+    // Bestem ny status basert på productType
+    const newStatus = productType === "KRAVBREV" ? "paid_kravbrev" : "paid";
 
-      const { error } = await supabase
-        .from("cases")
-        .update({
-          status: newStatus,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("access_token", token);
+    // Update with stripe_session_id for future dedup
+    const updated = await updateCaseAdmin(existing.id, {
+      status: newStatus,
+      stripe_session_id: sessionId,
+    });
 
-      if (error) {
-        console.error("[stripe-webhook] Supabase update error:", error.message);
-      } else {
-        console.log(`[stripe-webhook] Payment verified: token=${token.substring(0, 8)}..., status=${newStatus}, sessionId=${session.id}`);
-      }
+    if (!updated) {
+      console.error("[stripe-webhook] Supabase update error for token:", token.substring(0, 8));
+    } else {
+      console.log(`[stripe-webhook] Payment verified: token=${token.substring(0, 8)}..., status=${newStatus}, sessionId=${sessionId}`);
     }
   }
 

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { jsPDF } from "jspdf";
 import { CheckCircle2, FileDown, Loader2, FileText, ArrowRight } from "lucide-react";
 
 function BetaltContent() {
@@ -219,6 +218,7 @@ function BetaltContent() {
     setIsGenerating(true);
 
     try {
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF("p", "mm", "a4");
       const pageWidth = 210;
       const pageHeight = 297;

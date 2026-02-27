@@ -104,7 +104,7 @@ body {
 /* === NORDIC PREMIUM BACKGROUND === */
 .bg-nordic {
   position: relative;
-  min-height: 100vh;
+  min-height: 100svh;
   isolation: isolate;
   background:
     /* Vignette - darker edges fading to center */

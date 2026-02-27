@@ -23,6 +23,10 @@ export const metadata: Metadata = {
     description:
       "Misfornøyd med håndverkerarbeid? Sjekk om du kan kreve prisavslag, retting eller heving etter håndverkertjenesteloven.",
   },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function HandverkereLayout({

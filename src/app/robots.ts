@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         "/bilkjop/dokumenter",
         "/flyreiser/rapport",
         "/flyreiser/betalt",
+        "/flyreiser/kravbrev",
         "/handverkere/rapport",
         "/handverkere/betalt",
         "/handverkere/kravbrev",

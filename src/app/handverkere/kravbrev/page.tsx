@@ -69,20 +69,10 @@ export default function HandverkKravbrevPage() {
     localStorage.setItem("handverk-data", JSON.stringify(updatedData));
 
     try {
-      // Hent access_token fra localStorage
-      const token = data?.access_token as string | undefined;
-
-      if (!token) {
-        alert("Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt.");
-        setIsLoading(false);
-        return;
-      }
-
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token,
           productType: "KRAVBREV",
           category: "handverkere",
           returnPath: "/handverkere/kravbrev/betalt",

@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { jsPDF } from "jspdf";
-import mammoth from "mammoth";
 import {
   ArrowLeft,
   Download,
@@ -106,6 +104,7 @@ export default function GenererPDFPage() {
     const images: { data: string; width: number; height: number }[] = [];
 
     try {
+      const mammoth = (await import("mammoth")).default;
       const result = await mammoth.convertToHtml(
         { arrayBuffer: buffer },
         {
@@ -165,6 +164,7 @@ export default function GenererPDFPage() {
     setError(null);
 
     try {
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF("p", "mm", "a4");
       const pageWidth = 210;
       const pageHeight = 297;

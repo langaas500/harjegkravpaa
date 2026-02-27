@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { runWithTimeout } from "@/lib/runWithTimeout";
 import { logEvent, generateRequestId } from "@/lib/logger";
 import { isNonEmpty } from "@/lib/safeFormat";
+import { resolveAccessToken } from "@/lib/session";
 
 const client = new Anthropic();
 
@@ -44,17 +45,26 @@ export async function POST(req: NextRequest) {
   const start = Date.now();
 
   try {
-    const data = await req.json();
+    const MAX_PAYLOAD = 50_000;
+    const rawBody = await req.text();
+    if (rawBody.length > MAX_PAYLOAD) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+    const data = JSON.parse(rawBody);
 
-    // Server-side entitlement check
-    const accessToken = data.access_token as string | undefined;
+    // Server-side entitlement check via session cookie
+    const accessToken = await resolveAccessToken(req, "HANDVERK");
     if (!accessToken) {
-      return NextResponse.json({ error: "Mangler saksreferanse" }, { status: 403 });
+      return NextResponse.json({ error: "Ingen aktiv sesjon" }, { status: 403 });
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (supabaseUrl && supabaseKey) {
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json({ error: "Server config" }, { status: 500 });
+    }
+
+    {
       const supabase = createClient(supabaseUrl, supabaseKey);
       const { data: caseData } = await supabase
         .from("cases")

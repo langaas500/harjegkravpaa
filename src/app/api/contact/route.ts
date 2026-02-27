@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
     }
 
     await resend.emails.send({
-      from: "harjegkravpå.no <onboarding@resend.dev>",
-      to: "kontakt@harjegkravpå.no",
+      from: "harjegkravpaa.no <noreply@harjegkravpaa.no>",
+      to: "kontakt@harjegkravpaa.no",
       replyTo: email,
       subject: `Kontaktskjema: ${name || "Ukjent avsender"}`,
       text: `Navn: ${name || "Ikke oppgitt"}\nE-post: ${email}\n\nMelding:\n${message}`,

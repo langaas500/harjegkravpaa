@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: {
-    template: "%s | Harjegkravpå.no",
-    default: "Heving av bilkjøp | Harjegkravpå.no",
-  },
   openGraph: {
     siteName: "Harjegkravpå.no",
     type: "website",

@@ -87,19 +87,10 @@ export default function KravbrevPage() {
     localStorage.setItem("bilkjop-data", JSON.stringify(updatedData));
 
     try {
-      const token = updatedData?.access_token as string | undefined;
-
-      if (!token) {
-        alert("Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt.");
-        setIsLoading(false);
-        return;
-      }
-
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token,
           productType: "KRAVBREV",
           category: "bilkjop",
           returnPath: "/bilkjop/kravbrev/betalt",

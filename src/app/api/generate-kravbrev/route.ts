@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
+import { Resend } from "resend";
 import { runWithTimeout } from "@/lib/runWithTimeout";
 import { logEvent, generateRequestId } from "@/lib/logger";
 import { safeMoney, safeNumber, daysSince, isNonEmpty } from "@/lib/safeFormat";
+import { resolveAccessToken } from "@/lib/session";
 
 const client = new Anthropic();
 
@@ -12,17 +14,26 @@ export async function POST(request: NextRequest) {
   const start = Date.now();
 
   try {
-    const data = await request.json();
+    const MAX_PAYLOAD = 50_000;
+    const rawBody = await request.text();
+    if (rawBody.length > MAX_PAYLOAD) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+    const data = JSON.parse(rawBody);
 
-    // Server-side entitlement check
-    const accessToken = data.access_token as string | undefined;
+    // Server-side entitlement check via session cookie
+    const accessToken = await resolveAccessToken(request, "BIL");
     if (!accessToken) {
-      return NextResponse.json({ error: "Mangler saksreferanse" }, { status: 403 });
+      return NextResponse.json({ error: "Ingen aktiv sesjon" }, { status: 403 });
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (supabaseUrl && supabaseKey) {
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json({ error: "Server config" }, { status: 500 });
+    }
+
+    {
       const supabase = createClient(supabaseUrl, supabaseKey);
       const { data: caseData } = await supabase
         .from("cases")
@@ -417,7 +428,25 @@ Skriv brevet nå.`;
     );
 
     const textContent = message.content.find((block) => block.type === "text");
-    const letter = textContent ? textContent.text : "Kunne ikke generere kravbrev.";
+    const generatedText = textContent ? textContent.text : "";
+
+    function validateKravbrev(text: string): boolean {
+      if (!text || text.length < 200) return false;
+      if (text.length > 5000) return false;
+      const hasLegalRef = /§|loven|kjøpsloven|forbrukerkjøpsloven/i.test(text);
+      const hasDate = /\d{1,2}\.\s*\w+\s*\d{4}|\d{4}-\d{2}-\d{2}/.test(text);
+      return hasLegalRef && hasDate;
+    }
+
+    if (!validateKravbrev(generatedText)) {
+      console.error("AI output failed validation");
+      return NextResponse.json(
+        { error: "Generering feilet. Prøv igjen." },
+        { status: 500 }
+      );
+    }
+
+    const letter = generatedText;
 
     logEvent({
       route: "generate-kravbrev",
@@ -428,7 +457,63 @@ Skriv brevet nå.`;
       model: "claude-sonnet-4-5-20250929",
     });
 
-    return NextResponse.json({ letter });
+    // Send sak-lenke på epost (idempotent — maks 1 per sak)
+    let emailSent = false;
+    if (buyerEmail && accessToken && process.env.RESEND_API_KEY && supabaseUrl && supabaseKey) {
+      try {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const { data: caseRow } = await supabase
+          .from("cases")
+          .select("email_sent_at")
+          .eq("access_token", accessToken)
+          .single();
+
+        if (!caseRow?.email_sent_at) {
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://harjegkravpaa.no";
+          const sakUrl = `${siteUrl}/sak/${accessToken}`;
+          const resend = new Resend(process.env.RESEND_API_KEY);
+          await resend.emails.send({
+            from: "harjegkravpaa.no <noreply@harjegkravpaa.no>",
+            to: buyerEmail,
+            replyTo: "kontakt@harjegkravpaa.no",
+            subject: "Ditt kravbrev er klart – harjegkravpaa.no",
+            text: [
+              `Hei ${buyerName},`,
+              "",
+              "Kravbrevet ditt er nå generert og klart til bruk.",
+              "",
+              "Lagre denne lenken – den gir deg tilgang til saken din uten innlogging:",
+              sakUrl,
+              "",
+              "Der finner du kravbrevet, PDF-vurderingen og veiledning for neste steg.",
+              "Lenken fungerer på alle enheter.",
+              "",
+              "Lykke til!",
+              "",
+              "Med vennlig hilsen",
+              "harjegkravpaa.no",
+              "",
+              "---",
+              "Dette er en automatisk e-post. Ikke svar på denne.",
+            ].join("\n"),
+          });
+
+          await supabase
+            .from("cases")
+            .update({ email_sent_at: new Date().toISOString() })
+            .eq("access_token", accessToken);
+
+          emailSent = true;
+          console.log(`[generate-kravbrev] Email sent to ${buyerEmail.slice(0, 3)}***`);
+        } else {
+          console.log(`[generate-kravbrev] Email already sent for token=${accessToken.substring(0, 8)}...`);
+        }
+      } catch (err) {
+        console.error("[generate-kravbrev] Email send error:", err);
+      }
+    }
+
+    return NextResponse.json({ letter, emailSent });
   } catch (error) {
     const latencyMs = Date.now() - start;
     const isTimeout = error instanceof Error && error.message === "TIMEOUT";

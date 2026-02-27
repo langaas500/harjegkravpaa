@@ -74,7 +74,7 @@ export default function SeoFloatingCTA({
       style={{
         position: 'fixed',
         right: '24px',
-        bottom: '24px',
+        bottom: 'max(24px, env(safe-area-inset-bottom))',
         zIndex: 50,
         opacity: shouldShow ? 1 : 0,
         pointerEvents: shouldShow ? 'auto' : 'none',

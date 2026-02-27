@@ -451,8 +451,17 @@ export default function HandverkerePage() {
       uploadedFiles,
       outcome,
       caseId,
-      access_token: caseAccessToken || crypto.randomUUID(),
     };
+
+    // Set session cookie via resolve
+    if (caseAccessToken) {
+      fetch("/api/case/resolve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ access_token: caseAccessToken }),
+      }).catch(() => {});
+    }
+
     localStorage.setItem("handverk-data", JSON.stringify(data));
     router.push("/handverkere/rapport");
   };
@@ -528,7 +537,7 @@ export default function HandverkerePage() {
                   value={fagAnnetTekst}
                   onChange={(e) => setFagAnnetTekst(e.target.value)}
                   placeholder="F.eks. maler, taklegger..."
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
             )}
@@ -582,7 +591,7 @@ export default function HandverkerePage() {
                   value={problemAnnetTekst}
                   onChange={(e) => setProblemAnnetTekst(e.target.value)}
                   placeholder="Beskriv problemet kort..."
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
             )}
@@ -732,7 +741,7 @@ export default function HandverkerePage() {
                   value={beskrivelsetilleggKort}
                   onChange={(e) => setBeskrivelsetilleggKort(e.target.value)}
                   placeholder="F.eks. vannlekkasje, kortslutning..."
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
             </div>
@@ -871,7 +880,7 @@ export default function HandverkerePage() {
                   type="date"
                   value={jobbStartDato}
                   onChange={(e) => setJobbStartDato(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -908,7 +917,7 @@ export default function HandverkerePage() {
                     type="date"
                     value={ferdigDato}
                     onChange={(e) => setFerdigDato(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
               )}
@@ -919,7 +928,7 @@ export default function HandverkerePage() {
                   type="date"
                   value={oppdagetDato}
                   onChange={(e) => setOppdagetDato(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -956,7 +965,7 @@ export default function HandverkerePage() {
                     type="date"
                     value={reklamertDato}
                     onChange={(e) => setReklamertDato(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
               )}
@@ -1001,7 +1010,7 @@ export default function HandverkerePage() {
                     value={kontraktssum}
                     onChange={(e) => setKontraktssum(e.target.value)}
                     placeholder="F.eks. 150000"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
                 <div>
@@ -1011,7 +1020,7 @@ export default function HandverkerePage() {
                     value={fakturaSum}
                     onChange={(e) => setFakturaSum(e.target.value)}
                     placeholder="F.eks. 180000"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
               </div>
@@ -1023,7 +1032,7 @@ export default function HandverkerePage() {
                   value={utbedringEstimert}
                   onChange={(e) => setUtbedringEstimert(e.target.value)}
                   placeholder="F.eks. 25000"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1061,7 +1070,7 @@ export default function HandverkerePage() {
                     value={tilbudSum}
                     onChange={(e) => setTilbudSum(e.target.value)}
                     placeholder="F.eks. 30000"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
               )}
@@ -1199,7 +1208,7 @@ export default function HandverkerePage() {
                   type="date"
                   value={frist}
                   onChange={(e) => setFrist(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1374,7 +1383,7 @@ export default function HandverkerePage() {
               placeholder="Beskriv hele situasjonen..."
               maxLength={5000}
               rows={8}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
             />
             <p className="text-xs text-slate-500">{dinHistorie.length} / 5000 tegn (minimum 50)</p>
 
@@ -1438,7 +1447,7 @@ export default function HandverkerePage() {
               placeholder="Beskriv hva håndverkeren har sagt eller gjort..."
               maxLength={2000}
               rows={5}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
             />
             <p className="text-xs text-slate-500">{handverkerSvar.length} / 2000 tegn</p>
 
@@ -1479,7 +1488,7 @@ export default function HandverkerePage() {
                   value={navn}
                   onChange={(e) => setNavn(e.target.value)}
                   placeholder="Ola Nordmann"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1490,7 +1499,7 @@ export default function HandverkerePage() {
                   value={epost}
                   onChange={(e) => setEpost(e.target.value)}
                   placeholder="ola@eksempel.no"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1501,7 +1510,7 @@ export default function HandverkerePage() {
                   value={telefon}
                   onChange={(e) => setTelefon(e.target.value)}
                   placeholder="123 45 678"
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1513,7 +1522,7 @@ export default function HandverkerePage() {
                   onChange={(e) => setGateadresse(e.target.value)}
                   placeholder="Gateveien 123"
                   required
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1527,7 +1536,7 @@ export default function HandverkerePage() {
                     placeholder="0123"
                     required
                     maxLength={4}
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
                 <div>
@@ -1538,7 +1547,7 @@ export default function HandverkerePage() {
                     onChange={(e) => setPoststed(e.target.value)}
                     placeholder="Oslo"
                     required
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
               </div>
@@ -1551,7 +1560,7 @@ export default function HandverkerePage() {
                   onChange={(e) => setHandverkerNavn(e.target.value)}
                   placeholder="Elektriker AS / Ola Rørlegger"
                   required
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1563,7 +1572,7 @@ export default function HandverkerePage() {
                   onChange={(e) => setHandverkerGateadresse(e.target.value)}
                   placeholder="Håndverkerveien 1"
                   required
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
 
@@ -1577,7 +1586,7 @@ export default function HandverkerePage() {
                     placeholder="0456"
                     required
                     maxLength={4}
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
                 <div>
@@ -1588,7 +1597,7 @@ export default function HandverkerePage() {
                     onChange={(e) => setHandverkerPoststed(e.target.value)}
                     placeholder="Oslo"
                     required
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                 </div>
               </div>

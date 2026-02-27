@@ -383,9 +383,17 @@ export default function FlyreiserPage() {
       outcome,
       // Supabase tracking
       caseId,
-      // Fallback: generer lokal token hvis Supabase feilet
-      access_token: caseAccessToken || crypto.randomUUID(),
     };
+
+    // Set session cookie via resolve
+    if (caseAccessToken) {
+      fetch("/api/case/resolve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ access_token: caseAccessToken }),
+      }).catch(() => {});
+    }
+
     localStorage.setItem("flyreiser-data", JSON.stringify(data));
     router.push("/flyreiser/rapport");
   };
@@ -521,7 +529,7 @@ export default function FlyreiserPage() {
                 placeholder="Ola Nordmann"
                 value={passengerName}
                 onChange={(e) => setPassengerName(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               />
             </div>
 
@@ -533,7 +541,7 @@ export default function FlyreiserPage() {
                   placeholder="Norwegian, SAS, Widerøe..."
                   value={flight.airline}
                   onChange={(e) => setFlight({ ...flight, airline: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
               <div>
@@ -543,7 +551,7 @@ export default function FlyreiserPage() {
                   placeholder="DY1234, SK456..."
                   value={flight.flightNumber}
                   onChange={(e) => setFlight({ ...flight, flightNumber: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
             </div>
@@ -556,7 +564,7 @@ export default function FlyreiserPage() {
                   placeholder="Oslo (OSL), Bergen (BGO)..."
                   value={flight.departureAirport}
                   onChange={(e) => setFlight({ ...flight, departureAirport: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
               <div>
@@ -566,7 +574,7 @@ export default function FlyreiserPage() {
                   placeholder="London (LHR), Paris (CDG)..."
                   value={flight.arrivalAirport}
                   onChange={(e) => setFlight({ ...flight, arrivalAirport: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
             </div>
@@ -578,7 +586,7 @@ export default function FlyreiserPage() {
                   type="date"
                   value={flight.flightDate}
                   onChange={(e) => setFlight({ ...flight, flightDate: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
               <div>
@@ -600,7 +608,7 @@ export default function FlyreiserPage() {
                   type="time"
                   value={flight.scheduledDeparture}
                   onChange={(e) => setFlight({ ...flight, scheduledDeparture: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
               <div>
@@ -609,7 +617,7 @@ export default function FlyreiserPage() {
                   type="time"
                   value={flight.scheduledArrival}
                   onChange={(e) => setFlight({ ...flight, scheduledArrival: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
             </div>
@@ -680,7 +688,7 @@ export default function FlyreiserPage() {
                       type="time"
                       value={actualArrival}
                       onChange={(e) => setActualArrival(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                     />
                     <p className="text-xs text-slate-500 mt-1">Styrker kravbrevet. Sjekk flightstatus eller boardingkort.</p>
                   </div>
@@ -734,7 +742,7 @@ export default function FlyreiserPage() {
                           type="date"
                           value={cancellationNoticeDate}
                           onChange={(e) => setCancellationNoticeDate(e.target.value)}
-                          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none"
+                          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                         />
                       </div>
                       <div>
@@ -793,7 +801,7 @@ export default function FlyreiserPage() {
                         placeholder="F.eks: Fikk ombooking til neste dag kl 14:00 via København..."
                         maxLength={500}
                         rows={2}
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                       />
                     </div>
                     <div>
@@ -865,7 +873,7 @@ export default function FlyreiserPage() {
                       placeholder="F.eks: Fikk fly neste morgen + hotell..."
                       maxLength={500}
                       rows={3}
-                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                     />
                   </div>
                 )}
@@ -1016,7 +1024,7 @@ export default function FlyreiserPage() {
                       placeholder="F.eks: Måtte kjøpe dressbukse til kundemøte, presentasjonsutstyr lå i kofferten..."
                       maxLength={500}
                       rows={2}
-                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                     />
                   </div>
                 )}
@@ -1106,7 +1114,7 @@ export default function FlyreiserPage() {
                     value={totalExpenseAmount}
                     onChange={(e) => setTotalExpenseAmount(e.target.value)}
                     placeholder="F.eks: 2500"
-                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                   />
                   <p className="text-xs text-slate-500 mt-1">
                     Summen av alle utgifter du hadde på grunn av bagasjeproblemene
@@ -1301,7 +1309,7 @@ export default function FlyreiserPage() {
                   placeholder="F.eks: De sa det var tekniske problemer / dårlig vær..."
                   maxLength={500}
                   rows={3}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
               </div>
             )}
@@ -1362,7 +1370,7 @@ export default function FlyreiserPage() {
                   placeholder="F.eks: De nektet ansvar, sa det var ekstraordinære omstendigheter..."
                   maxLength={500}
                   rows={3}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                 />
                 <p className="text-xs text-slate-500 mt-1">{airlineResponse.length} / 500 tegn</p>
               </div>
@@ -1450,7 +1458,7 @@ export default function FlyreiserPage() {
                           value={eu261ExpenseAmount}
                           onChange={(e) => setEu261ExpenseAmount(e.target.value)}
                           placeholder="F.eks: 850"
-                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                         />
                       </div>
                       <div>
@@ -1460,7 +1468,7 @@ export default function FlyreiserPage() {
                           value={eu261ExpenseDescription}
                           onChange={(e) => setEu261ExpenseDescription(e.target.value)}
                           placeholder="Mat + taxi til hotell"
-                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none"
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
                         />
                       </div>
                     </div>
@@ -1479,7 +1487,7 @@ export default function FlyreiserPage() {
                 placeholder="Beskriv hva som skjedde..."
                 maxLength={2000}
                 rows={4}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               />
               <p className="text-xs text-slate-500 mt-1">{userDescription.length} / 2000 tegn</p>
             </div>
@@ -1494,7 +1502,7 @@ export default function FlyreiserPage() {
                 placeholder="Andre relevante opplysninger som kan styrke saken..."
                 maxLength={500}
                 rows={2}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               />
             </div>
 
@@ -1508,7 +1516,7 @@ export default function FlyreiserPage() {
                 onChange={(e) => setBankAccount(e.target.value.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim())}
                 placeholder="1234 56 78901"
                 maxLength={13}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 font-mono focus:border-white/30 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 font-mono focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20"
               />
               <p className="text-xs text-slate-500 mt-1">
                 Oppgir du kontonummer nå slipper du å sende det separat til flyselskapet.

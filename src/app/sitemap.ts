@@ -5,30 +5,27 @@ const BASE_URL = "https://harjegkravpå.no";
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
+  // High-priority SEO pages (bilkjop heving cluster)
+  const hevingPages = [
+    {
+      url: `${BASE_URL}/bilkjop/heving`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
+    },
+  ];
+
   // Static SEO pages
   const seoPages = [
     // Bilkjop SEO pages
     "/bilkjop/reklamasjon",
     "/bilkjop/garanti",
-    "/bilkjop/heving",
     "/bilkjop/heving-privat",
     "/bilkjop/heving-forhandler",
     "/bilkjop/heving-tidsfrist",
     "/bilkjop/kan-selger-heve",
     "/bilkjop/privat-kjop",
     "/bilkjop/forhandler",
-    // MC-kjop SEO pages
-    "/mc-kjop/mc-feil",
-    "/mc-kjop/reklamasjon",
-    "/mc-kjop/garanti",
-    "/mc-kjop/heving",
-    "/mc-kjop/privat-kjop",
-    "/mc-kjop/forhandler",
-    // Fly SEO pages
-    "/fly-forsinket",
-    "/fly-kansellert",
-    "/mistet-bagasje",
-    "/nektet-ombordstigning",
   ];
 
   // Main pages
@@ -46,22 +43,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/flyreiser`,
-      lastModified: now,
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
-    },
-    {
       url: `${BASE_URL}/bilkjop/bruktbil-feil`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/handverkere`,
-      lastModified: now,
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
     },
   ];
 
@@ -73,5 +58,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...mainPages, ...seoSitemapEntries];
+  // Priority 0.3 — utility-sider
+  const utilityPages = [
+    { url: `${BASE_URL}/om-oss`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/personvern`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/kontakt`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/bruksvilkar`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
+  ];
+
+  return [...mainPages, ...hevingPages, ...seoSitemapEntries, ...utilityPages];
 }

@@ -28,3 +28,24 @@ alter table cases enable row level security;
 create policy "Allow anonymous insert" on cases for insert with check (true);
 create policy "Allow anonymous select" on cases for select using (true);
 create policy "Allow anonymous update" on cases for update using (true);
+
+-- Oppdater status-sjekk til å inkludere betalingsstatuser
+alter table cases drop constraint if exists cases_status_check;
+alter table cases add constraint cases_status_check
+  check (status in ('draft', 'completed', 'paid', 'paid_kravbrev'));
+
+-- Session-cookie tabell for sikker autentisering
+create table if not exists case_sessions (
+  session_hash text primary key,
+  access_token text not null references cases(access_token),
+  case_type text not null check (case_type in ('BIL', 'HANDVERK', 'FLYREISER')),
+  expires_at timestamp with time zone not null,
+  created_at timestamp with time zone default now()
+);
+
+create index if not exists idx_case_sessions_access_token on case_sessions(access_token);
+create index if not exists idx_case_sessions_expires_at on case_sessions(expires_at);
+
+-- RLS for case_sessions - kun service role skal ha tilgang
+alter table case_sessions enable row level security;
+-- Ingen anon-policies — kun service_role key har tilgang

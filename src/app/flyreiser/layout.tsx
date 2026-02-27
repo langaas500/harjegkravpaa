@@ -23,6 +23,10 @@ export const metadata: Metadata = {
     description:
       "Forsinket, kansellert fly eller mistet bagasje? Sjekk om du har krav på kompensasjon etter EU-reglene. Gratis vurdering.",
   },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function FlyreiserLayout({

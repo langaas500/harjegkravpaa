@@ -1,36 +1,32 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Bike, ChevronDown } from "lucide-react";
 import SeoFloatingCTA from "@/components/SeoFloatingCTA";
 
 export default function McPrivatKjopPage() {
-  const router = useRouter();
-
   return (
     <main className="bg-nordic text-white min-h-screen">
 
       <nav className="border-b border-white/10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex justify-end">
           <div className="flex items-center gap-8 text-base">
-            <button
-              onClick={() => router.push("/bilkjop?vehicle=motorcycle")}
+            <Link
+              href="/bilkjop?vehicle=motorcycle"
               className="text-white font-medium hover:text-slate-300 transition"
             >
               Kjøretøy
-            </button>
-            <button
-              onClick={() => router.push("/flyreiser")}
+            </Link>
+            <Link
+              href="/flyreiser"
               className="text-slate-400 hover:text-white transition"
             >
               Flyreiser
-            </button>
-            <button
-              onClick={() => router.push("/bilkjop?vehicle=motorcycle")}
+            </Link>
+            <Link
+              href="/bilkjop?vehicle=motorcycle"
               className="text-white hover:text-slate-300 transition"
             >
               Sjekk saken din →
-            </button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -137,13 +133,13 @@ export default function McPrivatKjopPage() {
           <p className="text-slate-400 mb-5">
             Svar på noen spørsmål og få en vurdering av dine rettigheter ved privatkjøp.
           </p>
-          <button
-            onClick={() => router.push("/bilkjop?vehicle=motorcycle")}
+          <Link
+            href="/bilkjop?vehicle=motorcycle"
             className="inline-flex items-center gap-2 bg-[#1F4F45] text-[#ECFDF5] px-6 py-3 rounded-xl font-semibold hover:bg-[#246457] transition"
           >
             Sjekk saken din
             <ArrowRight className="h-5 w-5" />
-          </button>
+          </Link>
         </section>
 
         <p className="text-xs text-slate-600 text-center mt-8">

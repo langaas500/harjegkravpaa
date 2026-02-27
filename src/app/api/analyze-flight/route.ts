@@ -275,7 +275,16 @@ Svar KUN med JSON, ingen annen tekst.`;
     }
     jsonText = jsonText.trim();
 
-    const outcome = JSON.parse(jsonText);
+    let outcome;
+    try {
+      outcome = JSON.parse(jsonText);
+    } catch {
+      console.error("AI returned invalid JSON:", jsonText?.slice(0, 200));
+      return NextResponse.json(
+        { error: "Analyse midlertidig utilgjengelig. Prøv igjen." },
+        { status: 500 }
+      );
+    }
 
     console.log(`[analyze-flight] ip=${ip.slice(0, 8)}*** ok`);
     return NextResponse.json({ outcome });

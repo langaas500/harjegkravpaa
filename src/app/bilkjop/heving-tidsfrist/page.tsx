@@ -29,6 +29,37 @@ const faqs = [
   },
 ];
 
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Hjem",
+      item: "https://harjegkravpå.no",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Bilkjøp",
+      item: "https://harjegkravpå.no/bilkjop",
+    },
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: "Heving av bilkjøp",
+      item: "https://harjegkravpå.no/bilkjop/heving",
+    },
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: "Tidsfrist for heving",
+      item: "https://harjegkravpå.no/bilkjop/heving-tidsfrist",
+    },
+  ],
+};
+
 export default function HevingTidsfristPage() {
   return (
     <BilSeoHero
@@ -39,7 +70,9 @@ export default function HevingTidsfristPage() {
         <p className="text-lg text-slate-300 leading-relaxed">
           Du har ikke ubegrenset tid til å heve et bilkjøp. Fristene avhenger
           av om du kjøpte bilen privat eller fra forhandler, og når du oppdaget
-          feilen.
+          feilen. Tidsfrist heving bil er et av de vanligste temaene vi får
+          spørsmål om – og en av de vanligste grunnene til at ellers
+          berettigede krav tapes.
         </p>
       }
       heroImageAlt="Tidsfrist for å heve bilkjøp – reklamasjonsfrist og absolutte frister"
@@ -48,6 +81,10 @@ export default function HevingTidsfristPage() {
       primaryCtaButton="Sjekk fristen din"
       secondaryCtaText="Sjekk saken din nå →"
     >
+      <p className="text-xs text-slate-500 mb-10">
+        Sist oppdatert: Februar 2026
+      </p>
+
       {/* To typer frister */}
       <section className="mb-14">
         <h2 className="text-2xl font-bold mb-6">
@@ -57,28 +94,38 @@ export default function HevingTidsfristPage() {
           <p className="text-slate-300">
             For å heve et bilkjøp må du overholde to separate frister. Bryter
             du én av dem, taper du retten til å gjøre mangelen gjeldende –
-            uavhengig av hvor berettiget kravet ellers er.
+            uavhengig av hvor berettiget kravet ellers er. Begge fristene er
+            absolutte i den forstand at de ikke kan «gjenopprettes» dersom de
+            er oversittet.
           </p>
           <div className="space-y-3 mt-2">
             <div className="border-l-2 border-emerald-500/40 pl-4">
-              <p className="font-medium text-white">Relativ reklamasjonsfrist</p>
+              <p className="font-medium text-white">
+                Relativ reklamasjonsfrist
+              </p>
               <p className="text-sm text-slate-400 mt-1">
                 Du må reklamere «innen rimelig tid» etter at du oppdaget eller
                 burde oppdaget mangelen. Denne fristen løper fra
-                oppdagelsestidspunktet.
+                oppdagelsestidspunktet og gjelder uavhengig av den absolutte
+                fristen. I praksis bør du reklamere så raskt som mulig – helst
+                innen noen uker.
               </p>
             </div>
             <div className="border-l-2 border-emerald-500/40 pl-4">
-              <p className="font-medium text-white">Absolutt reklamasjonsfrist</p>
+              <p className="font-medium text-white">
+                Absolutt reklamasjonsfrist
+              </p>
               <p className="text-sm text-slate-400 mt-1">
                 En ytre ramme som setter en endelig grense for når du kan
-                reklamere, uavhengig av når feilen ble oppdaget.
+                reklamere, uavhengig av når feilen ble oppdaget. Denne fristen
+                løper fra overtakelsestidspunktet og er forskjellig avhengig av
+                om du kjøpte privat eller fra forhandler.
               </p>
             </div>
           </div>
           <p className="text-slate-300 mt-4">
-            Begge fristene må være oppfylt. Du finner en grundig gjennomgang av
-            hevingsvilkårene i vår{" "}
+            Begge fristene må være oppfylt for at du skal kunne heve bilkjøpet.
+            Du finner en grundig gjennomgang av hevingsvilkårene i vår{" "}
             <Link
               href="/bilkjop/heving"
               className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
@@ -98,7 +145,8 @@ export default function HevingTidsfristPage() {
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
           <p className="text-slate-300">
             Den absolutte reklamasjonsfristen varierer med hvem du kjøpte bilen
-            av:
+            av. Forskjellen er betydelig og kan være avgjørende for om du
+            fortsatt har mulighet til å heve bilkjøpet:
           </p>
           <div className="space-y-3 mt-2">
             <div className="border-l-2 border-white/20 pl-4">
@@ -107,7 +155,15 @@ export default function HevingTidsfristPage() {
               </p>
               <p className="text-sm text-slate-400 mt-1">
                 Ved kjøp mellom privatpersoner er den absolutte fristen 2 år
-                fra overtakelse. Selger kan ikke avtale en kortere frist.
+                fra overtakelse. Selger kan ikke avtale en kortere frist. Etter
+                2 år er kravet foreldet uavhengig av feilens art. Les mer om{" "}
+                <Link
+                  href="/bilkjop/heving-privat"
+                  className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+                >
+                  heving ved privatkjøp
+                </Link>
+                .
               </p>
             </div>
             <div className="border-l-2 border-white/20 pl-4">
@@ -117,13 +173,21 @@ export default function HevingTidsfristPage() {
               <p className="text-sm text-slate-400 mt-1">
                 Dersom tingen er ment å vare vesentlig lenger enn 2 år – noe
                 biler normalt er – gjelder en absolutt frist på 5 år.
-                Forhandler kan ikke avtale denne bort.
+                Forhandler kan ikke avtale denne bort. Les mer om{" "}
+                <Link
+                  href="/bilkjop/heving-forhandler"
+                  className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+                >
+                  heving hos forhandler
+                </Link>
+                .
               </p>
             </div>
           </div>
           <p className="text-slate-300 mt-4">
             Merk at den absolutte fristen alene ikke er nok. Du må også ha
-            reklamert innen rimelig tid etter at du oppdaget mangelen.
+            reklamert innen rimelig tid etter at du oppdaget mangelen. Begge
+            betingelsene må være oppfylt.
           </p>
         </div>
       </section>
@@ -136,23 +200,75 @@ export default function HevingTidsfristPage() {
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
           <p className="text-slate-300">
             Verken kjøpsloven eller forbrukerkjøpsloven fastsetter et eksakt
-            antall dager. Høyesterett har uttalt at 2 måneder normalt er innenfor
-            ved forbrukerkjøp (Rt-2013-865). Ved privatkjøp er vurderingen
-            strengere.
+            antall dager. Høyesterett har uttalt at 2 måneder normalt er
+            innenfor ved forbrukerkjøp (Rt-2013-865). Ved privatkjøp er
+            vurderingen strengere – her bør du reklamere enda raskere.
           </p>
           <p className="text-slate-300">
-            Momenter som påvirker vurderingen:
+            Momenter som påvirker vurderingen av «rimelig tid»:
           </p>
           <ul className="text-slate-300 space-y-2 ml-4">
-            <li>• Feilens art – noen feil krever undersøkelse før du kan reklamere</li>
-            <li>• Om du trengte tid til å avklare omfanget av mangelen</li>
-            <li>• Om du har vært i dialog med selger om feilen</li>
-            <li>• Ferien eller andre praktiske hindringer</li>
+            <li>
+              • <strong className="text-white">Feilens art:</strong> Noen feil
+              krever undersøkelse før du kan reklamere. En motorlyd som gradvis
+              tiltar gir deg noe mer tid enn en åpenbar feil.
+            </li>
+            <li>
+              • <strong className="text-white">Behov for avklaring:</strong> Om
+              du trengte tid til å avklare omfanget av mangelen gjennom
+              verkstedundersøkelse.
+            </li>
+            <li>
+              • <strong className="text-white">Dialog med selger:</strong> Om du
+              har vært i aktiv dialog med selger om feilen – dette kan tyde på
+              at du ikke har «sovet» på kravet.
+            </li>
+            <li>
+              • <strong className="text-white">Praktiske hindringer:</strong>{" "}
+              Ferie, sykdom eller andre unnskyldelige grunner kan gi noe ekstra
+              tid, men ikke ubegrenset.
+            </li>
           </ul>
           <p className="text-slate-300">
             Hovedregelen er enkel: reklamer så raskt du kan etter at du oppdager
-            feilen. Jo lenger du venter, desto større risiko for at reklamasjonen
-            anses for sen.
+            feilen. Jo lenger du venter, desto større risiko for at
+            reklamasjonen anses for sen – og da mister du retten til å heve
+            bilkjøpet uansett feilens alvorlighet.
+          </p>
+        </div>
+      </section>
+
+      {/* Foreldelse */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">
+          Foreldelse – en tredje tidsfrist
+        </h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            I tillegg til de to reklamasjonsfristene finnes det en tredje
+            tidsbegrensning: foreldelsesfristen etter foreldelsesloven.
+            Foreldelsesfristen er på 3 år fra du «fikk eller burde fått»
+            kjennskap til kravet.
+          </p>
+          <p className="text-slate-300">
+            I praksis har foreldelsesfristen størst betydning i tilfeller der:
+          </p>
+          <ul className="text-slate-300 space-y-2 ml-4">
+            <li>
+              • Du reklamerte i tide, men det tok lang tid å få avklart saken
+            </li>
+            <li>
+              • Du krever erstatning i tillegg til heving – erstatningskravet
+              har en egen foreldelsesfrist
+            </li>
+            <li>
+              • Saken har gått så lang tid at foreldelse uansett er aktuelt
+            </li>
+          </ul>
+          <p className="text-slate-300">
+            Foreldelsesfristen kan avbrytes ved å ta rettslige skritt – for
+            eksempel ved å sende forliksklage. Dersom du har en pågående sak
+            som har trukket ut i tid, bør du være oppmerksom på denne fristen.
           </p>
         </div>
       </section>
@@ -164,25 +280,74 @@ export default function HevingTidsfristPage() {
         </h2>
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
           <p className="text-slate-300">
-            Starttidspunktet for fristene er forskjellig:
+            Starttidspunktet for fristene er forskjellig, og det er viktig å
+            forstå forskjellen:
           </p>
           <ul className="text-slate-300 space-y-2 ml-4">
             <li>
               <strong className="text-white">Absolutt frist:</strong> Løper fra
               overtakelsestidspunktet – det vil si dagen du faktisk mottok
-              bilen, ikke datoen kontrakten ble signert.
+              bilen, ikke datoen kontrakten ble signert. Dersom du hentet bilen
+              to dager etter signering, er det hentedagen som gjelder.
             </li>
             <li>
               <strong className="text-white">Relativ frist:</strong> Løper fra
               det tidspunktet du oppdaget eller burde oppdaget mangelen. En
-              skjult feil som viser seg etter 18 måneder starter den relative
-              fristen på dette tidspunktet.
+              skjult feil som først viser seg etter 18 måneder starter den
+              relative fristen på dette tidspunktet – men du må fortsatt være
+              innenfor den absolutte fristen.
+            </li>
+            <li>
+              <strong className="text-white">Foreldelse:</strong> Løper fra du
+              fikk eller burde fått kjennskap til mangelen og hvem som er
+              ansvarlig.
             </li>
           </ul>
           <p className="text-slate-300">
             Et praktisk råd: noter datoen du oppdaget feilen, og reklamer
-            skriftlig så snart som mulig. Dokumentasjon av tidspunktet kan bli
-            avgjørende dersom selger bestrider at reklamasjonen var rettidig.
+            skriftlig så snart som mulig. Dokumentasjon av oppdagelsestidspunktet
+            kan bli avgjørende dersom selger bestrider at reklamasjonen var
+            rettidig.
+          </p>
+        </div>
+      </section>
+
+      {/* Slik sikrer du deg */}
+      <section className="mb-14">
+        <h2 className="text-2xl font-bold mb-6">
+          Slik sikrer du at fristen overholdes
+        </h2>
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
+          <p className="text-slate-300">
+            Mange taper sitt krav fordi de venter for lenge med å reklamere.
+            Her er konkrete tiltak du bør gjøre umiddelbart etter at du
+            oppdager en feil:
+          </p>
+          <ul className="text-slate-300 space-y-2 ml-4">
+            <li>
+              • Send reklamasjon til selger innen noen dager – ikke vent til du
+              har full oversikt over feilen
+            </li>
+            <li>
+              • Reklamer skriftlig (e-post eller SMS) slik at du kan dokumentere
+              tidspunktet
+            </li>
+            <li>
+              • Du trenger ikke vite årsaken til feilen – beskriv symptomene
+            </li>
+            <li>
+              • Innhent verkstedrapport så snart det lar seg gjøre – men ikke
+              vent med reklamasjonen til rapporten foreligger
+            </li>
+            <li>
+              • Hold selger løpende orientert dersom det tar tid å avklare
+              feilen
+            </li>
+          </ul>
+          <p className="text-slate-300">
+            Husk at tidsfrist for heving av bilkjøp aldri kan «repareres»
+            etter at den er utløpt. Har du først forsinket reklamasjonen, hjelper
+            det ikke at feilen er aldri så alvorlig.
           </p>
         </div>
       </section>
@@ -200,7 +365,15 @@ export default function HevingTidsfristPage() {
                 Du kjøper bil fra forhandler og oppdager motorproblemer etter 3
                 uker. Du reklamerer etter 5 dager. Begge frister er overholdt:
                 godt innenfor 5-årsfristen og reklamert innen rimelig tid.
-                Feil innen 6 måneder har dessuten bevispresumpsjon i din favør.
+                Feil innen 6 måneder har dessuten bevispresumpsjon i din favør
+                etter forbrukerkjøpsloven. Les mer om{" "}
+                <Link
+                  href="/bilkjop/heving-forhandler"
+                  className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+                >
+                  heving hos forhandler
+                </Link>
+                .
               </p>
             </div>
             <div className="border-l-2 border-emerald-500/40 pl-4">
@@ -212,7 +385,14 @@ export default function HevingTidsfristPage() {
                 etter 1,5 år. Du reklamerer etter 3 uker. Du er innenfor
                 2-årsfristen og har reklamert innen rimelig tid etter
                 oppdagelsen. Men du må selv sannsynliggjøre at feilen forelå
-                ved kjøpet.
+                ved kjøpet – les mer om{" "}
+                <Link
+                  href="/bilkjop/heving-privat"
+                  className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+                >
+                  heving ved privatkjøp
+                </Link>
+                .
               </p>
             </div>
             <div className="border-l-2 border-red-500/40 pl-4">
@@ -223,7 +403,8 @@ export default function HevingTidsfristPage() {
                 Du oppdager en feil i juni, men reklamerer først i desember.
                 Selv om du er innenfor den absolutte fristen, er 6 måneder
                 normalt for lang tid. Selger kan avvise kravet som for sent
-                fremsatt.
+                fremsatt, og du mister retten til å heve bilkjøpet – uansett
+                hvor alvorlig feilen er.
               </p>
             </div>
           </div>
@@ -235,12 +416,26 @@ export default function HevingTidsfristPage() {
         <h2 className="text-2xl font-bold mb-6">Kort oppsummert</h2>
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 md:p-8 space-y-4">
           <ul className="text-slate-300 space-y-2 ml-4">
-            <li>• Du må overholde både den relative og den absolutte fristen</li>
+            <li>
+              • Du må overholde både den relative og den absolutte fristen
+            </li>
             <li>• Privatkjøp: 2 års absolutt frist fra overtakelse</li>
             <li>• Forhandlerkjøp: 5 års absolutt frist fra overtakelse</li>
-            <li>• Reklamer innen rimelig tid – normalt innen 2–3 måneder etter oppdagelse</li>
-            <li>• Fristene løper fra overtakelse (absolutt) og oppdagelse (relativ)</li>
-            <li>• For sen reklamasjon = tapt krav, uansett feilens alvorlighet</li>
+            <li>
+              • Reklamer innen rimelig tid – normalt innen 2–3 måneder etter
+              oppdagelse
+            </li>
+            <li>
+              • Fristene løper fra overtakelse (absolutt) og oppdagelse
+              (relativ)
+            </li>
+            <li>
+              • For sen reklamasjon = tapt krav, uansett feilens alvorlighet
+            </li>
+            <li>
+              • Foreldelsesfristen på 3 år kan også komme inn som en ekstra
+              begrensning
+            </li>
           </ul>
           <p className="text-slate-300 mt-4">
             For å forstå de øvrige vilkårene for{" "}
@@ -250,7 +445,22 @@ export default function HevingTidsfristPage() {
             >
               heving av bilkjøp
             </Link>
-            , se vår hovedside.
+            , se vår hovedside. Usikker på om du kjøpte privat eller fra
+            forhandler? Se forskjellene i guidene for{" "}
+            <Link
+              href="/bilkjop/heving-privat"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving ved privatkjøp
+            </Link>{" "}
+            og{" "}
+            <Link
+              href="/bilkjop/heving-forhandler"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              heving hos forhandler
+            </Link>
+            .
           </p>
         </div>
       </section>
@@ -276,6 +486,11 @@ export default function HevingTidsfristPage() {
             </details>
           ))}
         </div>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
       </section>
 
       {/* Final CTA */}
@@ -305,6 +520,11 @@ export default function HevingTidsfristPage() {
           </p>
         </div>
       </section>
+
+      <p className="text-xs text-slate-500 text-center mt-8">
+        Basert på kjøpsloven og forbrukerkjøpsloven. Innholdet er generell
+        juridisk informasjon og ikke individuell rådgivning.
+      </p>
     </BilSeoHero>
   );
 }

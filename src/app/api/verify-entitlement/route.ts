@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { resolveAccessToken } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     return NextResponse.json(
@@ -15,10 +14,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { token, productType } = await req.json();
+    const { productType, case_type } = await req.json();
 
-    if (!token || typeof token !== "string") {
-      return NextResponse.json({ ok: false, reason: "missing_token" });
+    if (!case_type || typeof case_type !== "string") {
+      return NextResponse.json({ ok: false, reason: "missing_case_type" });
+    }
+
+    const accessToken = await resolveAccessToken(req, case_type);
+    if (!accessToken) {
+      return NextResponse.json({ ok: false, reason: "no_session" });
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -26,7 +30,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase
       .from("cases")
       .select("status")
-      .eq("access_token", token)
+      .eq("access_token", accessToken)
       .single();
 
     if (error || !data) {

@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   CheckCircle,
   Clock,
+  Trash2,
 } from "lucide-react";
 
 interface CaseData {
@@ -49,20 +50,23 @@ export default function SakPage() {
 
         setCaseData(data);
 
-        // Lagre data i localStorage for å kunne vise rapport/kravbrev
-        if (data.case_type === "HANDVERK") {
-          localStorage.setItem("handverk-data", JSON.stringify({
+        // Set session cookie via resolve endpoint
+        fetch("/api/case/resolve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: token }),
+        }).catch(() => {});
+
+        // Lagre data i localStorage UTEN access_token
+        const lsKey =
+          data.case_type === "HANDVERK" ? "handverk-data" :
+          data.case_type === "BIL" ? "bilkjop-data" :
+          data.case_type === "FLYREISER" ? "flyreiser-data" : null;
+        if (lsKey) {
+          localStorage.setItem(lsKey, JSON.stringify({
             ...data.payload,
             outcome: data.outcome,
             caseId: data.id,
-            access_token: token,
-          }));
-        } else if (data.case_type === "BIL") {
-          localStorage.setItem("bilkjop-data", JSON.stringify({
-            ...data.payload,
-            outcome: data.outcome,
-            caseId: data.id,
-            access_token: token,
           }));
         }
       } catch (err) {
@@ -247,8 +251,35 @@ export default function SakPage() {
           Hva gjør jeg nå?
         </button>
 
-        <div className="text-center text-xs text-slate-600 pt-4">
+        <div className="text-center text-xs text-slate-600 pt-4 space-y-3">
           <p>harjegkravpå.no – Veiledning, ikke juridisk rådgivning.</p>
+          <button
+            onClick={async () => {
+              if (!confirm("Er du sikker? Dette kan ikke angres.")) return;
+              try {
+                const res = await fetch("/api/delete-case", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ access_token: token }),
+                });
+                if (res.ok) {
+                  localStorage.removeItem("bilkjop-data");
+                  localStorage.removeItem("handverk-data");
+                  localStorage.removeItem("flyreiser-data");
+                  alert("Dine data er slettet.");
+                  router.push("/");
+                } else {
+                  alert("Kunne ikke slette data. Prøv igjen senere.");
+                }
+              } catch {
+                alert("Noe gikk galt. Prøv igjen senere.");
+              }
+            }}
+            className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-red-400 transition"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Slett mine data
+          </button>
         </div>
       </div>
     </main>

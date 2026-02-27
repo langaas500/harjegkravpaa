@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   CheckCircle,
   FileText,
@@ -68,7 +68,6 @@ function track(event: string, product?: string) {
 
 function KravbrevBetaltContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [data, setData] = useState<FlightData | null>(null);
   const [letter, setLetter] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -76,15 +75,21 @@ function KravbrevBetaltContent() {
   const [copied, setCopied] = useState(false);
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
   const [hasDownloaded, setHasDownloaded] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [entitlement, setEntitlement] = useState<"loading" | "verified" | "denied" | "error">("loading");
   const letterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const initData = (parsedData: FlightData) => {
       setData(parsedData);
+      // Migrate: if old LS has access_token, set session cookie then remove it
       if (parsedData.access_token) {
-        setAccessToken(parsedData.access_token);
+        fetch("/api/case/resolve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: parsedData.access_token }),
+        }).catch(() => {});
+        const { access_token: _, ...clean } = parsedData;
+        localStorage.setItem("flyreiser-data", JSON.stringify(clean));
       }
     };
 
@@ -96,6 +101,12 @@ function KravbrevBetaltContent() {
       const params = new URLSearchParams(window.location.search);
       const urlToken = params.get("token");
       if (urlToken) {
+        // Set cookie via resolve
+        fetch("/api/case/resolve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: urlToken }),
+        }).catch(() => {});
         fetch(`/api/sak/${urlToken}`)
           .then((res) => res.json())
           .then((result) => {
@@ -103,7 +114,6 @@ function KravbrevBetaltContent() {
               const recovered = {
                 ...result.payload,
                 outcome: result.outcome,
-                access_token: urlToken,
               } as FlightData;
               localStorage.setItem("flyreiser-data", JSON.stringify(recovered));
               initData(recovered);
@@ -142,24 +152,10 @@ function KravbrevBetaltContent() {
     loadFonts();
   }, []);
 
-  // Entitlement verification against Supabase
+  // Entitlement verification via session cookie
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get("token");
-    const justPaid = params.get("paid") === "1";
-    const stored = localStorage.getItem("flyreiser-data");
-    const storedToken = stored
-      ? (JSON.parse(stored)?.access_token as string)
-      : null;
-    const token = urlToken || storedToken;
-
-    if (!token) {
-      setEntitlement("denied");
-      return;
-    }
-
     let attempts = 0;
-    const maxAttempts = justPaid ? 4 : 1;
+    const maxAttempts = 4;
     let timeoutId: NodeJS.Timeout;
     let cancelled = false;
 
@@ -168,7 +164,7 @@ function KravbrevBetaltContent() {
       fetch("/api/verify-entitlement", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, productType: "KRAVBREV" }),
+        body: JSON.stringify({ productType: "KRAVBREV", case_type: "FLYREISER" }),
       })
         .then((res) => res.json())
         .then((result) => {
@@ -618,30 +614,6 @@ function KravbrevBetaltContent() {
             </button>
           )}
 
-          {accessToken && (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
-              <p className="text-sm text-slate-300">
-                Du kan komme tilbake til denne saken senere via denne lenken.
-                Lagre den hvis du vil ha tilgang til rapporten og kravbrevet igjen.
-              </p>
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
-                <input
-                  type="text"
-                  readOnly
-                  value={`${typeof window !== "undefined" ? window.location.origin : ""}/sak/${accessToken}`}
-                  className="flex-1 bg-transparent text-sm text-slate-400 outline-none"
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/sak/${accessToken}`);
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs border border-white/10 hover:border-white/30 transition"
-                >
-                  Kopier
-                </button>
-              </div>
-            </div>
-          )}
 
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
             <p className="text-sm text-amber-200">

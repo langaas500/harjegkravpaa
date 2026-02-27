@@ -39,21 +39,13 @@ export default function ReportPaywall({
   const handlePayment = async () => {
     setIsLoading(true);
     try {
-      if (!accessToken) {
-        alert(
-          "Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt."
-        );
-        setIsLoading(false);
-        return;
-      }
-
       track("checkout_start", "REPORT");
 
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: accessToken,
+          token: accessToken || undefined,
           productType: "REPORT",
           category,
           returnPath: reportReturnPath,
@@ -81,21 +73,13 @@ export default function ReportPaywall({
   const handleKravbrevPayment = async () => {
     setIsLoading(true);
     try {
-      if (!accessToken) {
-        alert(
-          "Feil: Kunne ikke finne saksreferanse. Prøv å gå gjennom skjemaet på nytt."
-        );
-        setIsLoading(false);
-        return;
-      }
-
       track("checkout_start", "KRAVBREV");
 
       const response = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: accessToken,
+          token: accessToken || undefined,
           productType: "KRAVBREV",
           category,
           returnPath: kravbrevReturnPath,

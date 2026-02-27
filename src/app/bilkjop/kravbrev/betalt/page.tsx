@@ -52,8 +52,8 @@ export default function KravbrevBetaltPage() {
   const [step, setStep] = useState<"contact" | "letter">("contact");
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
   const [hasDownloaded, setHasDownloaded] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     buyerName: "",
     buyerAddress: "",
@@ -66,12 +66,21 @@ export default function KravbrevBetaltPage() {
     sellerCity: "",
   });
   const letterRef = useRef<HTMLDivElement>(null);
+  const contactAnchorRef = useRef<HTMLDivElement>(null);
+  const resultAnchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const initData = (parsedData: Record<string, unknown>) => {
       setData(parsedData);
+      // Migrate: if old LS has access_token, set session cookie then remove it
       if (parsedData.access_token) {
-        setAccessToken(parsedData.access_token as string);
+        fetch("/api/case/resolve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: parsedData.access_token }),
+        }).catch(() => {});
+        const { access_token: _, ...clean } = parsedData;
+        localStorage.setItem("bilkjop-data", JSON.stringify(clean));
       }
       const storedContact = localStorage.getItem("kravbrev-contact");
       if (storedContact) {
@@ -99,6 +108,12 @@ export default function KravbrevBetaltPage() {
       const params = new URLSearchParams(window.location.search);
       const urlToken = params.get("token");
       if (urlToken) {
+        // Set cookie via resolve, then recover data
+        fetch("/api/case/resolve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: urlToken }),
+        }).catch(() => {});
         fetch(`/api/sak/${urlToken}`)
           .then((res) => res.json())
           .then((result) => {
@@ -107,7 +122,6 @@ export default function KravbrevBetaltPage() {
                 ...result.payload,
                 outcome: result.outcome,
                 caseId: result.id,
-                access_token: urlToken,
               } as Record<string, unknown>;
               localStorage.setItem("bilkjop-data", JSON.stringify(recovered));
               initData(recovered);
@@ -145,24 +159,10 @@ export default function KravbrevBetaltPage() {
     loadFonts();
   }, []);
 
-  // Entitlement verification against Supabase
+  // Entitlement verification via session cookie
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get("token");
-    const justPaid = params.get("paid") === "1";
-    const stored = localStorage.getItem("bilkjop-data");
-    const storedToken = stored
-      ? (JSON.parse(stored)?.access_token as string)
-      : null;
-    const token = urlToken || storedToken;
-
-    if (!token) {
-      setEntitlement("denied");
-      return;
-    }
-
     let attempts = 0;
-    const maxAttempts = justPaid ? 4 : 1;
+    const maxAttempts = 4;
     let timeoutId: NodeJS.Timeout;
     let cancelled = false;
 
@@ -171,7 +171,7 @@ export default function KravbrevBetaltPage() {
       fetch("/api/verify-entitlement", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, productType: "KRAVBREV" }),
+        body: JSON.stringify({ productType: "KRAVBREV", case_type: "BIL" }),
       })
         .then((res) => res.json())
         .then((result) => {
@@ -202,6 +202,20 @@ export default function KravbrevBetaltPage() {
       clearTimeout(timeoutId);
     };
   }, []);
+
+  // Auto-scroll to contact form when entitlement is verified
+  useEffect(() => {
+    if (entitlement === "verified" && step === "contact" && contactAnchorRef.current) {
+      contactAnchorRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [entitlement, step]);
+
+  // Auto-scroll to result when letter is ready
+  useEffect(() => {
+    if (letter && !isGenerating && resultAnchorRef.current) {
+      resultAnchorRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [letter, isGenerating]);
 
   const handleContactChange = (field: keyof ContactInfo, value: string) => {
     setContactInfo((prev) => ({ ...prev, [field]: value }));
@@ -241,6 +255,7 @@ export default function KravbrevBetaltPage() {
       }
 
       setLetter(result.letter);
+      setEmailSent(!!result.emailSent);
       localStorage.setItem("kravbrev-text", result.letter);
     } catch (err) {
       console.error("Generate error:", err);
@@ -555,6 +570,12 @@ export default function KravbrevBetaltPage() {
           {/* ═══════════ CONTACT STEP ═══════════ */}
           {step === "contact" && (
             <div className="space-y-6">
+              <div ref={contactAnchorRef} className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
+                <p className="text-sm font-bold text-emerald-400">Steg 1 av 2</p>
+                <p className="text-sm text-slate-300 mt-1">Fyll inn kontaktinfo så lager vi et ferdig kravbrev du kan sende.</p>
+                <p className="text-xs text-slate-500 mt-1">Tar ca. 2 minutter.</p>
+              </div>
+
               <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 space-y-4">
                 <div className="flex items-center gap-3 mb-4">
                   <User className="h-5 w-5 text-emerald-400" />
@@ -702,6 +723,30 @@ export default function KravbrevBetaltPage() {
           {/* ═══════════ LETTER STEP ═══════════ */}
           {step === "letter" && (
             <>
+              {isGenerating && (
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4 space-y-3">
+                  <p className="text-sm font-bold text-emerald-400">Steg 2 av 2</p>
+                  <p className="text-sm text-slate-300">Genererer kravbrev...</p>
+                  <div className="space-y-1.5 text-xs text-slate-500">
+                    <p>Setter inn kjøpsinfo</p>
+                    <p>Formulerer krav</p>
+                    <p>Klargjør for utskrift</p>
+                  </div>
+                </div>
+              )}
+
+              <div ref={resultAnchorRef} />
+
+              {letter && (
+                <div className={`flex items-center gap-2 text-sm px-4 py-2.5 rounded-lg ${emailSent ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"}`}>
+                  {emailSent ? (
+                    <><Check className="h-4 w-4 flex-shrink-0" /> Sak-lenke sendt til din e-post</>
+                  ) : (
+                    <><AlertCircle className="h-4 w-4 flex-shrink-0" /> Ingen e-post oppgitt — lagre lenken fra &quot;Flere valg&quot; under</>
+                  )}
+                </div>
+              )}
+
               <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
                 <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
                   <div className="flex items-center gap-3">
@@ -879,6 +924,25 @@ export default function KravbrevBetaltPage() {
                     <span>Last ned .docx</span>
                   </button>
 
+                  {/* ═══ PDF-VURDERING (inkludert gratis) ═══ */}
+                  <button
+                    onClick={handleDownloadReportPdf}
+                    disabled={isGeneratingReport}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.08] hover:bg-emerald-500/[0.12] transition text-emerald-400 disabled:opacity-60"
+                  >
+                    {isGeneratingReport ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Genererer vurdering...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="h-5 w-5" />
+                        <span>Last ned PDF-vurdering (inkludert)</span>
+                      </>
+                    )}
+                  </button>
+
                   {/* ═══ FLERE VALG (collapsible) ═══ */}
                   <button
                     onClick={() => setShowMore(!showMore)}
@@ -905,24 +969,6 @@ export default function KravbrevBetaltPage() {
                       >
                         <Download className="h-5 w-5" />
                         <span>Last ned PDF (uten vedlegg)</span>
-                      </button>
-
-                      <button
-                        onClick={handleDownloadReportPdf}
-                        disabled={isGeneratingReport}
-                        className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.08] hover:bg-emerald-500/[0.12] transition text-emerald-400 disabled:opacity-60"
-                      >
-                        {isGeneratingReport ? (
-                          <>
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>Genererer vurdering...</span>
-                          </>
-                        ) : (
-                          <>
-                            <FileText className="h-5 w-5" />
-                            <span>Last ned PDF-vurdering (inkludert)</span>
-                          </>
-                        )}
                       </button>
 
                       <button
@@ -961,29 +1007,6 @@ export default function KravbrevBetaltPage() {
                         Hva gjør jeg nå?
                       </button>
 
-                      {accessToken && (
-                        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
-                          <p className="text-sm text-slate-400">
-                            <strong className="text-white">Lagre denne lenken</strong> – den gir deg tilgang til saken din senere uten innlogging:
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              readOnly
-                              value={`${typeof window !== "undefined" ? window.location.origin : ""}/sak/${accessToken}`}
-                              className="flex-1 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.08] text-sm text-slate-300 select-all focus:outline-none"
-                            />
-                            <button
-                              onClick={async () => {
-                                await navigator.clipboard.writeText(`${window.location.origin}/sak/${accessToken}`);
-                              }}
-                              className="px-3 py-2 rounded-xl border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.03] transition text-sm"
-                            >
-                              Kopier
-                            </button>
-                          </div>
-                        </div>
-                      )}
                     </>
                   )}
                 </div>

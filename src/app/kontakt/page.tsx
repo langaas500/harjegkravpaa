@@ -147,7 +147,7 @@ export default function KontaktPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ditt navn"
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/30 focus:outline-none transition"
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition"
                 />
               </div>
 
@@ -161,7 +161,7 @@ export default function KontaktPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="din@epost.no"
                   required
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/30 focus:outline-none transition"
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition"
                 />
               </div>
 
@@ -175,7 +175,7 @@ export default function KontaktPage() {
                   placeholder="Skriv din melding her..."
                   required
                   rows={4}
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/30 focus:outline-none transition"
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition"
                 />
               </div>
 
