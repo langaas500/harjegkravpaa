@@ -212,11 +212,8 @@ export default function BilkjopWizard() {
 
   return (
     <main className="bg-[#0a0f0d] text-white min-h-screen relative overflow-hidden">
-      {/* Ambient background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-300px] left-1/2 -translate-x-1/2 w-[1000px] h-[700px] rounded-full" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.04) 0%, transparent 70%)" }} />
-        <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] rounded-full" style={{ background: "radial-gradient(circle, rgba(16,185,129,0.025) 0%, transparent 70%)" }} />
-      </div>
+      {/* Background image */}
+      <div className="fixed inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/wizard-bg.jpg')" }} />
 
       {/* Progress bar */}
       {isWizardStep && (
@@ -228,12 +225,14 @@ export default function BilkjopWizard() {
       <div className="relative z-10">
         {/* ═══════════ WIZARD STEPS ═══════════ */}
         {isWizardStep && (
-          <div className="mx-auto w-full max-w-2xl px-4 py-12 pt-14">
+          <div className="mx-auto w-full max-w-2xl px-4 py-12 pt-14 border border-white/[0.12] bg-[#0a0f0d]/90 backdrop-blur-sm rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.6)] my-4">
             <div className="flex items-center justify-between mb-8">
               <span className="text-[11px] text-slate-500 font-semibold tracking-[0.1em] uppercase">
                 {stepTitle(step)}
               </span>
-              <span className="text-[11px] text-slate-700">{progress}%</span>
+              <span className="text-[11px] text-slate-700">
+{progress}%
+              </span>
             </div>
 
             {step === "BASICS" && (
@@ -250,21 +249,27 @@ export default function BilkjopWizard() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm text-slate-400 mb-1.5">Ditt navn (valgfritt)</label>
-                    <input type="text" autoComplete="name" placeholder="Ola Nordmann" value={state.buyerName} onChange={(e) => update({ buyerName: e.target.value })} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                    <input type="text" autoComplete="name" placeholder="Ola Nordmann" value={state.buyerName} onChange={(e) => update({ buyerName: e.target.value })} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
                   </div>
                   <div>
                     <label className="block text-sm text-slate-400 mb-1.5">Selger (valgfritt)</label>
-                    <input type="text" placeholder="Firma AS / Navn" value={state.sellerName} onChange={(e) => update({ sellerName: e.target.value })} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                    <input type="text" placeholder="Firma AS / Navn" value={state.sellerName} onChange={(e) => update({ sellerName: e.target.value })} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {([["Merke", "make"], ["Modell", "model"], ["Reg.nr", "regNum"], ["Årsmodell", "year"], ["Kilometerstand", "km"], ["Kjøpesum (kr) *", "price"]] as const).map(([placeholder, key]) => (
-                    <input key={key} type="text" inputMode={key === "year" || key === "km" ? "numeric" : key === "price" ? "decimal" : undefined} placeholder={placeholder} value={state.vehicle[key]} onChange={(e) => update({ vehicle: { ...state.vehicle, [key]: e.target.value } })} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                    <div key={key}>
+                      <input type="text" inputMode={key === "year" || key === "km" ? "numeric" : key === "price" ? "decimal" : undefined} placeholder={placeholder} value={state.vehicle[key]} onChange={(e) => update({ vehicle: { ...state.vehicle, [key]: e.target.value } })} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                      {key === "regNum" && <p className="mt-1 text-xs text-slate-500">Finner du på vognkortet</p>}
+                      {key === "km" && <p className="mt-1 text-xs text-slate-500">Ved kjøpstidspunktet</p>}
+                      {key === "price" && <p className="mt-1 text-xs text-slate-500">Beløpet du faktisk betalte</p>}
+                    </div>
                   ))}
                 </div>
                 <div>
                   <label className="block text-sm text-slate-400 mb-1.5">Kjøpsdato *</label>
-                  <input type="date" value={state.vehicle.purchaseDate} onChange={(e) => update({ vehicle: { ...state.vehicle, purchaseDate: e.target.value } })} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                  <input type="date" value={state.vehicle.purchaseDate} onChange={(e) => update({ vehicle: { ...state.vehicle, purchaseDate: e.target.value } })} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                  <p className="mt-1 text-xs text-slate-500">Datoen på kjøpskontrakten</p>
                 </div>
                 <p className="text-xs text-slate-600">* Obligatoriske felter</p>
                 <div className="flex gap-3 pt-2">
@@ -407,7 +412,7 @@ export default function BilkjopWizard() {
                 {state.contactedSeller === true && (
                   <div>
                     <label className="block text-sm text-slate-400 mb-2">Hva svarte selger? (valgfritt)</label>
-                    <textarea value={state.sellerResponse} onChange={(e) => update({ sellerResponse: e.target.value })} placeholder="F.eks: Selger nekter ansvar, sier det er slitasje..." maxLength={500} rows={3} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                    <textarea value={state.sellerResponse} onChange={(e) => update({ sellerResponse: e.target.value })} placeholder="F.eks: Selger nekter ansvar, sier det er slitasje..." maxLength={500} rows={3} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
                     <p className="text-xs text-slate-600 mt-1">{state.sellerResponse.length} / 500 tegn</p>
                   </div>
                 )}
@@ -438,7 +443,7 @@ export default function BilkjopWizard() {
                         <li>• Verkstedfunn eller feilkoder</li>
                       </ul>
                     </div>
-                    <textarea value={state.userDescription} onChange={(e) => update({ userDescription: e.target.value })} placeholder="Beskriv hva som har skjedd..." maxLength={1000} rows={5} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                    <textarea value={state.userDescription} onChange={(e) => update({ userDescription: e.target.value })} placeholder="Beskriv hva som har skjedd..." maxLength={1000} rows={5} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
                     <p className="text-xs text-slate-600">{state.userDescription.length} / 1000 tegn</p>
                   </>
                 )}
@@ -470,7 +475,7 @@ export default function BilkjopWizard() {
                         <li>• &ldquo;Ingen rust eller skjulte feil&rdquo;</li>
                       </ul>
                     </div>
-                    <textarea value={state.sellerPromises} onChange={(e) => update({ sellerPromises: e.target.value })} placeholder={`Beskriv hva selger sa eller lovte om ${vehicleText("bilen", "motorsykkelen")}...`} maxLength={1000} rows={4} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                    <textarea value={state.sellerPromises} onChange={(e) => update({ sellerPromises: e.target.value })} placeholder={`Beskriv hva selger sa eller lovte om ${vehicleText("bilen", "motorsykkelen")}...`} maxLength={1000} rows={4} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
                     <p className="text-xs text-slate-600">{state.sellerPromises.length} / 1000 tegn</p>
                   </>
                 )}
@@ -569,7 +574,7 @@ export default function BilkjopWizard() {
                         <li>• Verkstedets vurdering av feilen</li>
                       </ul>
                     </div>
-                    <textarea value={state.workshopReportText} onChange={(e) => update({ workshopReportText: e.target.value })} placeholder="Lim inn eller oppsummer verkstedsrapporten her..." maxLength={2000} rows={6} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition font-mono text-base" />
+                    <textarea value={state.workshopReportText} onChange={(e) => update({ workshopReportText: e.target.value })} placeholder="Lim inn eller oppsummer verkstedsrapporten her..." maxLength={2000} rows={6} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition font-mono text-base" />
                     <p className="text-xs text-slate-600">{state.workshopReportText.length} / 2000 tegn</p>
                   </>
                 )}
@@ -593,7 +598,7 @@ export default function BilkjopWizard() {
                 </div>
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">Lenke til annonsen (valgfritt)</label>
-                  <input type="url" value={state.finnUrl} onChange={(e) => update({ finnUrl: e.target.value })} placeholder="https://finn.no/..." className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                  <input type="url" value={state.finnUrl} onChange={(e) => update({ finnUrl: e.target.value })} placeholder="https://finn.no/..." className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
                   <p className="text-xs text-slate-600 mt-1">Lenken brukes kun som referanse i dokumentene.</p>
                 </div>
                 <div>
@@ -602,7 +607,7 @@ export default function BilkjopWizard() {
                 </div>
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">Hva ble lovet i annonsen som ikke stemmer? (valgfritt)</label>
-                  <textarea value={state.adClaims} onChange={(e) => update({ adClaims: e.target.value })} placeholder="For eksempel: 'I annonsen stod det at bilen var EU-godkjent uten anmerkninger...'" maxLength={600} rows={4} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
+                  <textarea value={state.adClaims} onChange={(e) => update({ adClaims: e.target.value })} placeholder="For eksempel: 'I annonsen stod det at bilen var EU-godkjent uten anmerkninger...'" maxLength={600} rows={4} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition" />
                   <p className="text-xs text-slate-600 mt-1">{state.adClaims.length} / 600 tegn</p>
                 </div>
                 <div className="flex gap-3 pt-2">
@@ -632,7 +637,7 @@ export default function BilkjopWizard() {
                         <li>• Tidligere kommunikasjon med selger</li>
                       </ul>
                     </div>
-                    <textarea value={state.additionalInfo} onChange={(e) => update({ additionalInfo: e.target.value })} placeholder="Skriv så mye du ønsker her..." maxLength={5000} rows={6} className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-white placeholder:text-slate-600 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition font-mono text-base" />
+                    <textarea value={state.additionalInfo} onChange={(e) => update({ additionalInfo: e.target.value })} placeholder="Skriv så mye du ønsker her..." maxLength={5000} rows={6} className="w-full rounded-xl border border-white/[0.20] bg-white/[0.07] px-4 py-3 text-white placeholder:text-slate-500 resize-none focus:border-emerald-500/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/20 transition font-mono text-base" />
                     <p className="text-xs text-slate-600">{state.additionalInfo.length} / 5000 tegn</p>
                   </>
                 )}

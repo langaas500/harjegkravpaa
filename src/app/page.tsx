@@ -8,12 +8,9 @@ import {
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
-  Clock,
   FileText,
 } from "lucide-react";
-import HeroProductPreview from "@/components/HeroProductPreview";
 import {
-  CaseCounter,
   FaqAccordion,
   StickyMobileCta,
 } from "./_components/HomeClientIslands";
@@ -27,6 +24,7 @@ type Cat = {
   disabled?: boolean;
   tag?: string;
   highlight?: boolean;
+  cta?: string;
 };
 
 const cats: Cat[] = [
@@ -34,10 +32,11 @@ const cats: Cat[] = [
     key: "kjoretoy",
     icon: Car,
     title: "Kjøretøy",
-    desc: "Feil på bil eller MC etter kjøpet? Sjekk kravene dine på 2 min.",
+    desc: "Feil på bil eller MC? Sjekk om du kan kreve prisavslag, retting eller heving.",
     href: "/bilkjop",
     tag: "Mest brukt",
     highlight: true,
+    cta: "Sjekk kjøpet ditt",
   },
   {
     key: "flyreiser",
@@ -45,21 +44,24 @@ const cats: Cat[] = [
     title: "Flyreiser",
     desc: "Forsinket eller kansellert fly? Sjekk om du har krav på erstatning.",
     href: "/flyreiser",
+    cta: "Sjekk flyreisen din",
   },
   {
     key: "handverkere",
     icon: Wrench,
     title: "Håndverkere",
-    desc: "Dårlig arbeid eller uenighet om pris? Få en vurdering av saken.",
+    desc: "Dårlig arbeid eller uenighet om pris? Sjekk hvilke rettigheter du har.",
     href: "/handverkere",
+    cta: "Sjekk håndverkerjobben",
   },
   {
     key: "reklamasjon",
     icon: Package,
     title: "Reklamasjon",
-    desc: "Feil med varen? Finn ut om du har rett til omlevering eller refusjon.",
+    desc: "Feil på vare? Sjekk om du har krav på retting, omlevering eller refusjon.",
     href: "/snart?cat=reklamasjon",
     disabled: true,
+    cta: "Sjekk reklamasjonen din",
   },
 ];
 
@@ -80,24 +82,27 @@ const faqs = [
 
 export default function HomePage() {
   return (
-    <main className="relative min-h-[100svh] overflow-hidden bg-[#0a0f0d] text-white">
-      {/* Background image */}
-      <div
-        className="absolute inset-0 -z-20 bg-cover bg-center"
-        style={{ backgroundImage: "url(/bg.png)" }}
-      />
-      {/* Overlay */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0a0f0d]/80 via-[#0a0f0d]/60 to-[#0a0f0d]/90" />
+    <main className="relative min-h-[100svh] bg-[#0a0f0d] text-white">
+      {/* Hero area with background image */}
+      <div className="relative overflow-hidden">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/hero-person-2.jpg')" }}
+        />
+        {/* Overlay — two layers */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#0a0f0d]/90 via-[#0a0f0d]/50 to-transparent" />
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#0a0f0d]/20 via-[#0a0f0d]/60 to-[#0a0f0d] to-[65%]" />
 
-      {/* Ambient glow */}
-      <div className="fixed inset-0 pointer-events-none -z-5">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.03] rounded-full blur-[120px]" />
-      </div>
+        {/* Ambient glow */}
+        <div className="absolute inset-0 pointer-events-none z-[2]">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-500/[0.03] rounded-full blur-[120px]" />
+        </div>
 
-      {/* Content */}
-      <div className="mx-auto flex w-full max-w-6xl flex-col px-6">
-        {/* Top nav */}
-        <header className="pt-5">
+        {/* Content */}
+        <div className="relative z-[3] mx-auto flex w-full max-w-6xl flex-col px-6">
+          {/* Top nav */}
+          <header className="pt-5">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
               <ShieldCheck className="h-6 w-6 text-emerald-400/90" />
@@ -133,78 +138,67 @@ export default function HomePage() {
         {/* Main content */}
         <div className="flex flex-col pb-5 pt-8 md:pt-14">
           {/* Hero — text left, preview right */}
-          <section className="flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-16">
+          <section className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+
             {/* Left: text + CTA */}
-            <div className="flex-1 max-w-xl">
+            <div className="flex-1 max-w-2xl">
+
               <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-emerald-400 text-sm font-medium mb-6">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Basert på norsk forbrukerlov
               </div>
 
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
-                Finn ut om du har
+                Kjøpte du noe med feil?
                 <br />
                 <span className="bg-gradient-to-r from-emerald-300 to-emerald-500 bg-clip-text text-transparent">
-                  krav etter kjøpet
+                  Du har krav.
                 </span>
               </h1>
 
-              {/* A) Value-prop */}
-              <p className="mt-4 md:mt-6 text-base md:text-lg text-slate-400 leading-relaxed max-w-xl">
-                Sjekk om du har krav på 2-3 min. Få ferdig kravbrev fra 99 kr.
-                <br className="hidden md:block" />
-                Ingen konto. Ingen binding. Basert på din situasjon.
-              </p>
+              <div className="mt-4 md:mt-6 border border-white/10 bg-black/40 p-5 max-w-xl rounded-xl backdrop-blur-sm">
+                <p className="text-base md:text-lg text-slate-400 leading-relaxed">
+                  Sjekk saken din gratis. Få et ferdig kravbrev basert på norsk lov —
+                  klart til å sende til selgeren i dag.
+                </p>
+              </div>
 
-              {/* F) CTA microcopy */}
               <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div className="flex flex-col items-start gap-1.5">
                   <Link
                     href="/bilkjop"
                     className="group inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-7 py-3.5 text-base font-bold text-black hover:bg-emerald-400 transition-all hover:shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    Sjekk om du har krav &ndash; gratis
+                    Sjekk om du har krav — gratis
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
-                  <span className="text-xs text-slate-600 pl-1">
+                  <span className="text-sm text-slate-400 pl-1">
                     Betal kun hvis du vil ha ferdig kravbrev.
                   </span>
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-slate-500">
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 text-emerald-500/60" />
-                    Ca. 2 min
-                  </span>
-                  <CaseCounter />
-                </div>
               </div>
 
-              {/* B) Trust row */}
-              <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-slate-500">
+              <div className="mt-6 grid grid-cols-2 gap-x-2 gap-y-2 text-sm text-slate-400">
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 flex-shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
                   Basert på norsk lov
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 flex-shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
                   Ingen abonnement
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 flex-shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
                   Kravbrev + vurdering
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 flex-shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
                   Sak-lenke du kan lagre
                 </span>
               </div>
             </div>
 
-            {/* Right: animated product preview */}
-            <div className="hidden lg:block flex-shrink-0">
-              <HeroProductPreview />
-            </div>
           </section>
 
           {/* Categories */}
@@ -267,7 +261,7 @@ export default function HomePage() {
                       </p>
                       {!c.disabled && (
                         <span className="inline-flex items-center gap-1 mt-2.5 text-sm font-medium text-emerald-400/70 group-hover:text-emerald-400 transition-colors">
-                          Sjekk om du har krav
+                          {c.cta ?? "Sjekk om du har krav"}
                           <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
                         </span>
                       )}
@@ -309,7 +303,14 @@ export default function HomePage() {
               </Link>
             </div>
           </section>
+        </div>
+        </div>
+      </div>
+      {/* End hero area */}
 
+      {/* Rest of page — no background image */}
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col px-6">
+        <div className="flex flex-col pb-5">
           {/* C) "Hva du får" mini-block */}
           <section className="mt-10 md:mt-14">
             <h2 className="text-lg md:text-xl font-semibold text-white/80 mb-4">
