@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { SEO_NODES } from "@/config/seo-matrix";
 
 const BASE_URL = "https://harjegkravpå.no";
 
@@ -95,5 +96,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/bruksvilkar`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
   ];
 
-  return [...mainPages, ...bilkjopEntries, ...flyEntries, ...mcEntries, ...utilityPages];
+  // Programmatic SEO pages from seo-matrix
+  const programmaticEntries = SEO_NODES.map((node) => ({
+    url: `${BASE_URL}/${node.cat}/${node.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [...mainPages, ...bilkjopEntries, ...flyEntries, ...mcEntries, ...programmaticEntries, ...utilityPages];
 }

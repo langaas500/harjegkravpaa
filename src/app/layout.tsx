@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import AppHeader from "./components/AppHeader";
 import { CookieBanner } from "@/app/_components/CookieBanner";
@@ -105,14 +106,16 @@ export default function RootLayout({
       </Script>
 
       <body className={inter.className}>
-        <PostHogProvider>
-          <div className="sticky top-0 z-50">
-            <AppHeader />
-          </div>
+        <Suspense fallback={null}>
+          <PostHogProvider>
+            <div className="sticky top-0 z-50">
+              <AppHeader />
+            </div>
 
-          {children}
-          <CookieBanner />
-        </PostHogProvider>
+            {children}
+            <CookieBanner />
+          </PostHogProvider>
+        </Suspense>
       </body>
     </html>
   );
