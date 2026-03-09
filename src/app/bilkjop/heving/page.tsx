@@ -94,23 +94,23 @@ const articleJsonLd = {
 };
 
 export const metadata: Metadata = {
-  title: "Heving av bilkjøp – Kan du kreve pengene tilbake?",
+  title: "Heve bilkjøp? AI vurderer saken og lager kravbrev for 99 kr",
   description:
-    "Har bilen alvorlige feil? Sjekk om du kan kreve heving og få pengene tilbake etter forbrukerkjøpsloven. Regler, frister og fremgangsmåte. Tar 2 minutter.",
+    "Du kan heve bilkjøpet hvis bilen har alvorlig mangel. Legg inn din sak og last opp dokumenter — AI lager personlig rapport + kravbrev til selger for 99 kr.",
   alternates: { canonical: CANONICAL_URL },
   openGraph: {
-    title: "Heving av bilkjøp – Kan du kreve pengene tilbake?",
+    title: "Heve bilkjøp? AI vurderer saken og lager kravbrev for 99 kr",
     description:
-      "Har bilen alvorlige feil? Sjekk om du kan kreve heving etter forbrukerkjøpsloven. Regler, frister og fremgangsmåte.",
+      "Legg inn saken din — AI lager personlig rapport + kravbrev til selger for 99 kr.",
     url: CANONICAL_URL,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Heving av bilkjøp – Kan du kreve pengene tilbake?",
+    title: "Heve bilkjøp? AI lager rapport + kravbrev",
     description:
-      "Heving av bilkjøp: vesentlig mangel, frister, privat vs forhandler og steg-for-steg. Praktisk oversikt + kalkulator.",
+      "Legg inn saken din. AI-vurdering + kravbrev for 99 kr.",
   },
 };
 
@@ -663,6 +663,33 @@ export default function HevingPage() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       </section>
 
+      {/* Intern linking */}
+      <section className="mb-14">
+        <h2 className="text-lg font-semibold text-slate-300 mb-3">
+          Les også
+        </h2>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <Link
+            href="/bilkjop/reklamasjon"
+            className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+          >
+            Reklamasjon på bil
+          </Link>
+          <Link
+            href="/bilkjop/skjulte-feil-bil"
+            className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+          >
+            Skjulte feil på bil
+          </Link>
+          <Link
+            href="/bilkjop/bruktbil-feil"
+            className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+          >
+            Kjøpt bruktbil med feil?
+          </Link>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section data-final-cta="true" className="relative rounded-3xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 to-emerald-500/5" />
@@ -672,14 +699,14 @@ export default function HevingPage() {
             Heving krever en konkret vurdering
           </h2>
           <p className="text-slate-400 mb-6 max-w-lg mx-auto">
-            Svar på noen spørsmål om bilkjøpet ditt – få en vurdering av saken
-            din på 2 minutter.
+            Svar på noen spørsmål om bilkjøpet ditt – få juridisk rapport og
+            kravbrev til selger for 99 kr.
           </p>
           <Link
             href="/bilkjop"
             className="group inline-flex items-center gap-2 bg-emerald-500 text-black px-8 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-400 transition-all hover:shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98]"
           >
-            Start gratis vurdering
+            Sjekk saken din — 99 kr
             <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <p className="text-xs text-slate-600 mt-4">

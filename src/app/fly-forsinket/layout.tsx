@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Fly forsinket? Sjekk om du har krav på kompensasjon | Harjegkravpå.no",
+  title: "Fly forsinket? Sjekk kravet ditt og få kravbrev – 99 kr",
   description:
-    "Ble flyet ditt forsinket mer enn 3 timer? Du kan ha krav på opptil 600 euro i kompensasjon. Sjekk dine rettigheter gratis.",
+    "Forsinket fly over 3 timer? Du kan ha krav på opptil 600 euro. Legg inn flyreisen og last opp dokumentasjon — AI lager rapport + kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/fly-forsinket`,
   },
   openGraph: {
-    title: "Fly forsinket? Sjekk om du har krav på kompensasjon | Harjegkravpå.no",
+    title: "Fly forsinket? Sjekk kravet ditt og få kravbrev – 99 kr",
     description:
-      "Ble flyet ditt forsinket mer enn 3 timer? Du kan ha krav på opptil 600 euro i kompensasjon. Sjekk dine rettigheter gratis.",
+      "AI lager rapport + kravbrev til flyselskapet for 99 kr.",
     url: `${SITE_URL}/fly-forsinket`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Fly forsinket? Sjekk om du har krav på kompensasjon | Harjegkravpå.no",
+    title: "Fly forsinket? AI lager rapport + kravbrev",
     description:
-      "Ble flyet ditt forsinket mer enn 3 timer? Du kan ha krav på opptil 600 euro i kompensasjon. Sjekk dine rettigheter gratis.",
+      "Opptil 600 euro i kompensasjon. Sjekk saken din for 99 kr.",
   },
 };
 

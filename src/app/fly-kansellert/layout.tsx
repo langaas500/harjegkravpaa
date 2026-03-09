@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Fly kansellert? Sjekk dine rettigheter | Harjegkravpå.no",
+  title: "Fly kansellert? Sjekk kompensasjonskravet ditt – 99 kr",
   description:
-    "Ble flyet ditt kansellert? Du kan ha krav på opptil 600 euro i kompensasjon pluss refusjon. Sjekk dine rettigheter.",
+    "Kansellert fly? Du kan ha krav på opptil 600 euro + refusjon. Legg inn flyreisen — AI lager rapport + kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/fly-kansellert`,
   },
   openGraph: {
-    title: "Fly kansellert? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Fly kansellert? Sjekk kompensasjonskravet ditt – 99 kr",
     description:
-      "Ble flyet ditt kansellert? Du kan ha krav på opptil 600 euro i kompensasjon pluss refusjon. Sjekk dine rettigheter.",
+      "AI lager rapport + kravbrev til flyselskapet for 99 kr.",
     url: `${SITE_URL}/fly-kansellert`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Fly kansellert? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Fly kansellert? Rapport + kravbrev for 99 kr",
     description:
-      "Ble flyet ditt kansellert? Du kan ha krav på opptil 600 euro i kompensasjon pluss refusjon. Sjekk dine rettigheter.",
+      "Opptil 600 euro i kompensasjon. Sjekk saken for 99 kr.",
   },
 };
 

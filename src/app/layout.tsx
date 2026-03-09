@@ -14,22 +14,63 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Har jeg krav på?",
+  title: {
+    default: "HarJegKravPå.no – AI-verktøy som lager rapport og kravbrev for din sak",
+    template: "%s | HarJegKravPå.no",
+  },
   description:
-    "Finn ut om du har krav etter norsk forbrukerlov. Svar på noen korte spørsmål og se om du har krav – og hva du bør gjøre videre. Gratis og uforpliktende.",
+    "Legg inn din sak, last opp dokumenter og bilder – AI analyserer mot norsk lov og lager juridisk rapport + ferdig kravbrev til selger. Alt for 99 kr. En advokat koster typisk 2 500 kr/t.",
+  keywords: [
+    "kravbrev",
+    "reklamasjon bil",
+    "heve bilkjøp",
+    "forbrukerrettigheter",
+    "juridisk vurdering",
+    "kjøpsloven",
+    "forbrukerkjøpsloven",
+    "AI juridisk verktøy",
+  ],
   alternates: {
     canonical: "https://harjegkravpå.no",
   },
   openGraph: {
+    title: "HarJegKravPå.no – AI-verktøy: rapport + kravbrev for din sak",
+    description:
+      "Legg inn saken din og last opp dokumenter. AI analyserer mot norsk lov og lager personlig rapport + kravbrev til selger. 99 kr – klar på minutter.",
+    url: "https://harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
+    locale: "nb_NO",
+    type: "website",
     images: [
       {
         url: "https://harjegkravpaa.no/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Harjegkravpå.no – Sjekk om du har krav",
+        alt: "HarJegKravPå.no – AI-verktøy som lager rapport og kravbrev for din sak",
       },
     ],
   },
+  robots: { index: true, follow: true },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "HarJegKravPå.no",
+  applicationCategory: "LegalService",
+  operatingSystem: "Web",
+  description:
+    "AI-verktøy der du legger inn din sak, laster opp dokumenter og bilder, og får personlig juridisk rapport og ferdig kravbrev til selger – basert på norsk kjøpslov og forbrukerkjøpsloven. Klar på minutter, ikke dager.",
+  offers: {
+    "@type": "Offer",
+    name: "Juridisk rapport + kravbrev",
+    price: "99",
+    priceCurrency: "NOK",
+    description:
+      "Du får to PDF-er: en juridisk rapport som vurderer akkurat din sak, og et ferdig kravbrev du sender til selger. Alternativet er ofte advokat til 2 500 kr/t.",
+  },
+  url: "https://harjegkravpå.no",
+  inLanguage: "nb",
 };
 
 export default function RootLayout({
@@ -39,6 +80,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="no">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       {/* Google tag (gtag.js) for Google Ads */}
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=AW-17884170370"

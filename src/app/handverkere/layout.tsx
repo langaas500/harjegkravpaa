@@ -3,28 +3,28 @@ import type { Metadata } from "next";
 const CANONICAL_URL = "https://harjegkravpå.no/handverkere";
 
 export const metadata: Metadata = {
-  title: "Håndverkerklage? Sjekk dine rettigheter | Harjegkravpå.no",
+  title: "Misfornøyd med håndverker? Få vurdering og kravbrev – 99 kr",
   description:
-    "Misfornøyd med håndverkerarbeid? Sjekk om du kan kreve prisavslag, retting eller heving etter håndverkertjenesteloven.",
+    "Beskriv håndverkerjobben og last opp bilder. AI vurderer saken etter håndverkertjenesteloven og lager rapport + kravbrev. 99 kr – en advokat koster typisk 2 500 kr/t.",
   alternates: {
     canonical: CANONICAL_URL,
   },
   openGraph: {
-    title: "Håndverkerklage? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Misfornøyd med håndverker? Få vurdering og kravbrev – 99 kr",
     description:
-      "Misfornøyd med håndverkerarbeid? Sjekk om du kan kreve prisavslag, retting eller heving etter håndverkertjenesteloven.",
+      "Beskriv jobben, last opp bilder — AI vurderer saken og lager rapport + kravbrev. 99 kr.",
     url: CANONICAL_URL,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Håndverkerklage? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Håndverkerklage? AI lager rapport + kravbrev for 99 kr",
     description:
-      "Misfornøyd med håndverkerarbeid? Sjekk om du kan kreve prisavslag, retting eller heving etter håndverkertjenesteloven.",
+      "Beskriv jobben, last opp bilder — AI vurderer saken og lager rapport + kravbrev. 99 kr.",
   },
   robots: {
-    index: false,
+    index: true,
     follow: true,
   },
 };

@@ -360,7 +360,7 @@ export default function FlyreiserKravbrevPage() {
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 mb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold">Juridisk kravbrev</p>
+                  <p className="font-semibold">Juridisk rapport + kravbrev</p>
                   <p className="text-xs text-slate-400">
                     Basert på {data.problemType === "BAGGAGE" ? "Montreal" : "EU261"}, klart til å
                     sende

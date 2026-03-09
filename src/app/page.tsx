@@ -9,11 +9,14 @@ import {
   ShieldCheck,
   CheckCircle2,
   FileText,
+  Clock,
+  Banknote,
 } from "lucide-react";
 import {
   FaqAccordion,
   StickyMobileCta,
 } from "./_components/HomeClientIslands";
+import SeoJsonLd from "@/components/SeoJsonLd";
 
 type Cat = {
   key: string;
@@ -68,21 +71,39 @@ const cats: Cat[] = [
 const faqs = [
   {
     q: "Er dette en advokattjeneste?",
-    a: "Nei. Vi gir automatisert, veiledende vurdering basert på norsk forbrukerlovgivning. Vi er ikke et advokatfirma og gir ikke juridisk rådgivning.",
+    a: "Nei. HarJegKravPå er et AI-verktøy som gir automatisert, veiledende vurdering basert på norsk forbrukerlovgivning. Vi er ikke et advokatfirma. Du får personlig rapport og kravbrev basert på din sak – til en brøkdel av prisen for advokat.",
   },
   {
     q: "Hva koster det?",
-    a: "Vurderingen er gratis. Hvis du vil ha et ferdig kravbrev med juridiske referanser, koster det fra 99 kr. Ingen abonnement.",
+    a: "Du betaler 99 kr og får to PDF-er: en juridisk rapport som analyserer akkurat din sak, og et ferdig kravbrev du sender til selger. Ingen abonnement. Til sammenligning koster advokat typisk 2 500 kr per time.",
   },
   {
     q: "Hva trenger jeg for å starte?",
-    a: "Kjøpsdato og pris er nok til å komme i gang. Resten er valgfritt og kan legges til underveis.",
+    a: "Kjøpsdato og pris er nok til å komme i gang. Du kan også laste opp dokumenter og bilder – som kvittering, kontrakt eller bilder av feil – for en mer presis vurdering.",
+  },
+  {
+    q: "Hvordan bruker AI mine dokumenter?",
+    a: "AI analyserer informasjonen du legger inn og dokumentene du laster opp, og vurderer saken din opp mot norsk forbrukerlov. Resultatet er en personlig rapport og et kravbrev som er skreddersydd for din situasjon.",
   },
 ];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.a,
+    },
+  })),
+};
 
 export default function HomePage() {
   return (
     <main className="relative min-h-[100svh] bg-[#0a0f0d] text-white">
+      <SeoJsonLd data={faqSchema} />
       {/* Hero area with background image */}
       <div className="relative overflow-hidden">
         {/* Background image */}
@@ -158,8 +179,8 @@ export default function HomePage() {
 
               <div className="mt-4 md:mt-6 border border-white/10 bg-black/40 p-5 max-w-xl rounded-xl backdrop-blur-sm">
                 <p className="text-base md:text-lg text-slate-400 leading-relaxed">
-                  Sjekk saken din gratis. Få et ferdig kravbrev basert på norsk lov —
-                  klart til å sende til selgeren i dag.
+                  Legg inn saken din, last opp dokumenter og bilder — AI analyserer akkurat din situasjon
+                  mot norsk lov og lager personlig rapport + ferdig kravbrev til selger. Alt for 99 kr.
                 </p>
               </div>
 
@@ -169,11 +190,11 @@ export default function HomePage() {
                     href="/bilkjop"
                     className="group inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-7 py-3.5 text-base font-bold text-black hover:bg-emerald-400 transition-all hover:shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    Sjekk om du har krav — gratis
+                    Sjekk saken din — 99 kr
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                   <span className="text-sm text-slate-400 pl-1">
-                    Betal kun hvis du vil ha ferdig kravbrev.
+                    Juridisk rapport + kravbrev i én pakke.
                   </span>
                 </div>
 
@@ -182,19 +203,19 @@ export default function HomePage() {
               <div className="mt-6 grid grid-cols-2 gap-x-2 gap-y-2 text-sm text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
-                  Basert på norsk lov
+                  Du legger inn din sak
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
-                  Ingen abonnement
+                  Last opp dokumenter og bilder
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
-                  Kravbrev + vurdering
+                  Personlig rapport + kravbrev (99 kr)
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/70 flex-shrink-0" />
-                  Sak-lenke du kan lagre
+                  Advokat koster typisk 2 500 kr/t
                 </span>
               </div>
             </div>
@@ -301,6 +322,12 @@ export default function HomePage() {
               >
                 Reklamasjon på bruktbil
               </Link>
+              <Link
+                href="/bilkjop/skjulte-feil-bil"
+                className="hover:text-emerald-400/70 transition-colors"
+              >
+                Skjulte feil på bil
+              </Link>
             </div>
           </section>
         </div>
@@ -325,23 +352,23 @@ export default function HomePage() {
                 <ul className="space-y-1.5 text-sm text-slate-400">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 mt-0.5 flex-shrink-0" />
-                    Kort oppsummering av saken
+                    AI-analyse av akkurat din sak
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 mt-0.5 flex-shrink-0" />
-                    Hva du typisk kan kreve
+                    Hva du kan kreve basert på dine dokumenter
                   </li>
                 </ul>
               </div>
               <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5">
                 <div className="flex items-center gap-2.5 mb-3">
                   <FileText className="h-5 w-5 text-emerald-400/80" />
-                  <p className="font-semibold text-white/90">Ferdig kravbrev</p>
+                  <p className="font-semibold text-white/90">Ferdig kravbrev til selger</p>
                 </div>
                 <ul className="space-y-1.5 text-sm text-slate-400">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 mt-0.5 flex-shrink-0" />
-                    Riktig lovhenvisning
+                    Personlig brev med riktige lovhenvisninger
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500/50 mt-0.5 flex-shrink-0" />
@@ -350,6 +377,71 @@ export default function HomePage() {
                 </ul>
               </div>
             </div>
+          </section>
+
+          {/* Slik fungerer det */}
+          <section className="mt-10 md:mt-14">
+            <h2 className="text-lg md:text-xl font-semibold text-white/80 mb-4">
+              Slik fungerer det
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { n: "1", title: "Beskriv saken din", desc: "Legg inn detaljer om kjøpet og problemet" },
+                { n: "2", title: "Last opp dokumenter", desc: "Kvittering, bilder, kontrakt — det du har" },
+                { n: "3", title: "AI analyserer din sak", desc: "Vurdert mot norsk forbrukerlov" },
+                { n: "4", title: "Rapport + kravbrev", desc: "To PDF-er, klare til bruk med en gang" },
+              ].map((s) => (
+                <div key={s.n} className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 text-sm font-bold mb-2">
+                    {s.n}
+                  </span>
+                  <p className="font-semibold text-white/90 text-sm">{s.title}</p>
+                  <p className="text-xs text-slate-500 mt-1">{s.desc}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-slate-400 mt-3">
+              Alt i en pakke: <strong className="text-white">99 kr</strong>
+            </p>
+          </section>
+
+          {/* Advokat-sammenligning */}
+          <section className="mt-10 md:mt-14">
+            <h2 className="text-lg md:text-xl font-semibold text-white/80 mb-4">
+              Advokat vs. HarJegKravPå
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5">
+                <p className="font-semibold text-white/70 mb-3">Advokat</p>
+                <div className="space-y-2 text-sm text-slate-400">
+                  <p className="flex items-center gap-2">
+                    <Banknote className="h-4 w-4 text-slate-500 flex-shrink-0" />
+                    2 000–5 000 kr
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-slate-500 flex-shrink-0" />
+                    Dager til uker ventetid
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-5">
+                <p className="font-semibold text-emerald-400 mb-3">HarJegKravPå</p>
+                <div className="space-y-2 text-sm text-slate-300">
+                  <p className="flex items-center gap-2">
+                    <Banknote className="h-4 w-4 text-emerald-400/70 flex-shrink-0" />
+                    99 kr
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-emerald-400/70 flex-shrink-0" />
+                    Klar på minutter
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-slate-400 mt-3">
+              Du betaler 99 kr for å finne ut om du kan få tilbake tusenvis –
+              og du får kravbrevet klart til å sende med en gang.
+            </p>
           </section>
 
           {/* G) FAQ */}

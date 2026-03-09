@@ -5,30 +5,7 @@ const BASE_URL = "https://harjegkravpå.no";
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  // High-priority SEO pages (bilkjop heving cluster)
-  const hevingPages = [
-    {
-      url: `${BASE_URL}/bilkjop/heving`,
-      lastModified: now,
-      changeFrequency: "weekly" as const,
-      priority: 0.85,
-    },
-  ];
-
-  // Static SEO pages
-  const seoPages = [
-    // Bilkjop SEO pages
-    "/bilkjop/reklamasjon",
-    "/bilkjop/garanti",
-    "/bilkjop/heving-privat",
-    "/bilkjop/heving-forhandler",
-    "/bilkjop/heving-tidsfrist",
-    "/bilkjop/kan-selger-heve",
-    "/bilkjop/privat-kjop",
-    "/bilkjop/forhandler",
-  ];
-
-  // Main pages
+  // Main product pages (highest priority)
   const mainPages = [
     {
       url: BASE_URL,
@@ -43,22 +20,74 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/bilkjop/bruktbil-feil`,
+      url: `${BASE_URL}/flyreiser`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/handverkere`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
   ];
 
-  // SEO pages with lower priority
-  const seoSitemapEntries = seoPages.map((path) => ({
+  // Bilkjop SEO content pages
+  const bilkjopSeoPages = [
+    "/bilkjop/heving",
+    "/bilkjop/bruktbil-feil",
+    "/bilkjop/reklamasjon",
+    "/bilkjop/skjulte-feil-bil",
+    "/bilkjop/garanti",
+    "/bilkjop/heving-privat",
+    "/bilkjop/heving-forhandler",
+    "/bilkjop/heving-tidsfrist",
+    "/bilkjop/kan-selger-heve",
+    "/bilkjop/privat-kjop",
+    "/bilkjop/forhandler",
+  ];
+
+  const bilkjopEntries = bilkjopSeoPages.map((path) => ({
     url: `${BASE_URL}${path}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
-  // Priority 0.3 — utility-sider
+  // Fly SEO content pages
+  const flySeoPages = [
+    "/fly-forsinket",
+    "/fly-kansellert",
+    "/mistet-bagasje",
+    "/nektet-ombordstigning",
+  ];
+
+  const flyEntries = flySeoPages.map((path) => ({
+    url: `${BASE_URL}${path}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  // MC SEO content pages
+  const mcSeoPages = [
+    "/mc-kjop/mc-feil",
+    "/mc-kjop/reklamasjon",
+    "/mc-kjop/heving",
+    "/mc-kjop/garanti",
+    "/mc-kjop/forhandler",
+    "/mc-kjop/privat-kjop",
+  ];
+
+  const mcEntries = mcSeoPages.map((path) => ({
+    url: `${BASE_URL}${path}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  // Utility pages
   const utilityPages = [
     { url: `${BASE_URL}/om-oss`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
     { url: `${BASE_URL}/personvern`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
@@ -66,5 +95,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/bruksvilkar`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
   ];
 
-  return [...mainPages, ...hevingPages, ...seoSitemapEntries, ...utilityPages];
+  return [...mainPages, ...bilkjopEntries, ...flyEntries, ...mcEntries, ...utilityPages];
 }

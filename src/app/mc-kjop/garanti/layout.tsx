@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Garanti på MC – hva dekkes? | Harjegkravpå.no",
+  title: "Garanti på MC – hva dekkes og hva kan du kreve?",
   description:
-    "Hva dekker garantien på motorsykkel? Les om forskjellen på garanti og reklamasjon, og hva du kan kreve. Gratis vurdering.",
+    "Garanti vs. reklamasjon for motorsykkel: hva gjelder? Legg inn saken og få AI-vurdering + kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/mc-kjop/garanti`,
   },
   openGraph: {
-    title: "Garanti på MC – hva dekkes? | Harjegkravpå.no",
+    title: "Garanti på MC – hva dekkes og hva kan du kreve?",
     description:
-      "Hva dekker garantien på motorsykkel? Les om forskjellen på garanti og reklamasjon, og hva du kan kreve. Gratis vurdering.",
+      "Garanti vs. reklamasjon for MC: Legg inn saken og få AI-vurdering + kravbrev for 99 kr.",
     url: `${SITE_URL}/mc-kjop/garanti`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Garanti på MC – hva dekkes? | Harjegkravpå.no",
+    title: "Garanti på MC – hva dekkes og hva kan du kreve?",
     description:
-      "Hva dekker garantien på motorsykkel? Les om forskjellen på garanti og reklamasjon, og hva du kan kreve. Gratis vurdering.",
+      "Garanti vs. reklamasjon for MC: Legg inn saken og få AI-vurdering + kravbrev for 99 kr.",
   },
 };
 

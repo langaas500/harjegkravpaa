@@ -149,7 +149,7 @@ export default function ReportPaywall({
                   </p>
                 </div>
               </div>
-              <p className="text-2xl font-bold">39 kr</p>
+              <p className="text-2xl font-bold">99 kr</p>
             </div>
           </div>
           <button
@@ -176,8 +176,8 @@ export default function ReportPaywall({
       )}
 
       <div className="border-t border-white/10 pt-6">
-        <h3 className="text-xl font-bold mb-1">Få ferdig juridisk kravbrev – 99 kr</h3>
-        <p className="text-sm text-slate-400 mb-5">Du får et ferdig skrevet brev du kan kopiere og sende direkte.</p>
+        <h3 className="text-xl font-bold mb-1">Juridisk rapport + kravbrev – 99 kr</h3>
+        <p className="text-sm text-slate-400 mb-5">Du får juridisk rapport og ferdig kravbrev til selger i én pakke.</p>
 
         <ul className="space-y-2.5 mb-6">
           {[

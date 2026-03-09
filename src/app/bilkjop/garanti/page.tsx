@@ -32,7 +32,7 @@ const faqs = [
 
 export const metadata: Metadata = {
   description:
-    "Hva dekker egentlig bilgarantien? Lær forskjellen på garanti og reklamasjonsrett, og hva du kan kreve dersom garantien ikke overholdes.",
+    "Garanti vs. reklamasjon: hva gjelder for din bil? Legg inn saken og få AI-vurdering + kravbrev for 99 kr.",
 };
 
 export default function GarantiPage() {

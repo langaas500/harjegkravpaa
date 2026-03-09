@@ -1,5 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Om oss – HarJegKravPå.no",
+  description:
+    "HarJegKravPå.no er et norsk AI-verktøy som lager personlig rapport og kravbrev for forbrukersaker. Legg inn saken din og få svar på 2 minutter — 99 kr.",
+  openGraph: {
+    title: "Om oss – HarJegKravPå.no",
+    description:
+      "Norsk AI-verktøy for forbrukersaker. Rapport + kravbrev for 99 kr.",
+    siteName: "HarJegKravPå.no",
+  },
+};
 
 export default function OmOssPage() {
   return (
@@ -103,14 +116,14 @@ export default function OmOssPage() {
               Sjekk om du kan ha et krav
             </h2>
             <p className="text-slate-400 mb-6 max-w-lg mx-auto">
-              Gratis, veiledende vurdering på ca. 2 minutter. Ingen konto.
-              Ingen binding.
+              Veiledende vurdering på ca. 2 minutter. Rapport + kravbrev for 99 kr.
+              Ingen konto. Ingen binding.
             </p>
             <Link
               href="/bilkjop"
               className="group inline-flex items-center gap-2 bg-emerald-500 text-black px-8 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-400 transition-all hover:shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98]"
             >
-              Start gratis vurdering
+              Start vurdering — 99 kr
               <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>

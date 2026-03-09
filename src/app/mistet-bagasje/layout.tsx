@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Mistet bagasje? Sjekk dine rettigheter | Harjegkravpå.no",
+  title: "Mistet eller skadet bagasje? Sjekk kravet ditt – 99 kr",
   description:
-    "Mistet, forsinket eller skadet bagasje? Du kan ha krav på opptil 16 000 kr i erstatning. Sjekk dine rettigheter.",
+    "Mistet, forsinket eller skadet bagasje? Du kan ha krav på opptil 16 000 kr. Legg inn saken — AI lager rapport + kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/mistet-bagasje`,
   },
   openGraph: {
-    title: "Mistet bagasje? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Mistet eller skadet bagasje? Sjekk kravet ditt – 99 kr",
     description:
-      "Mistet, forsinket eller skadet bagasje? Du kan ha krav på opptil 16 000 kr i erstatning. Sjekk dine rettigheter.",
+      "AI lager rapport + kravbrev til flyselskapet for 99 kr.",
     url: `${SITE_URL}/mistet-bagasje`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mistet bagasje? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Mistet bagasje? Rapport + kravbrev for 99 kr",
     description:
-      "Mistet, forsinket eller skadet bagasje? Du kan ha krav på opptil 16 000 kr i erstatning. Sjekk dine rettigheter.",
+      "Opptil 16 000 kr i erstatning. Sjekk saken for 99 kr.",
   },
 };
 

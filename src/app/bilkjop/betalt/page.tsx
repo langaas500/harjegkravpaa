@@ -847,8 +847,8 @@ function BetaltContent() {
 
         <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-left">
           <p className="text-sm text-slate-400 mb-1">Ordre</p>
-          <p className="font-semibold">Bilkjøp-rapport PDF</p>
-          <p className="text-slate-400">39 kr</p>
+          <p className="font-semibold">Juridisk rapport + kravbrev</p>
+          <p className="text-slate-400">99 kr</p>
         </div>
 
         {/* B – UI FØR PDF */}

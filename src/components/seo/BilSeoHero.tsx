@@ -142,6 +142,30 @@ export default function BilSeoHero({
           </div>
         </section>
 
+        {/* Slik fungerer det */}
+        <section className="mb-16">
+          <h2 className="text-xl font-bold mb-4">Slik fungerer det</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { n: "1", title: "Beskriv saken din", desc: "Legg inn detaljer om kjøpet og problemet" },
+              { n: "2", title: "Last opp dokumenter", desc: "Kvittering, bilder, kontrakt — det du har" },
+              { n: "3", title: "AI analyserer din sak", desc: "Vurdert mot norsk forbrukerlov" },
+              { n: "4", title: "Rapport + kravbrev", desc: "To PDF-er, klare til bruk med en gang" },
+            ].map((s) => (
+              <div key={s.n} className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 text-sm font-bold mb-2">
+                  {s.n}
+                </span>
+                <p className="font-semibold text-white/90 text-sm">{s.title}</p>
+                <p className="text-xs text-slate-500 mt-1">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-slate-400 mt-3">
+            Alt i én pakke: <strong className="text-white">99 kr</strong> · Advokat koster typisk 2 500 kr/t
+          </p>
+        </section>
+
         {children}
 
         <p className="text-xs text-slate-600 text-center mt-10">

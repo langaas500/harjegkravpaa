@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Nektet ombordstigning? Sjekk dine rettigheter | Harjegkravpå.no",
+  title: "Nektet ombordstigning? Sjekk kompensasjonskravet – 99 kr",
   description:
-    "Ble du nektet ombordstigning på grunn av overbooking? Du kan ha krav på opptil 600 euro i kompensasjon.",
+    "Nektet ombordstigning ved overbooking? Du kan ha krav på opptil 600 euro. Legg inn saken — AI lager rapport + kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/nektet-ombordstigning`,
   },
   openGraph: {
-    title: "Nektet ombordstigning? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Nektet ombordstigning? Sjekk kompensasjonskravet – 99 kr",
     description:
-      "Ble du nektet ombordstigning på grunn av overbooking? Du kan ha krav på opptil 600 euro i kompensasjon.",
+      "AI lager rapport + kravbrev til flyselskapet for 99 kr.",
     url: `${SITE_URL}/nektet-ombordstigning`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nektet ombordstigning? Sjekk dine rettigheter | Harjegkravpå.no",
+    title: "Nektet ombordstigning? Rapport + kravbrev for 99 kr",
     description:
-      "Ble du nektet ombordstigning på grunn av overbooking? Du kan ha krav på opptil 600 euro i kompensasjon.",
+      "Opptil 600 euro i kompensasjon. Sjekk saken for 99 kr.",
   },
 };
 

@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Reklamasjon på MC – dine rettigheter | Harjegkravpå.no",
+  title: "Reklamasjon på MC – slik går du frem",
   description:
-    "Vil du reklamere på motorsykkel? Les om reklamasjonsfrister, hva du kan kreve og hvordan du går frem. Gratis vurdering.",
+    "Vil du reklamere på motorsykkel? Legg inn saken — AI lager rapport + kravbrev til selger for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/mc-kjop/reklamasjon`,
   },
   openGraph: {
-    title: "Reklamasjon på MC – dine rettigheter | Harjegkravpå.no",
+    title: "Reklamasjon på MC – slik går du frem",
     description:
-      "Vil du reklamere på motorsykkel? Les om reklamasjonsfrister, hva du kan kreve og hvordan du går frem. Gratis vurdering.",
+      "Reklamere på MC? Legg inn saken — AI lager rapport + kravbrev til selger for 99 kr.",
     url: `${SITE_URL}/mc-kjop/reklamasjon`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Reklamasjon på MC – dine rettigheter | Harjegkravpå.no",
+    title: "Reklamasjon på MC – slik går du frem",
     description:
-      "Vil du reklamere på motorsykkel? Les om reklamasjonsfrister, hva du kan kreve og hvordan du går frem. Gratis vurdering.",
+      "Reklamere på MC? Legg inn saken — AI lager rapport + kravbrev til selger for 99 kr.",
   },
 };
 

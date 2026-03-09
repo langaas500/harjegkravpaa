@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Heving av MC-kjøp – når kan du heve? | Harjegkravpå.no",
+  title: "Heve MC-kjøp? Sjekk vilkårene og få kravbrev",
   description:
-    "Når kan du heve et MC-kjøp og få pengene tilbake? Les om vilkårene for heving og hvordan du går frem. Gratis vurdering.",
+    "Vil du heve MC-kjøpet? Les om vilkårene. Legg inn saken — AI lager rapport + kravbrev til selger for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/mc-kjop/heving`,
   },
   openGraph: {
-    title: "Heving av MC-kjøp – når kan du heve? | Harjegkravpå.no",
+    title: "Heve MC-kjøp? Sjekk vilkårene og få kravbrev",
     description:
-      "Når kan du heve et MC-kjøp og få pengene tilbake? Les om vilkårene for heving og hvordan du går frem. Gratis vurdering.",
+      "Vil du heve MC-kjøpet? Legg inn saken — AI lager rapport + kravbrev til selger for 99 kr.",
     url: `${SITE_URL}/mc-kjop/heving`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Heving av MC-kjøp – når kan du heve? | Harjegkravpå.no",
+    title: "Heve MC-kjøp? Sjekk vilkårene og få kravbrev",
     description:
-      "Når kan du heve et MC-kjøp og få pengene tilbake? Les om vilkårene for heving og hvordan du går frem. Gratis vurdering.",
+      "Vil du heve MC-kjøpet? Legg inn saken — AI lager rapport + kravbrev til selger for 99 kr.",
   },
 };
 

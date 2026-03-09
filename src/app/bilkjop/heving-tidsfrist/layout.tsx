@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Tidsfrist for heving av bilkjøp | Harjegkravpå.no",
+  title: "Frist for heving av bilkjøp – 2 eller 5 år?",
   description:
-    "Hvor lang tid har du på å heve et bilkjøp? Les om reklamasjonsfrist, absolutt frist, 2 vs 5 år og når fristene begynner å løpe.",
+    "Hvor lang tid har du på å heve bilkjøpet? Les om frister for privat- og forhandlerkjøp. Usikker? Legg inn saken — AI vurderer og lager kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/bilkjop/heving-tidsfrist`,
   },
   openGraph: {
-    title: "Tidsfrist for heving av bilkjøp | Harjegkravpå.no",
+    title: "Frist for heving av bilkjøp – 2 eller 5 år?",
     description:
-      "Hvor lang tid har du på å heve et bilkjøp? Les om reklamasjonsfrist, absolutt frist, 2 vs 5 år og når fristene begynner å løpe.",
+      "Les om reklamasjonsfrister. AI vurderer saken din og lager kravbrev for 99 kr.",
     url: `${SITE_URL}/bilkjop/heving-tidsfrist`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tidsfrist for heving av bilkjøp | Harjegkravpå.no",
+    title: "Frist for heving av bilkjøp",
     description:
-      "Hvor lang tid har du på å heve et bilkjøp? Les om reklamasjonsfrist, absolutt frist, 2 vs 5 år og når fristene begynner å løpe.",
+      "Reklamasjonsfrist ved bilkjøp: 2 vs 5 år. Sjekk saken din for 99 kr.",
   },
 };
 

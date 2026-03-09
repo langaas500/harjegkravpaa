@@ -3,25 +3,25 @@ import type { Metadata } from "next";
 const CANONICAL_URL = "https://harjegkravpå.no/bilkjop";
 
 export const metadata: Metadata = {
-  title: "Bilkjøp – sjekk om du har krav | Harjegkravpå.no",
+  title: "Kjøpt bil med feil? Få juridisk rapport + kravbrev til selger – 99 kr",
   description:
-    "Har du oppdaget feil etter bilkjøp? Sjekk om du kan kreve heving, prisavslag eller erstatning. Gratis veiledende vurdering basert på norsk forbrukerlov.",
+    "Beskriv bilfeilen og få AI-vurdering basert på norsk forbrukerkjøpslov. Du får juridisk rapport og ferdig kravbrev i én pakke for 99 kr. Svar på minutter.",
   alternates: {
     canonical: CANONICAL_URL,
   },
   openGraph: {
-    title: "Bilkjøp – sjekk om du har krav | Harjegkravpå.no",
+    title: "Kjøpt bil med feil? Få juridisk rapport + kravbrev til selger – 99 kr",
     description:
-      "Har du oppdaget feil etter bilkjøp? Sjekk om du kan kreve heving, prisavslag eller erstatning. Gratis veiledende vurdering basert på norsk forbrukerlov.",
+      "Beskriv bilfeilen og få AI-vurdering basert på norsk forbrukerkjøpslov. Du får juridisk rapport og ferdig kravbrev i én pakke for 99 kr.",
     url: CANONICAL_URL,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bilkjøp – sjekk om du har krav | Harjegkravpå.no",
+    title: "Kjøpt bil med feil? Få juridisk rapport + kravbrev – 99 kr",
     description:
-      "Har du oppdaget feil etter bilkjøp? Sjekk om du kan kreve heving, prisavslag eller erstatning. Gratis vurdering basert på norsk lov.",
+      "Beskriv bilfeilen og få AI-vurdering basert på norsk forbrukerkjøpslov. Rapport + kravbrev for 99 kr.",
   },
 };
 

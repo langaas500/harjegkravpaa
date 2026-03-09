@@ -295,7 +295,7 @@ export default function HeroProductPreview() {
 
               <div className="mt-auto space-y-1.5">
                 <div className="w-full rounded-lg bg-emerald-500 py-2 text-center text-xs font-bold text-black">
-                  Kravbrev + vurdering — 99 kr
+                  Juridisk rapport + kravbrev — 99 kr
                 </div>
               </div>
             </div>

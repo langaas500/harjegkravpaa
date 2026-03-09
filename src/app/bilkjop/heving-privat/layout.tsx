@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Heving av privat bilkjøp – regler | Harjegkravpå.no",
+  title: "Heve privat bilkjøp? Regler, vilkår og kravbrev for 99 kr",
   description:
-    "Kjøpte du bil privat og vil heve? Les om kjøpsloven, «som den er»-forbehold, bevisbyrde og terskelen for heving mellom privatpersoner.",
+    "Kjøpte du bil privat og vil heve? Les om kjøpsloven og «som den er»-forbehold. Legg inn saken din — AI lager rapport + kravbrev til selger for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/bilkjop/heving-privat`,
   },
   openGraph: {
-    title: "Heving av privat bilkjøp – regler | Harjegkravpå.no",
+    title: "Heve privat bilkjøp? Regler, vilkår og kravbrev for 99 kr",
     description:
-      "Kjøpte du bil privat og vil heve? Les om kjøpsloven, «som den er»-forbehold, bevisbyrde og terskelen for heving mellom privatpersoner.",
+      "Kjøpte du bil privat og vil heve? AI lager rapport + kravbrev til selger for 99 kr.",
     url: `${SITE_URL}/bilkjop/heving-privat`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Heving av privat bilkjøp – regler | Harjegkravpå.no",
+    title: "Heve privat bilkjøp? Regler og vilkår",
     description:
-      "Kjøpte du bil privat og vil heve? Les om kjøpsloven, «som den er»-forbehold, bevisbyrde og terskelen for heving mellom privatpersoner.",
+      "Kjøpte du bil privat og vil heve? Les om kjøpsloven. Sjekk saken din for 99 kr.",
   },
 };
 

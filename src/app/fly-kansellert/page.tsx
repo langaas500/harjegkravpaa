@@ -29,6 +29,79 @@ export default function FlyKansellertPage() {
       secondaryCtaText="Sjekk saken din nå →"
       ctaHref="/flyreiser"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Hjem",
+                item: "https://harjegkravpå.no",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Flyreiser",
+                item: "https://harjegkravpå.no/flyreiser",
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: "Kansellert fly",
+                item: "https://harjegkravpå.no/fly-kansellert",
+              },
+            ],
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Hvor lenge kan jeg vente med å kreve kompensasjon?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Du kan kreve kompensasjon for kansellerte flyreiser opptil 3 år tilbake i tid. Det betyr at selv om kanselleringen skjedde for en stund siden, kan du fortsatt ha krav.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Hva hvis jeg ble tilbudt ombooking?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Du kan fortsatt ha krav på kompensasjon selv om du ble tilbudt ombooking, avhengig av ankomsttiden sammenlignet med opprinnelig fly.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Gjelder reglene for alle flyselskaper?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Reglene gjelder for alle flyselskaper som flyr fra EU/EØS, og for EU-baserte selskaper som flyr til EU/EØS.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Kan jeg kreve både refusjon og kompensasjon?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Ja. Kompensasjon og refusjon er to forskjellige ting. Du kan ha krav på begge deler ved kansellering.",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
       {/* Når fikk du beskjed */}
       <section className="mb-14">
         <h2 className="text-2xl font-bold mb-6">

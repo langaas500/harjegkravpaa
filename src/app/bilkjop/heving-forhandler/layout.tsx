@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Heve bilkjøp fra forhandler – regler | Harjegkravpå.no",
+  title: "Heve bilkjøp fra forhandler? Slik går du frem",
   description:
-    "Kjøpte du bil fra forhandler med feil? Les om forbrukerkjøpsloven, rettingsforsøk, vesentlig mangel og når du kan kreve heving.",
+    "Kjøpte bil fra forhandler med feil? Les om rettingsforsøk og vesentlig mangel. Legg inn saken — AI lager rapport + kravbrev til forhandler for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/bilkjop/heving-forhandler`,
   },
   openGraph: {
-    title: "Heve bilkjøp fra forhandler – regler | Harjegkravpå.no",
+    title: "Heve bilkjøp fra forhandler? Slik går du frem",
     description:
-      "Kjøpte du bil fra forhandler med feil? Les om forbrukerkjøpsloven, rettingsforsøk, vesentlig mangel og når du kan kreve heving.",
+      "Feil på bil fra forhandler? AI lager rapport + kravbrev for 99 kr.",
     url: `${SITE_URL}/bilkjop/heving-forhandler`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Heve bilkjøp fra forhandler – regler | Harjegkravpå.no",
+    title: "Heve bilkjøp fra forhandler? Regler og fremgangsmåte",
     description:
-      "Kjøpte du bil fra forhandler med feil? Les om forbrukerkjøpsloven, rettingsforsøk, vesentlig mangel og når du kan kreve heving.",
+      "Les om forbrukerkjøpsloven og rettingsforsøk. Sjekk saken din for 99 kr.",
   },
 };
 

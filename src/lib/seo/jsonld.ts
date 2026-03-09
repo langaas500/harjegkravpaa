@@ -77,7 +77,7 @@ export function buildOrganizationSchema() {
     name: "Harjegkravpå.no",
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
-    description: "Finn ut om du har krav ved bilkjøp, MC-kjøp eller flyreiser",
+    description: "AI-verktøy som lager personlig rapport og kravbrev for norske forbrukere. Legg inn saken din, last opp dokumenter — 99 kr.",
     sameAs: [],
   };
 }

@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Kjøpt MC fra forhandler? Sterkt forbrukervern | Harjegkravpå.no",
+  title: "MC fra forhandler med feil? Sjekk rettighetene dine",
   description:
-    "Kjøpt MC fra forhandler og oppdaget feil? Du har sterkt forbrukervern. Les om dine rettigheter. Gratis vurdering.",
+    "Kjøpt MC fra forhandler med feil? Du har sterkt forbrukervern. Legg inn saken — AI lager rapport + kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/mc-kjop/forhandler`,
   },
   openGraph: {
-    title: "Kjøpt MC fra forhandler? Sterkt forbrukervern | Harjegkravpå.no",
+    title: "MC fra forhandler med feil? Sjekk rettighetene dine",
     description:
-      "Kjøpt MC fra forhandler og oppdaget feil? Du har sterkt forbrukervern. Les om dine rettigheter. Gratis vurdering.",
+      "Kjøpt MC fra forhandler med feil? Legg inn saken — AI lager rapport + kravbrev for 99 kr.",
     url: `${SITE_URL}/mc-kjop/forhandler`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kjøpt MC fra forhandler? Sterkt forbrukervern | Harjegkravpå.no",
+    title: "MC fra forhandler med feil? Sjekk rettighetene dine",
     description:
-      "Kjøpt MC fra forhandler og oppdaget feil? Du har sterkt forbrukervern. Les om dine rettigheter. Gratis vurdering.",
+      "Kjøpt MC fra forhandler med feil? Legg inn saken — AI lager rapport + kravbrev for 99 kr.",
   },
 };
 

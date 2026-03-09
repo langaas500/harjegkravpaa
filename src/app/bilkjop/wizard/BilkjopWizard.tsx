@@ -708,7 +708,7 @@ export default function BilkjopWizard() {
                 <>
                   <div className="flex gap-3 pt-2">
                     <button onClick={() => setStep("ADDITIONAL")} className="flex items-center gap-2 rounded-xl border border-white/[0.08] px-5 py-3 text-slate-400 hover:bg-white/[0.03] transition"><ArrowLeft className="h-4 w-4" />Tilbake</button>
-                    <button onClick={goToReport} className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"><FileText className="h-5 w-5" />Få kravbrev og full vurdering (99 kr)<ArrowRight className="h-5 w-5" /></button>
+                    <button onClick={goToReport} className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"><FileText className="h-5 w-5" />Få juridisk rapport + kravbrev (99 kr)<ArrowRight className="h-5 w-5" /></button>
                   </div>
                   <ul className="text-xs text-slate-500 space-y-1 px-1">
                     <li>• Ferdig kravbrev klart til å sende</li>

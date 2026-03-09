@@ -230,8 +230,8 @@ export default function HandverkKravbrevPage() {
             <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 mb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold">Juridisk kravbrev</p>
-                  <p className="text-xs text-slate-400">Ferdig formulert, klart til å sende</p>
+                  <p className="font-semibold">Juridisk rapport + kravbrev</p>
+                  <p className="text-xs text-slate-400">To PDF-er i én pakke — klart til å sende</p>
                 </div>
                 <p className="text-2xl font-bold">99 kr</p>
               </div>

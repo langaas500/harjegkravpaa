@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Bilgaranti – hva gjelder egentlig? | Harjegkravpå.no",
+  title: "Garanti på bil – hva dekkes og hva kan du kreve?",
   description:
-    "Forstå forskjellen mellom garanti og reklamasjon ved bilkjøp. Lær hva garantien dekker og hva du har krav på uansett.",
+    "Garanti vs. reklamasjon ved bilkjøp: hva gjelder? Legg inn din sak og få AI-vurdering med rapport + kravbrev for 99 kr. Advokat koster typisk 2 500 kr/t.",
   alternates: {
     canonical: `${SITE_URL}/bilkjop/garanti`,
   },
   openGraph: {
-    title: "Bilgaranti – hva gjelder egentlig? | Harjegkravpå.no",
+    title: "Garanti på bil – hva dekkes og hva kan du kreve?",
     description:
-      "Forstå forskjellen mellom garanti og reklamasjon ved bilkjøp. Lær hva garantien dekker og hva du har krav på uansett.",
+      "Garanti vs. reklamasjon ved bilkjøp: hva gjelder? Få AI-vurdering + kravbrev for 99 kr.",
     url: `${SITE_URL}/bilkjop/garanti`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bilgaranti – hva gjelder egentlig? | Harjegkravpå.no",
+    title: "Garanti på bil – hva dekkes?",
     description:
-      "Forstå forskjellen mellom garanti og reklamasjon ved bilkjøp. Lær hva garantien dekker og hva du har krav på uansett.",
+      "Forstå forskjellen mellom garanti og reklamasjon. Sjekk din sak med AI-verktøy for 99 kr.",
   },
 };
 

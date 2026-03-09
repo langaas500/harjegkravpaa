@@ -489,8 +489,8 @@ export default function HandverkerePage() {
 
             <div className="text-sm text-slate-400 space-y-1">
               <p>• Tar ca. 3–4 minutter</p>
-              <p>• Gratis vurdering</p>
-              <p>• Kravbrev inkl. vurdering (99 kr)</p>
+              <p>• Rapport + kravbrev for 99 kr</p>
+              <p>• Juridisk rapport + kravbrev (99 kr)</p>
             </div>
 
             <button
@@ -1704,57 +1704,23 @@ export default function HandverkerePage() {
                 </span>
               </div>
               <h2 className="text-xl font-bold mb-2">{outcome.title}</h2>
-              <p className="text-slate-300">{outcome.summary}</p>
+              <p className="text-slate-300">
+                {outcome.level === "RED"
+                  ? "Basert på svarene dine er det usikkert om vilkårene er oppfylt."
+                  : "Basert på svarene dine kan det foreligge en mangel."}
+              </p>
             </div>
 
-            {outcome.recommendedClaim && (
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-sm text-slate-400 uppercase tracking-wide mb-1">Anbefalt kravtype</p>
-                <p className="text-white font-medium">
-                  {outcome.recommendedClaim === "retting" && "Retting av arbeidet"}
-                  {outcome.recommendedClaim === "prisavslag" && "Prisavslag"}
-                  {outcome.recommendedClaim === "heving" && "Heving av avtalen"}
-                  {outcome.recommendedClaim === "erstatning" && "Erstatning"}
-                </p>
-              </div>
-            )}
-
-            {outcome.strengthFactors && outcome.strengthFactors.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm text-emerald-400 uppercase tracking-wide">Det som styrker saken</p>
-                <ul className="text-slate-300 space-y-1">
-                  {outcome.strengthFactors.map((factor, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                      {factor}
-                    </li>
+            {outcome.keyPoints && outcome.keyPoints.length > 0 && (
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4 space-y-2">
+                <p className="text-sm font-semibold text-slate-300">Dette betyr ofte:</p>
+                <ul className="text-sm text-slate-400 space-y-1">
+                  {outcome.keyPoints.slice(0, 3).map((point, i) => (
+                    <li key={i}>• {point}</li>
                   ))}
                 </ul>
               </div>
             )}
-
-            {outcome.riskFactors && outcome.riskFactors.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm text-amber-400 uppercase tracking-wide">Mulige risikofaktorer</p>
-                <ul className="text-slate-300 space-y-1">
-                  {outcome.riskFactors.map((factor, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
-                      {factor}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <p className="text-sm text-slate-400 uppercase tracking-wide">Nøkkelpunkter</p>
-              <ul className="text-slate-300 space-y-1">
-                {outcome.keyPoints.map((point, i) => (
-                  <li key={i}>• {point}</li>
-                ))}
-              </ul>
-            </div>
 
             <div className="flex gap-3">
               <button
@@ -1769,10 +1735,15 @@ export default function HandverkerePage() {
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"
               >
                 <FileText className="h-5 w-5" />
-                Se full rapport
+                Få juridisk rapport + kravbrev (99 kr)
                 <ArrowRight className="h-5 w-5" />
               </button>
             </div>
+            <ul className="text-xs text-slate-500 space-y-1 px-1">
+              <li>• Ferdig kravbrev klart til å sende</li>
+              <li>• Tilpasset lovhenvisning</li>
+              <li>• Konkrete neste steg</li>
+            </ul>
 
             <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering, ikke juridisk rådgivning

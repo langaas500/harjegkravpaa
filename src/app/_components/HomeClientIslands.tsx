@@ -19,7 +19,7 @@ export function CaseCounter() {
   return (
     <span className="flex items-center gap-1.5">
       <Users className="h-3.5 w-3.5 text-emerald-500/60" />
-      {caseCount > 0 ? `${caseCount}+ vurderinger` : "Gratis vurdering"}
+      {caseCount > 0 ? `${caseCount}+ vurderinger` : "Rapport + kravbrev — 99 kr"}
     </span>
   );
 }
@@ -79,7 +79,7 @@ export function StickyMobileCta() {
           href="/bilkjop"
           className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-black hover:bg-emerald-400 transition-colors flex-shrink-0"
         >
-          Sjekk saken din gratis
+          Sjekk saken din — 99 kr
         </Link>
       </div>
     </div>

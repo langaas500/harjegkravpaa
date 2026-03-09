@@ -32,7 +32,7 @@ const faqs = [
 
 export const metadata: Metadata = {
   description:
-    "Kjøpte du bil fra forhandler? Les om dine rettigheter etter forbrukerkjøpsloven – reklamasjon, heving og hva du kan kreve. Sjekk saken din gratis.",
+    "Feil på bil fra forhandler? Legg inn saken din — AI vurderer rettighetene dine og lager rapport + kravbrev for 99 kr.",
 };
 
 export default function ForhandlerPage() {

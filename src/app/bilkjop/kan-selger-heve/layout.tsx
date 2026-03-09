@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Kan selger heve bilkjøpet? Regler | Harjegkravpå.no",
+  title: "Kan selger heve bilkjøpet? Regler du bør kjenne",
   description:
-    "Kan selger heve kjøpet av bil? Les om betalingsmislighold, vesentlig kontraktsbrudd, tilbakeholdsrett og heving før levering.",
+    "Kan selger heve bilkjøpet ditt? Les om betalingsmislighold og kontraktsbrudd. Usikker på dine rettigheter? AI lager rapport + kravbrev for 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/bilkjop/kan-selger-heve`,
   },
   openGraph: {
-    title: "Kan selger heve bilkjøpet? Regler | Harjegkravpå.no",
+    title: "Kan selger heve bilkjøpet? Regler du bør kjenne",
     description:
-      "Kan selger heve kjøpet av bil? Les om betalingsmislighold, vesentlig kontraktsbrudd, tilbakeholdsrett og heving før levering.",
+      "Les om betalingsmislighold og kontraktsbrudd. AI lager rapport + kravbrev for 99 kr.",
     url: `${SITE_URL}/bilkjop/kan-selger-heve`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kan selger heve bilkjøpet? Regler | Harjegkravpå.no",
+    title: "Kan selger heve bilkjøpet? Regler",
     description:
-      "Kan selger heve kjøpet av bil? Les om betalingsmislighold, vesentlig kontraktsbrudd, tilbakeholdsrett og heving før levering.",
+      "Les om selgers hevingsrett. Sjekk saken din for 99 kr.",
   },
 };
 

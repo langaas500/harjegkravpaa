@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Bil fra forhandler – dine rettigheter | Harjegkravpå.no",
+  title: "Feil på bil fra forhandler? Sjekk rettighetene dine og få kravbrev",
   description:
-    "Kjøpte du bil fra forhandler og oppdaget feil? Finn ut om dine rettigheter etter forbrukerkjøpsloven.",
+    "Kjøpt bil fra forhandler med feil? Du har sterkt forbrukervern. Legg inn saken, last opp dokumenter — AI lager rapport + kravbrev til forhandler. 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/bilkjop/forhandler`,
   },
   openGraph: {
-    title: "Bil fra forhandler – dine rettigheter | Harjegkravpå.no",
+    title: "Feil på bil fra forhandler? Sjekk rettighetene dine og få kravbrev",
     description:
-      "Kjøpte du bil fra forhandler og oppdaget feil? Finn ut om dine rettigheter etter forbrukerkjøpsloven.",
+      "Du har sterkt forbrukervern. AI lager rapport + kravbrev for 99 kr.",
     url: `${SITE_URL}/bilkjop/forhandler`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bil fra forhandler – dine rettigheter | Harjegkravpå.no",
+    title: "Feil på bil fra forhandler? Sjekk hva du kan kreve",
     description:
-      "Kjøpte du bil fra forhandler og oppdaget feil? Finn ut om dine rettigheter etter forbrukerkjøpsloven.",
+      "AI vurderer saken din og lager rapport + kravbrev. 99 kr – klar på minutter.",
   },
 };
 

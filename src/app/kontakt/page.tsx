@@ -11,14 +11,9 @@ const FAQ_ITEMS = [
       "Du svarer på noen spørsmål om saken din. Deretter lager vi en veiledende vurdering basert på det du har oppgitt, med anbefalt neste steg.",
   },
   {
-    question: "Hva får jeg for 39 kr?",
-    answer:
-      "Du får en full rapport som oppsummerer saken din, med vurdering, relevante lover og konkrete anbefalinger for hva du bør gjøre videre.",
-  },
-  {
     question: "Hva får jeg for 99 kr?",
     answer:
-      "Du får et ferdig kravbrev tilpasset saken din, klart til å sendes til selger, håndverker eller flyselskap, med korrekt og tydelig formulering.",
+      "Du får to separate PDF-dokumenter: en juridisk rapport som analyserer saken din opp mot norsk kjøpslov/forbrukerkjøpsloven, og et ferdig kravbrev tilpasset saken din, klart til å sende til selger. Alt i én pakke for 99 kr.",
   },
   {
     question: "Hvordan sender jeg kravbrevet?",

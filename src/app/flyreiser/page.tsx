@@ -501,7 +501,7 @@ export default function FlyreiserPage() {
 
             <div className="text-sm text-slate-400 space-y-1">
               <p>• Tar ca. 2 minutter</p>
-              <p>• Gratis vurdering</p>
+              <p>• Rapport + kravbrev for 99 kr</p>
               <p>• Kompensasjon opptil 600 EUR</p>
             </div>
 
@@ -1588,24 +1588,23 @@ export default function FlyreiserPage() {
                 </span>
               </div>
               <h2 className="text-xl font-bold mb-2">{outcome.title}</h2>
-              <p className="text-slate-300">{outcome.summary}</p>
-
-              {outcome.compensationAmount && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <p className="text-sm text-slate-400">Mulig kompensasjon</p>
-                  <p className="text-2xl font-bold text-emerald-400">{outcome.compensationAmount}</p>
-                </div>
-              )}
+              <p className="text-slate-300">
+                {outcome.level === "RED"
+                  ? "Basert på svarene dine er det usikkert om vilkårene er oppfylt."
+                  : "Basert på svarene dine kan du ha krav på kompensasjon."}
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-sm text-slate-400 uppercase tracking-wide">Nøkkelpunkter</p>
-              <ul className="text-slate-300 space-y-1">
-                {outcome.keyPoints.map((point, i) => (
-                  <li key={i}>• {point}</li>
-                ))}
-              </ul>
-            </div>
+            {outcome.keyPoints && outcome.keyPoints.length > 0 && (
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4 space-y-2">
+                <p className="text-sm font-semibold text-slate-300">Dette betyr ofte:</p>
+                <ul className="text-sm text-slate-400 space-y-1">
+                  {outcome.keyPoints.slice(0, 3).map((point, i) => (
+                    <li key={i}>• {point}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="flex gap-3">
               <button
@@ -1620,10 +1619,15 @@ export default function FlyreiserPage() {
                 className="flex-1 flex items-center justify-center gap-2 rounded-full bg-emerald-500 text-black py-3 font-bold hover:bg-emerald-400 transition"
               >
                 <FileText className="h-5 w-5" />
-                Se full rapport
+                Få juridisk rapport + kravbrev (99 kr)
                 <ArrowRight className="h-5 w-5" />
               </button>
             </div>
+            <ul className="text-xs text-slate-500 space-y-1 px-1">
+              <li>• Ferdig kravbrev klart til å sende</li>
+              <li>• Tilpasset lovhenvisning</li>
+              <li>• Konkrete neste steg</li>
+            </ul>
 
             <p className="text-xs text-slate-500 text-center">
               Veiledende vurdering, ikke juridisk rådgivning

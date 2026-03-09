@@ -32,7 +32,7 @@ const faqs = [
 
 export const metadata: Metadata = {
   description:
-    "Kjøpte du bil av privatperson? Her er dine rettigheter etter kjøpsloven – hva du kan klage på, frister og når du kan kreve pengene tilbake.",
+    "Kjøpt bil privat med feil? Legg inn saken — AI vurderer dine rettigheter etter kjøpsloven og lager kravbrev for 99 kr.",
 };
 
 export default function PrivatKjopPage() {

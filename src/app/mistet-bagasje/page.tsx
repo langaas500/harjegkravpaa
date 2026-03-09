@@ -30,6 +30,79 @@ export default function MistetBagasjePage() {
       secondaryCtaText="Sjekk saken din nå →"
       ctaHref="/flyreiser"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Hjem",
+                item: "https://harjegkravpå.no",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Flyreiser",
+                item: "https://harjegkravpå.no/flyreiser",
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: "Mistet bagasje",
+                item: "https://harjegkravpå.no/mistet-bagasje",
+              },
+            ],
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Hva er et PIR-skjema?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "PIR (Property Irregularity Report) er et standardskjema du fyller ut på flyplassen når bagasjen er forsinket, tapt eller skadet. Dette er viktig dokumentasjon for senere krav.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Når regnes bagasjen som tapt?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Bagasje som ikke er funnet innen 21 dager etter at den skulle vært levert, regnes som tapt. Da kan du kreve full erstatning.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Hva er SDR?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "SDR (Special Drawing Rights) er en internasjonal regneenhet brukt av IMF. 1 288 SDR tilsvarer ca. 16 000 kr, men kursen varierer.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Kan jeg kjøpe hva som helst mens jeg venter?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Nei. Du får dekket nødvendige utgifter – klær og toalettsaker som er rimelige. Luksuskjøp eller unødvendige ting dekkes ikke.",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
       {/* Hva skjedde med bagasjen */}
       <section className="mb-14">
         <h2 className="text-2xl font-bold mb-6">

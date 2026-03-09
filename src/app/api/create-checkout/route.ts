@@ -11,8 +11,8 @@ const CATEGORY_TO_CASE_TYPE: Record<string, string> = {
 
 // LIVE Price IDs fra Stripe Dashboard
 const PRICE_IDS: Record<string, string> = {
-  REPORT: "price_1SqW7hCCpSOV7VNPm41GEzmK",   // 39 NOK
-  KRAVBREV: "price_1SqW8vCCpSOV7VNPxmhEQDYQ", // 99 NOK
+  REPORT: "price_1SqW7hCCpSOV7VNPm41GEzmK",   // 99 NOK — rapport + kravbrev pakke
+  KRAVBREV: "price_1SqW8vCCpSOV7VNPxmhEQDYQ", // 99 NOK — rapport + kravbrev pakke
 };
 
 const VALID_PRODUCT_TYPES = Object.keys(PRICE_IDS);

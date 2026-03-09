@@ -94,6 +94,12 @@ export default function BilkjopPage() {
             >
               Garanti på bil
             </Link>
+            <Link
+              href="/bilkjop/skjulte-feil-bil"
+              className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+            >
+              Skjulte feil på bil
+            </Link>
           </div>
           <p className="text-sm text-slate-400">
             Vil du{" "}

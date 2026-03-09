@@ -59,7 +59,7 @@ const breadcrumbJsonLd = {
 
 export const metadata: Metadata = {
   description:
-    "Kan selger kreve å heve bilkjøpet? Les om selgers hevingsrett ved betalingsmislighold og kontraktsbrudd – og hva du kan gjøre som kjøper.",
+    "Kan selger heve bilkjøpet? Les om reglene — og sjekk din sak med AI-verktøyet vårt. Rapport + kravbrev for 99 kr.",
 };
 
 export default function KanSelgerHevePage() {
@@ -520,7 +520,7 @@ export default function KanSelgerHevePage() {
             href="/bilkjop"
             className="group inline-flex items-center gap-2 bg-emerald-500 text-black px-8 py-4 rounded-2xl font-bold text-lg hover:bg-emerald-400 transition-all hover:shadow-[0_0_40px_rgba(16,185,129,0.2)] hover:scale-[1.02] active:scale-[0.98]"
           >
-            Start gratis vurdering
+            Sjekk saken din — 99 kr
             <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <p className="text-xs text-slate-600 mt-4">

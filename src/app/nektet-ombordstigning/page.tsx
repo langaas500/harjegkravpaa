@@ -23,6 +23,79 @@ export default function NektetOmbordstigningPage() {
       secondaryCtaText="Sjekk saken din nå →"
       ctaHref="/flyreiser"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Hjem",
+                item: "https://harjegkravpå.no",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Flyreiser",
+                item: "https://harjegkravpå.no/flyreiser",
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: "Nektet ombordstigning",
+                item: "https://harjegkravpå.no/nektet-ombordstigning",
+              },
+            ],
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Hvor lenge kan jeg vente med å kreve kompensasjon?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Du kan kreve kompensasjon for nektet ombordstigning opptil 3 år tilbake i tid.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Hva hvis jeg ga fra meg plassen frivillig?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Hvis du frivillig ga fra deg plassen, gjelder ikke de faste kompensasjonssatsene. Da har du kun krav på det flyselskapet tilbød deg.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Gjelder reglene for alle flyselskaper?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Reglene gjelder for alle flyselskaper som flyr fra EU/EØS, og for EU-baserte selskaper som flyr til EU/EØS.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Kan flyselskapet nekte å betale?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Ved overbooking har du krav på kompensasjon, og flyselskapet kan ikke nekte dette. Hvis de likevel gjør det, kan du ta saken videre til Transportklagenemnda.",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
       {/* Hva er overbooking */}
       <section className="mb-14">
         <h2 className="text-2xl font-bold mb-6">Hva er overbooking?</h2>

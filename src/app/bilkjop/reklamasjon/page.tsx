@@ -32,7 +32,7 @@ const faqs = [
 
 export const metadata: Metadata = {
   description:
-    "Slik reklamerer du på bil etter kjøpsloven og forbrukerkjøpsloven. Frister, fremgangsmåte og hva du må dokumentere for å stå sterkest mulig.",
+    "Slik reklamerer du på bil. Legg inn saken din og last opp dokumenter — AI lager rapport + kravbrev til selger for 99 kr.",
 };
 
 export default function ReklamasjonPage() {
@@ -529,6 +529,33 @@ export default function ReklamasjonPage() {
         </div>
       </section>
 
+      {/* Intern linking */}
+      <section className="mb-14">
+        <h2 className="text-lg font-semibold text-slate-300 mb-3">
+          Les også
+        </h2>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <Link
+            href="/bilkjop/heving"
+            className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+          >
+            Heving av bilkjøp
+          </Link>
+          <Link
+            href="/bilkjop/skjulte-feil-bil"
+            className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+          >
+            Skjulte feil på bil
+          </Link>
+          <Link
+            href="/bilkjop/bruktbil-feil"
+            className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition"
+          >
+            Kjøpt bruktbil med feil?
+          </Link>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section
         data-final-cta="true"
@@ -541,8 +568,8 @@ export default function ReklamasjonPage() {
             Usikker på om du har en sak?
           </h2>
           <p className="text-slate-400 mb-6 max-w-lg mx-auto">
-            Svar på noen spørsmål om bilkjøpet ditt – få en vurdering av saken
-            din på 2 minutter.
+            Svar på noen spørsmål om bilkjøpet ditt – få juridisk rapport og
+            kravbrev til selger for 99 kr.
           </p>
           <Link
             href="/bilkjop"

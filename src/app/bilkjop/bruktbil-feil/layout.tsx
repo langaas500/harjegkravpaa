@@ -3,25 +3,25 @@ import SeoJsonLd from "@/components/SeoJsonLd";
 import { buildWebPageSchema, SITE_URL } from "@/lib/seo/jsonld";
 
 export const metadata: Metadata = {
-  title: "Kjøpt bil med feil? Sjekk om du har krav | Harjegkravpå.no",
+  title: "Kjøpt bruktbil med feil? Sjekk saken din og få kravbrev – 99 kr",
   description:
-    "Kjøpt bruktbil med feil? Sjekk om du har krav på prisavslag, heving eller erstatning. Gratis vurdering.",
+    "Oppdaget feil på bruktbilen? Legg inn saken din og last opp dokumenter — AI vurderer om du har krav på prisavslag, heving eller erstatning, og lager ferdig kravbrev. 99 kr.",
   alternates: {
     canonical: `${SITE_URL}/bilkjop/bruktbil-feil`,
   },
   openGraph: {
-    title: "Kjøpt bil med feil? Sjekk om du har krav | Harjegkravpå.no",
+    title: "Kjøpt bruktbil med feil? Sjekk saken din og få kravbrev – 99 kr",
     description:
-      "Kjøpt bruktbil med feil? Sjekk om du har krav på prisavslag, heving eller erstatning. Gratis vurdering.",
+      "Oppdaget feil på bruktbilen? AI vurderer saken og lager rapport + kravbrev. 99 kr.",
     url: `${SITE_URL}/bilkjop/bruktbil-feil`,
-    siteName: "Harjegkravpå.no",
+    siteName: "HarJegKravPå.no",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kjøpt bil med feil? Sjekk om du har krav | Harjegkravpå.no",
+    title: "Kjøpt bruktbil med feil? Få AI-vurdering + kravbrev",
     description:
-      "Kjøpt bruktbil med feil? Sjekk om du har krav på prisavslag, heving eller erstatning. Gratis vurdering.",
+      "Legg inn saken og få rapport + kravbrev basert på norsk lov. 99 kr.",
   },
 };
 
