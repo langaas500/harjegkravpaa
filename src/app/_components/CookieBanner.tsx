@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { initPostHog } from "@/lib/posthog";
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);
@@ -19,6 +20,8 @@ export function CookieBanner() {
         analytics_storage: "granted",
       });
     }
+    // Initialize PostHog immediately on consent
+    initPostHog();
   }
 
   function decline() {

@@ -206,14 +206,21 @@ export default function FlyreiserPage() {
   };
 
   useEffect(() => {
-    trackEvent('wizard_start', { case_type: 'FLY' });
+    trackEvent('wizard_started', { case_type: 'flyreiser' });
   }, []);
 
   useEffect(() => {
     if (step !== "INTRO") {
-      trackEvent('wizard_step', { case_type: 'FLY', step, step_name: STEP_NAMES[step] });
+      trackEvent('wizard_step_completed', { case_type: 'flyreiser', step });
     }
   }, [step]);
+
+  useEffect(() => {
+    if (step === "RESULT" && outcome) {
+      trackEvent('wizard_result_shown', { case_type: 'flyreiser' });
+      trackEvent('result_level', { case_type: 'flyreiser', level: outcome.level });
+    }
+  }, [step, outcome]);
 
   const analyzeCase = async () => {
     setIsAnalyzing(true);

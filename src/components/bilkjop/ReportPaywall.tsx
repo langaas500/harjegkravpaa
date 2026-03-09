@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, CreditCard, FileText, CheckCircle2 } from "lucide-react";
-import { trackEvent } from "@/lib/posthog";
+import { trackEvent, getPostHogId } from "@/lib/posthog";
 
 interface ReportPaywallProps {
   accessToken: string | null;
@@ -52,6 +52,7 @@ export default function ReportPaywall({
           productType: "REPORT",
           category,
           returnPath: reportReturnPath,
+          ph_distinct_id: getPostHogId(),
         }),
       });
 
@@ -87,6 +88,7 @@ export default function ReportPaywall({
           productType: "KRAVBREV",
           category,
           returnPath: kravbrevReturnPath,
+          ph_distinct_id: getPostHogId(),
         }),
       });
 

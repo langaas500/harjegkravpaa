@@ -85,15 +85,22 @@ export default function BilkjopWizard() {
   }, [searchParams]);
 
   useEffect(() => {
-    trackEvent('wizard_start', { case_type: 'BIL' });
+    trackEvent('wizard_started', { case_type: 'bilkjop' });
   }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
     if (step !== "BASICS") {
-      trackEvent('wizard_step', { case_type: 'BIL', step, step_name: stepTitle(step) });
+      trackEvent('wizard_step_completed', { case_type: 'bilkjop', step });
     }
   }, [step]);
+
+  useEffect(() => {
+    if (step === "RESULT" && state.outcome) {
+      trackEvent('wizard_result_shown', { case_type: 'bilkjop' });
+      trackEvent('result_level', { case_type: 'bilkjop', level: state.outcome.level });
+    }
+  }, [step, state.outcome]);
 
   const update = (partial: Partial<WizardState>) => setState((s) => ({ ...s, ...partial }));
 
@@ -134,7 +141,7 @@ export default function BilkjopWizard() {
       if (!response.ok) throw new Error("API failed");
       const result = await response.json();
       setState((s) => ({ ...s, outcome: result.outcome }));
-      trackEvent('analysis_complete', { case_type: 'BIL', outcome: result.outcome?.level });
+      trackEvent('analysis_complete', { case_type: 'bilkjop', outcome: result.outcome?.level });
 
       if (supabaseCase) {
         await updateCase(supabaseCase.id, { outcome: result.outcome, status: "completed" });

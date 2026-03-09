@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { token, productType, category, returnPath } = body;
+    const { token, productType, category, returnPath, ph_distinct_id } = body;
 
     // Resolve token: body first, then cookie fallback
     let resolvedToken = typeof token === "string" && token ? token : null;
@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
         token: resolvedToken,
         productType,
         category: category || "",
+        ph_distinct_id: typeof ph_distinct_id === "string" ? ph_distinct_id : "",
       },
       success_url: `${siteUrl}/stripe/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}${returnPath}`,

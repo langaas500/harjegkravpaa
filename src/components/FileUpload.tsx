@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback } from "react";
 import { Upload, X, FileText, Image as ImageIcon, Loader2, AlertCircle } from "lucide-react";
+import { trackEvent } from "@/lib/posthog";
 
 interface UploadedFile {
   key: string;
@@ -82,6 +83,7 @@ export default function FileUpload({
 
       if (uploadedFiles.length > 0) {
         onFilesChange([...files, ...uploadedFiles]);
+        trackEvent('files_uploaded', { case_type: category, count: uploadedFiles.length });
       }
 
       if (uploadedFiles.length < filesToUpload.length) {

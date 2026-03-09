@@ -248,14 +248,18 @@ export default function HandverkerePage() {
   };
 
   useEffect(() => {
-    trackEvent('wizard_start', { case_type: 'HANDVERK' });
+    trackEvent('wizard_started', { case_type: 'handverkere' });
   }, []);
 
   useEffect(() => {
     if (step !== "INTRO") {
-      trackEvent('wizard_step', { case_type: 'HANDVERK', step, step_name: STEP_NAMES[step] });
+      trackEvent('wizard_step_completed', { case_type: 'handverkere', step });
     }
-  }, [step]);
+    if (step === "RESULT" && outcome) {
+      trackEvent('wizard_result_shown', { case_type: 'handverkere' });
+      trackEvent('result_level', { case_type: 'handverkere', level: outcome.level });
+    }
+  }, [step, outcome]);
 
   const analyzeCase = async () => {
     setIsAnalyzing(true);

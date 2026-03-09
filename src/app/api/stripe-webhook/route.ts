@@ -76,13 +76,28 @@ export async function POST(req: NextRequest) {
       console.log(`[stripe-webhook] Payment verified: token=${token.substring(0, 8)}..., status=${newStatus}, sessionId=${sessionId}`);
     }
 
-    // PostHog server-side tracking
-    try {
-      const phClient = new PostHog('phc_nd3hkeygkxbcwMXgTKCLWCRlVXqYzOt7dbT2KsIhbM9', { host: 'https://eu.i.posthog.com' });
-      await phClient.capture({ distinctId: sessionId, event: 'purchase_confirmed', properties: { value: 99, currency: 'NOK', product_type: productType } });
-      await phClient.shutdown();
-    } catch (phErr) {
-      console.error("[stripe-webhook] PostHog tracking error:", phErr);
+    // PostHog server-side tracking — use ph_distinct_id from metadata to link to client session
+    const distinctId = session.metadata?.ph_distinct_id || session.client_reference_id || sessionId;
+    if (distinctId) {
+      try {
+        const phKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+        if (phKey) {
+          const phClient = new PostHog(phKey, { host: 'https://eu.i.posthog.com' });
+          await phClient.capture({
+            distinctId,
+            event: 'purchase_confirmed',
+            properties: {
+              value: 99,
+              currency: 'NOK',
+              product_type: productType,
+              case_type: session.metadata?.category || '',
+            },
+          });
+          await phClient.shutdown();
+        }
+      } catch (phErr) {
+        console.error("[stripe-webhook] PostHog tracking error:", phErr);
+      }
     }
   }
 

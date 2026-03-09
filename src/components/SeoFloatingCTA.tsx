@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { trackEvent } from "@/lib/posthog";
 
 interface SeoFloatingCTAProps {
   href: string;
@@ -83,6 +84,7 @@ export default function SeoFloatingCTA({
     >
       <Link
         href={href}
+        onClick={() => trackEvent('seo_cta_clicked', { href, label, source: 'floating' })}
         className="inline-block rounded-xl bg-[#1F4F45] hover:bg-[#246457] text-[#ECFDF5] font-semibold shadow-xl px-5 py-3 transition"
       >
         {label}
