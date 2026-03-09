@@ -144,35 +144,31 @@ export default function UniversalSeoTemplate({ node }: Props) {
     mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
   };
 
+  const defaultFaqs = [
+    {
+      q: `Hva sier loven om ${node.title.toLowerCase()}?`,
+      a: `${node.desc} Hjemmel: ${node.lawRef}. Legg inn saken din for en personlig vurdering basert på norsk lov.`,
+    },
+    {
+      q: "Hva koster det å få vurdert saken?",
+      a: "Du får juridisk rapport og ferdig kravbrev for 99 kr. Til sammenligning koster en advokat typisk 2 500 kr per time.",
+    },
+    {
+      q: "Hvordan fungerer tjenesten?",
+      a: "Beskriv saken din, last opp dokumenter, og AI-en analyserer saken mot norsk lov. Du får rapport og kravbrev som PDF — klart til bruk med en gang.",
+    },
+  ];
+
+  const activeFaqs = node.faqs && node.faqs.length > 0 ? node.faqs : defaultFaqs;
+
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: `Hva sier loven om ${node.title.toLowerCase()}?`,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: `${node.desc} Hjemmel: ${node.lawRef}. Legg inn saken din hos HarJegKravPå.no for en personlig vurdering basert på norsk lov.`,
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Hva koster det å få vurdert saken?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Du får juridisk rapport og ferdig kravbrev for 99 kr. En advokat koster typisk 2 500 kr per time.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Hvordan fungerer tjenesten?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Beskriv saken din, last opp dokumenter, og AI-en analyserer saken mot norsk lov. Du får rapport og kravbrev som PDF — klart til bruk med en gang.",
-        },
-      },
-    ],
+    mainEntity: activeFaqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
   };
 
   return (
@@ -296,20 +292,7 @@ export default function UniversalSeoTemplate({ node }: Props) {
         <section className="mb-14">
           <h2 className="text-2xl font-bold mb-6">Ofte stilte spørsmål</h2>
           <div className="space-y-3">
-            {[
-              {
-                q: `Hva sier loven om ${node.title.toLowerCase()}?`,
-                a: `${node.desc} Hjemmel: ${node.lawRef}. Legg inn saken din for en personlig vurdering basert på norsk lov.`,
-              },
-              {
-                q: "Hva koster det å få vurdert saken?",
-                a: "Du får juridisk rapport og ferdig kravbrev for 99 kr. Til sammenligning koster en advokat typisk 2 500 kr per time.",
-              },
-              {
-                q: "Hvordan fungerer tjenesten?",
-                a: "Beskriv saken din, last opp dokumenter, og AI-en analyserer saken mot norsk lov. Du får rapport og kravbrev som PDF — klart til bruk med en gang.",
-              },
-            ].map((faq, i) => (
+            {activeFaqs.map((faq, i) => (
               <details
                 key={i}
                 className="group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition"
