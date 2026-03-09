@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 import { createCase, updateCase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/posthog";
 
 type Step =
   | "INTRO"
@@ -229,6 +230,33 @@ export default function HandverkerePage() {
   const canProceedDok = dokumentasjon.length > 0;
   const canProceedHistorie = dinHistorie.trim().length >= 50;
 
+  const STEP_NAMES: Record<Step, string> = {
+    INTRO: "Intro",
+    FAG: "Fag",
+    PROBLEM: "Problem",
+    ALVORLIGHET: "Alvorlighet",
+    AVTALE: "Avtale",
+    TIDSLINJE: "Tidslinje",
+    OMFANG_KOST: "Omfang/Kostnad",
+    KRAVMAL: "Kravmål",
+    DOKUMENTASJON: "Dokumentasjon",
+    HISTORIE: "Historie",
+    SVAR: "Svar",
+    PERSONALIA: "Personalia",
+    UPLOAD: "Opplasting",
+    RESULT: "Resultat",
+  };
+
+  useEffect(() => {
+    trackEvent('wizard_start', { case_type: 'HANDVERK' });
+  }, []);
+
+  useEffect(() => {
+    if (step !== "INTRO") {
+      trackEvent('wizard_step', { case_type: 'HANDVERK', step, step_name: STEP_NAMES[step] });
+    }
+  }, [step]);
+
   const analyzeCase = async () => {
     setIsAnalyzing(true);
     try {
@@ -325,6 +353,7 @@ export default function HandverkerePage() {
 
       const result = await response.json();
       setOutcome(result.outcome);
+      trackEvent('analysis_complete', { case_type: 'HANDVERK', outcome: result.outcome?.level });
 
       // Oppdater case med outcome
       if (supabaseCase) {

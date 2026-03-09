@@ -29,6 +29,8 @@ interface ContactInfo {
   contractorCity: string;
 }
 
+import { trackEvent } from "@/lib/posthog";
+
 function track(event: string, product?: string) {
   fetch("/api/track", {
     method: "POST",
@@ -63,6 +65,8 @@ function KravbrevBetaltContent() {
   const letterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    trackEvent('kravbrev_generated', { case_type: 'HANDVERK' });
+
     const initData = (parsedData: Record<string, unknown>) => {
       setData(parsedData);
       setContactInfo({
@@ -345,6 +349,7 @@ function KravbrevBetaltContent() {
 
   const handleDownloadDocx = async () => {
     if (!letter) return;
+    trackEvent('document_download', { case_type: 'HANDVERK', doc_type: 'kravbrev' });
 
     const { Document, Packer, Paragraph, TextRun } = await import("docx");
 

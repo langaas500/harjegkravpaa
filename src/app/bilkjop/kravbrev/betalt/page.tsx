@@ -17,6 +17,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { generateReportPdf } from "@/lib/bilkjop/generateReportPdf";
+import { trackEvent } from "@/lib/posthog";
 
 function track(event: string, product?: string) {
   fetch("/api/track", {
@@ -70,6 +71,8 @@ export default function KravbrevBetaltPage() {
   const resultAnchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    trackEvent('kravbrev_generated', { case_type: 'BIL' });
+
     const initData = (parsedData: Record<string, unknown>) => {
       setData(parsedData);
       // Migrate: if old LS has access_token, set session cookie then remove it
@@ -298,6 +301,7 @@ export default function KravbrevBetaltPage() {
   const handleDownloadDocx = async () => {
     if (!letter) return;
     track("download_docx", "KRAVBREV");
+    trackEvent('document_download', { case_type: 'BIL', doc_type: 'kravbrev' });
 
     const { Document, Packer, Paragraph, TextRun } = await import("docx");
 
@@ -454,6 +458,7 @@ export default function KravbrevBetaltPage() {
     setIsGeneratingReport(true);
     try {
       await generateReportPdf(data, fontData);
+      trackEvent('document_download', { case_type: 'BIL', doc_type: 'rapport' });
     } catch (err) {
       console.error("Report PDF error:", err);
       alert("Kunne ikke generere PDF-vurdering. Prøv igjen.");

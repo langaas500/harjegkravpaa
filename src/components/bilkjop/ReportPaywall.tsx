@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, CreditCard, FileText, CheckCircle2 } from "lucide-react";
+import { trackEvent } from "@/lib/posthog";
 
 interface ReportPaywallProps {
   accessToken: string | null;
@@ -34,12 +35,14 @@ export default function ReportPaywall({
 
   useEffect(() => {
     track("paywall_open");
+    trackEvent('paywall_view', { case_type: category });
   }, []);
 
   const handlePayment = async () => {
     setIsLoading(true);
     try {
       track("checkout_start", "REPORT");
+      trackEvent('checkout_start', { case_type: category, product: 'REPORT' });
 
       const response = await fetch("/api/create-checkout", {
         method: "POST",
@@ -74,6 +77,7 @@ export default function ReportPaywall({
     setIsLoading(true);
     try {
       track("checkout_start", "KRAVBREV");
+      trackEvent('checkout_start', { case_type: category, product: 'KRAVBREV' });
 
       const response = await fetch("/api/create-checkout", {
         method: "POST",

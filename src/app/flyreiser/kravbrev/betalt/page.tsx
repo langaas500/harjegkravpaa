@@ -58,6 +58,8 @@ interface FlightData {
   } | null;
 }
 
+import { trackEvent } from "@/lib/posthog";
+
 function track(event: string, product?: string) {
   fetch("/api/track", {
     method: "POST",
@@ -79,6 +81,8 @@ function KravbrevBetaltContent() {
   const letterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    trackEvent('kravbrev_generated', { case_type: 'FLY' });
+
     const initData = (parsedData: FlightData) => {
       setData(parsedData);
       // Migrate: if old LS has access_token, set session cookie then remove it
@@ -254,6 +258,7 @@ function KravbrevBetaltContent() {
 
   const handleDownloadDocx = async () => {
     if (!letter) return;
+    trackEvent('document_download', { case_type: 'FLY', doc_type: 'kravbrev' });
 
     const { Document, Packer, Paragraph, TextRun } = await import("docx");
 

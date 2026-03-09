@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, FileDown, Loader2, FileText, ArrowRight } from "lucide-react";
+import { trackEvent } from "@/lib/posthog";
 
 function BetaltContent() {
   const router = useRouter();
@@ -13,6 +14,8 @@ function BetaltContent() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
+    trackEvent('purchase', { case_type: 'FLY', value: 99, currency: 'NOK' });
+
     const stored = localStorage.getItem("flyreiser-data");
     if (stored) {
       const parsedData = JSON.parse(stored);
@@ -1030,6 +1033,7 @@ function BetaltContent() {
 
       const fileName = `flyreise-rapport-${new Date().toISOString().split("T")[0]}.pdf`;
       doc.save(fileName);
+      trackEvent('document_download', { case_type: 'FLY', doc_type: 'rapport' });
       setDownloaded(true);
     } catch (error) {
       console.error("PDF generation error:", error);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plane,
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 import { createCase, updateCase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/posthog";
 
 type ProblemType = "DELAY" | "CANCELLED" | "DENIED_BOARDING" | "BAGGAGE" | null;
 type BaggageType = "delayed" | "lost" | "damaged" | null;
@@ -194,6 +195,26 @@ export default function FlyreiserPage() {
   const canProceedExtraordinary = wasExtraordinary !== null;
   const canProceedAirlineContact = contactedAirline !== null;
 
+  const STEP_NAMES: Record<Step, string> = {
+    INTRO: "Intro",
+    FLIGHT_DETAILS: "Flydetaljer",
+    PROBLEM_DETAILS: "Problemdetaljer",
+    EXTRAORDINARY: "Ekstraordinært",
+    AIRLINE_CONTACT: "Flyselskapkontakt",
+    DESCRIPTION: "Beskrivelse",
+    RESULT: "Resultat",
+  };
+
+  useEffect(() => {
+    trackEvent('wizard_start', { case_type: 'FLY' });
+  }, []);
+
+  useEffect(() => {
+    if (step !== "INTRO") {
+      trackEvent('wizard_step', { case_type: 'FLY', step, step_name: STEP_NAMES[step] });
+    }
+  }, [step]);
+
   const analyzeCase = async () => {
     setIsAnalyzing(true);
     try {
@@ -250,6 +271,7 @@ export default function FlyreiserPage() {
 
       const result = await response.json();
       setOutcome(result.outcome);
+      trackEvent('analysis_complete', { case_type: 'FLY', outcome: result.outcome?.level });
 
       // Save to Supabase
       try {

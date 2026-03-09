@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import AppHeader from "./components/AppHeader";
 import { CookieBanner } from "@/app/_components/CookieBanner";
+import PostHogProvider from "@/components/PostHogProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -104,12 +105,14 @@ export default function RootLayout({
       </Script>
 
       <body className={inter.className}>
-        <div className="sticky top-0 z-50">
-          <AppHeader />
-        </div>
+        <PostHogProvider>
+          <div className="sticky top-0 z-50">
+            <AppHeader />
+          </div>
 
-        {children}
-        <CookieBanner />
+          {children}
+          <CookieBanner />
+        </PostHogProvider>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { PostHog } from "posthog-node";
 import { getCaseByAccessTokenAdmin, updateCaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
@@ -73,6 +74,15 @@ export async function POST(req: NextRequest) {
       console.error("[stripe-webhook] Supabase update error for token:", token.substring(0, 8));
     } else {
       console.log(`[stripe-webhook] Payment verified: token=${token.substring(0, 8)}..., status=${newStatus}, sessionId=${sessionId}`);
+    }
+
+    // PostHog server-side tracking
+    try {
+      const phClient = new PostHog('phc_nd3hkeygkxbcwMXgTKCLWCRlVXqYzOt7dbT2KsIhbM9', { host: 'https://eu.i.posthog.com' });
+      await phClient.capture({ distinctId: sessionId, event: 'purchase_confirmed', properties: { value: 99, currency: 'NOK', product_type: productType } });
+      await phClient.shutdown();
+    } catch (phErr) {
+      console.error("[stripe-webhook] PostHog tracking error:", phErr);
     }
   }
 

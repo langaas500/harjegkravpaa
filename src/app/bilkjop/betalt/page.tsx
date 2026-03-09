@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, FileDown, Loader2, FileText, ArrowRight } from "lucide-react";
+import { trackEvent } from "@/lib/posthog";
 
 function BetaltContent() {
   const router = useRouter();
@@ -12,6 +13,8 @@ function BetaltContent() {
   const [fontData, setFontData] = useState<{ regular: string; bold: string } | null>(null);
 
   useEffect(() => {
+    trackEvent('purchase', { case_type: 'BIL', value: 99, currency: 'NOK' });
+
     const stored = localStorage.getItem("bilkjop-data");
     if (stored) {
       setData(JSON.parse(stored));
@@ -813,6 +816,7 @@ function BetaltContent() {
       doc.text("Konfidensielt", pageWidth - margin, pageHeight - 8, { align: "right" });
 
       doc.save(`bilkjop-rapport-${isDealer ? "forhandler" : "privat"}-${new Date().toISOString().split("T")[0]}.pdf`);
+      trackEvent('document_download', { case_type: 'BIL', doc_type: 'rapport' });
       setDownloaded(true);
     } catch (error) {
       console.error("PDF error:", error);

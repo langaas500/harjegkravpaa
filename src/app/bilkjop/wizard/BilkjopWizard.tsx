@@ -18,6 +18,7 @@ import {
 import FileUpload from "@/components/FileUpload";
 import ReportPaywall from "@/components/bilkjop/ReportPaywall";
 import { createCase, updateCase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/posthog";
 
 import type { Step, WizardState } from "./types";
 import { ISSUE_OPTIONS, COST_OPTIONS } from "./constants";
@@ -84,7 +85,14 @@ export default function BilkjopWizard() {
   }, [searchParams]);
 
   useEffect(() => {
+    trackEvent('wizard_start', { case_type: 'BIL' });
+  }, []);
+
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
+    if (step !== "BASICS") {
+      trackEvent('wizard_step', { case_type: 'BIL', step, step_name: stepTitle(step) });
+    }
   }, [step]);
 
   const update = (partial: Partial<WizardState>) => setState((s) => ({ ...s, ...partial }));
@@ -126,6 +134,7 @@ export default function BilkjopWizard() {
       if (!response.ok) throw new Error("API failed");
       const result = await response.json();
       setState((s) => ({ ...s, outcome: result.outcome }));
+      trackEvent('analysis_complete', { case_type: 'BIL', outcome: result.outcome?.level });
 
       if (supabaseCase) {
         await updateCase(supabaseCase.id, { outcome: result.outcome, status: "completed" });
