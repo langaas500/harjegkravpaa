@@ -203,6 +203,17 @@ export default function UniversalSeoTemplate({ node }: Props) {
           </p>
         </div>
 
+        {/* Body text */}
+        {node.bodyText && (
+          <div className="mb-10 space-y-4">
+            {node.bodyText.split("\n\n").map((paragraph, i) => (
+              <p key={i} className="text-slate-300 leading-relaxed">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        )}
+
         {/* Primary CTA */}
         <section className="relative rounded-3xl overflow-hidden mb-14">
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-500/20 via-emerald-600/10 to-transparent p-[1px]">
