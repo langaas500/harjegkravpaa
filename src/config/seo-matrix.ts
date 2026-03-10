@@ -8,7 +8,7 @@ export interface SeoNode {
 }
 
 export const SEO_NODES: SeoNode[] = [
-  // BILKJØP (40 noder) — URL: /bilkjop/[slug]
+  // BILKJØP (44 noder) — URL: /bilkjop/[slug]
   { slug: "girkasse-havari", title: "Heve bilkjøp pga defekt girkasse", lawRef: "FKL § 32 / KL § 39", cat: "bilkjop", desc: "Girkasse-havari regnes som vesentlig mangel etter forbrukerkjøpsloven dersom feilen forelå ved kjøpet." },
   { slug: "registerreim-brudd", title: "Krav ved registerreim-brudd på bruktbil", lawRef: "FKL § 16", cat: "bilkjop", desc: "Registerreim-brudd innen rimelig tid etter kjøp er et klart tegn på skjult mangel." },
   { slug: "skjult-rust-skade", title: "Heve kjøp pga skjult rust i ramme", lawRef: "KL § 19", cat: "bilkjop", desc: "Skjult rust i bærende konstruksjoner er vesentlig mangel som gir hevingsrett." },
@@ -111,7 +111,25 @@ export const SEO_NODES: SeoNode[] = [
     { q: "Kan jeg holde selger ansvarlig for at EU-kontrollen ikke avdekket feilene?", a: "Ja. Selger garanterer implisitt at bilen er i den stand EU-kontrollen tilsier. Feil som burde vært oppdaget er selgers ansvar overfor deg som kjøper." },
   ]},
 
-  // FLYREISER (20 noder) — URL: /flyreiser/[slug]
+  // BILKJØP (4 nye noder)
+  { slug: "rust-understell-bruktbil", title: "Alvorlig rust i understell på bruktbil", lawRef: "KL § 19", cat: "bilkjop", desc: "Gjennomgående rust i bærende konstruksjoner er vesentlig mangel som gir hevingsrett.", faqs: [
+    { q: "Er rust i understellet en mangel?", a: "Ja, dersom rusten er så omfattende at bilen ikke vil bestå EU-kontroll og dette ikke ble opplyst om." },
+    { q: "Kan jeg heve kjøpet pga. rust?", a: "Ja, dersom rustskadene er gjennomgående på bærende konstruksjoner og bilen er i vesentlig dårligere stand enn forespeilet." },
+  ]},
+  { slug: "feilkode-p0420-katalysator", title: "Feilkode P0420 og defekt katalysator", lawRef: "FKL § 16", cat: "bilkjop", desc: "Defekt katalysator kort tid etter kjøp er reklamasjonsgrunnlag — utbedring kan koste 10-30 000 kr.", faqs: [
+    { q: "Er defekt katalysator en reklamasjonssak?", a: "Ja, en katalysator skal vare vesentlig lenger enn vanlige slitedeler." },
+    { q: "Kan jeg kreve at selger dekker utbedringen?", a: "Ja, dersom feilen forelå ved kjøpet. Dokumenter med verkstedrapport og feilkodeutskrift." },
+  ]},
+  { slug: "bil-solgt-som-reparasjonsobjekt", title: "Rettigheter når bil selges som reparasjonsobjekt", lawRef: "KL § 19", cat: "bilkjop", desc: "Selv reparasjonsobjekter har opplysningsplikt — selger kan ikke skjule kjente feil.", faqs: [
+    { q: "Har jeg reklamasjonsrett på reparasjonsobjekt?", a: "Ja, men begrenset. Selger fritas ikke for opplysningsplikt om kjente skjulte feil selv om bilen selges som reparasjonsobjekt." },
+    { q: "Hva betyr reparasjonsobjekt juridisk?", a: "Det signaliserer store mangler og reduserer forventningene, men fritar ikke selger fra ansvar for feilaktige opplysninger." },
+  ]},
+  { slug: "feil-omregistrering-avgift", title: "Problemer med omregistrering eller avgifter ved bilkjøp", lawRef: "KL § 18", cat: "bilkjop", desc: "Selger som ikke har ordnet omregistrering eller har uoppgjorte heftelser bryter avtalen.", faqs: [
+    { q: "Hva hvis selger ikke har betalt årsavgift eller omregistrering?", a: "Dersom avtalen sa at bilen ble solgt fri for heftelser er dette selgers ansvar å ordne opp i." },
+    { q: "Kan jeg heve kjøpet hvis bilen ikke kan omregistreres?", a: "Ja, dersom manglende papirer eller pant gjør at du ikke får rettmessig eierskap er dette hevingsgrunnlag." },
+  ]},
+
+  // FLYREISER (22 noder) — URL: /flyreiser/[slug]
   { slug: "sas-fly-kansellert", title: "SAS fly kansellert: Slik krever du 600 €", lawRef: "EU 261/2004 art. 7", cat: "flyreiser", desc: "Ved kansellering under 14 dager før avgang har du krav på standardkompensasjon." },
   { slug: "norwegian-forsinkelse", title: "Norwegian forsinkelse over 3 timer — krav på erstatning", lawRef: "EU 261/2004 art. 7", cat: "flyreiser", desc: "Forsinkelse over 3 timer gir samme kompensasjonsrett som kansellering." },
   { slug: "wideroe-mistet-tilslutning", title: "Widerøe: Mistet tilslutningsfly pga forsinkelse", lawRef: "EU 261/2004 art. 7", cat: "flyreiser", desc: "Mistet tilslutning som følge av forsinkelse gir full kompensasjonsrett." },
@@ -165,7 +183,17 @@ export const SEO_NODES: SeoNode[] = [
     { q: "Ruteflyet er eneste transportmulighet til øya min. Har jeg ekstra rettigheter?", a: "Flyselskapet plikter å tilby alternativ transport eller full refusjon. Dersom alternativ transport ikke finnes, kan du kreve dekning av andre reisekostnader." },
   ]},
 
-  // MC-KJØP (15 noder) — URL: /mc-kjop/[slug]
+  // FLYREISER (2 nye noder)
+  { slug: "bagasje-forsinket-ferie", title: "Forsinket bagasje på feriereise", lawRef: "Montreal-konvensjonen art. 19", cat: "flyreiser", desc: "Flyselskapet dekker nødvendige kjøp når bagasjen er forsinket.", faqs: [
+    { q: "Hva kan jeg kjøpe når bagasjen er borte?", a: "Nødvendige klær og toalettartikler på flyselskapets regning. Ta vare på alle kvitteringer." },
+    { q: "Hvor mye kan jeg kreve?", a: "Opptil ca. 17 000 kr dersom bagasjen blir erklært tapt etter 21 dager." },
+  ]},
+  { slug: "nedgradert-business-economy", title: "Nedgradert fra Business til Economy på fly", lawRef: "EU 261/2004 art. 10", cat: "flyreiser", desc: "Nedgradering gir rett på refusjon av 30-75% av billettsummen.", faqs: [
+    { q: "Hva har jeg krav på ved nedgradering?", a: "Refusjon av 30% (under 1500km), 50% (1500-3500km) eller 75% (over 3500km) av billettsummen." },
+    { q: "Når skal pengene utbetales?", a: "Flyselskapet skal refundere innen 7 dager etter at du har fremmet kravet." },
+  ]},
+
+  // MC-KJØP (18 noder) — URL: /mc-kjop/[slug]
   { slug: "mc-rammeskade-skjult", title: "Skjult rammeskade på brukt motorsykkel", lawRef: "KL § 19", cat: "mc-kjop", desc: "Uopplyst rammeskade på MC er vesentlig mangel og gir hevingsrett." },
   { slug: "mc-ulovlig-trimmet", title: "Kjøpt ulovlig trimmet MC uten å vite det?", lawRef: "KL § 18", cat: "mc-kjop", desc: "Ulovlig trimming som ikke ble opplyst om er svik og gir hevingsrett." },
   { slug: "mc-motorbank-ulyd", title: "Ulyd og motorbank på MC: Reklamasjon", lawRef: "KL § 39", cat: "mc-kjop", desc: "Motorbank kort tid etter kjøp presumeres å være skjult mangel." },
@@ -211,7 +239,21 @@ export const SEO_NODES: SeoNode[] = [
     { q: "Er ettermarkedsdeler alltid en mangel?", a: "Ikke alltid, men dersom de er av dårligere kvalitet enn originalt eller påvirker garantier, og dette ikke ble opplyst, er det en mangel." },
   ]},
 
-  // HÅNDVERKERE (15 noder) — URL: /handverkere/[slug]
+  // MC-KJØP (3 nye noder)
+  { slug: "mc-girboks-problem", title: "Problemer med girboks eller clutch på MC", lawRef: "KL § 39", cat: "mc-kjop", desc: "Girboks som hopper ut av gir er sikkerhetskritisk mangel og klar reklamasjonssak.", faqs: [
+    { q: "Giret hopper ut av leie under kjøring. Er det en mangel?", a: "Ja, dette er sikkerhetskritisk og presumeres å ha eksistert ved kjøpet dersom det skjer kort tid etter overtakelse." },
+    { q: "Er clutch en slitedel selger ikke er ansvarlig for?", a: "Clutch er slitedel, men skal vare mer enn noen få tusen kilometer. Tidlig havari er en mangel." },
+  ]},
+  { slug: "mc-registerreim-brudd", title: "Brudd i registerreim på motorsykkel", lawRef: "KL § 39", cat: "mc-kjop", desc: "Registerreim som ryker før oppgitt skifteintervall kan indikere skjult mangel ved kjøpet.", faqs: [
+    { q: "Er registerreim selgers ansvar?", a: "Hvis den ryker lenge før oppgitt skifteintervall kan det regnes som mangel — særlig hvis selger opplyste om nylig service." },
+    { q: "Hva skjer ved motorhavari pga. registerreim?", a: "Motorhavari er ekstremt kostbart. Krev verkstedrapport som dokumenterer årsaken og send reklamasjon umiddelbart." },
+  ]},
+  { slug: "mc-skjult-velteskade", title: "Skjulte skader etter velt på motorsykkel", lawRef: "KL § 18", cat: "mc-kjop", desc: "Skjult velteskade selger ikke opplyste om er brudd på opplysningsplikten.", faqs: [
+    { q: "Hva hvis sykkelen har skjev ramme etter velt?", a: "Skjev ramme er vesentlig mangel dersom selger oppga at sykkelen aldri hadde vært i velt." },
+    { q: "Kan jeg heve kjøpet ved skjult velteskade?", a: "Ja, sikkerhetskritiske feil som er forsøkt skjult gir sterkt grunnlag for heving etter kjøpsloven § 18." },
+  ]},
+
+  // HÅNDVERKERE (17 noder) — URL: /handverkere/[slug]
   { slug: "bad-lekkasje-oppussing", title: "Vannlekkasje etter renovering av bad", lawRef: "HTL § 5", cat: "handverkere", desc: "Lekkasje etter baderomsrenovering er mangel etter håndverkertjenesteloven." },
   { slug: "forsinket-handverker-dagmulkt", title: "Håndverker er forsinket: Krav på dagmulkt", lawRef: "HTL § 11", cat: "handverkere", desc: "Ved forsinkelse utover avtalt tid kan du kreve dagmulkt uten å bevise tap." },
   { slug: "samsvarserklaring-mangler", title: "Mangler samsvarserklæring på el-arbeid", lawRef: "HTL § 5", cat: "handverkere", desc: "Manglende samsvarserklæring er mangel som gir rett til utbedring uten kostnad." },
@@ -258,6 +300,16 @@ export const SEO_NODES: SeoNode[] = [
   { slug: "takstein-feil-montering", title: "Feil monterte takstein: Lekkasje og skader", lawRef: "HTL § 5", cat: "handverkere", desc: "Tak som lekker etter ny taklegging er klar mangel med lang reklamasjonsfrist.", faqs: [
     { q: "Taket lekker etter ny takstein ble lagt. Er det håndverkerens ansvar?", a: "Ja, et nytt tak skal ikke lekke. Lekkasje etter ny legging er klar mangel, uavhengig av vær- og vindforhold innenfor normale norske forhold." },
     { q: "Håndverkeren sier lekkasjen skyldes ekstremt uvær. Hva gjør jeg?", a: "Be om værvarslings-dokumentasjon for perioden. Normalt norsk høstvær er ikke ekstraordinært. Taket skal tåle det." },
+  ]},
+
+  // HÅNDVERKERE (2 nye noder)
+  { slug: "maling-flasser-fasade", title: "Maling flasser på husveggen etter kort tid", lawRef: "HTL § 5", cat: "handverkere", desc: "Flassende fasademaling etter kort tid er ikke fagmessig utført og gir reklamasjonsrett.", faqs: [
+    { q: "Hvorfor flasser malingen etter ett år?", a: "Ofte pga. dårlig grunnarbeid, feil produkt eller maling på fuktig underlag — alt er håndverkers ansvar." },
+    { q: "Må maleren male på nytt for sin regning?", a: "Ja, dersom flassingen skyldes utførelsen skal firmaet rette feilen uten ekstra kostnad for deg." },
+  ]},
+  { slug: "drenering-kjeller-fukt", title: "Fukt i kjeller etter nylagt drenering", lawRef: "HTL § 5", cat: "handverkere", desc: "Fortsatt fukt etter ny drenering er sterk indikasjon på mangelfullt arbeid.", faqs: [
+    { q: "Hjelper ikke den nye dreneringen?", a: "Hvis det fortsatt kommer inn vann er arbeidet sannsynligvis ikke utført faglig korrekt — reklamér skriftlig." },
+    { q: "Hva er reklamasjonsfristen?", a: "5 års reklamasjonsrett på arbeid utført på fast eiendom etter håndverkertjenesteloven." },
   ]},
 ];
 
