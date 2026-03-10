@@ -333,6 +333,19 @@ export default function UniversalSeoTemplate({ node }: Props) {
           </section>
         )}
 
+        {/* Slik fungerer det — kontekstuell lenke */}
+        <section className="mb-14">
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+            <p className="text-slate-300 text-sm">
+              Usikker på hvordan tjenesten fungerer?{" "}
+              <Link href="/slik-fungerer-det" className="text-emerald-400 hover:text-emerald-300 underline underline-offset-4 decoration-emerald-400/30 transition">
+                Les hvordan HarJegKravPå analyserer din sak
+              </Link>{" "}
+              — gratis indikasjon, deretter rapport og kravbrev for 99 kr. Ingen konto, tilgang via e-post i 3 måneder.
+            </p>
+          </div>
+        </section>
+
         {/* Final CTA */}
         <section data-final-cta="true" className="relative rounded-3xl overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 to-emerald-500/5" />
