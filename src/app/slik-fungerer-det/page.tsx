@@ -61,8 +61,8 @@ const howToJsonLd = {
     {
       "@type": "HowToStep",
       position: 4,
-      name: "Ingen registrering, ingen abonnement",
-      text: "Betal kun for det du bruker. Ingen konto, ingen abonnement, ingen skjulte kostnader.",
+      name: "Ingen konto — tilgang via e-post",
+      text: "Du trenger ikke opprette konto. Etter betaling sender vi deg en personlig lenke på e-post. Rapporten og kravbrevet er tilgjengelig via denne lenken i 3 måneder.",
     },
   ],
 };
@@ -118,13 +118,13 @@ const steps = [
   {
     icon: CreditCard,
     number: "4",
-    title: "Ingen registrering, ingen abonnement",
+    title: "Ingen konto — tilgang via e-post",
     description:
-      "Betal kun for det du bruker. Ingen konto, ingen abonnement, ingen skjulte kostnader. Én betaling — 99 kr — og du har alt du trenger.",
+      "Du trenger ikke opprette konto. Etter betaling sender vi deg en personlig lenke på e-post. Rapporten og kravbrevet er tilgjengelig via denne lenken i 3 måneder.",
     details: [
       "Ingen brukerkonto eller innlogging",
-      "Engangsbetaling via Stripe — trygt og enkelt",
-      "Advokat koster typisk 2 500 kr/t for samme vurdering",
+      "Personlig lenke sendes til din e-post etter betaling",
+      "Tilgjengelig i 3 måneder — last ned når du vil",
     ],
   },
 ];
