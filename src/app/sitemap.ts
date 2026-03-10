@@ -94,6 +94,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/personvern`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
     { url: `${BASE_URL}/kontakt`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
     { url: `${BASE_URL}/bruksvilkar`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/slik-fungerer-det`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
   ];
 
   // Programmatic SEO pages from seo-matrix
